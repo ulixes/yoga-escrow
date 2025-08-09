@@ -151,16 +151,4 @@ export const FilterRunners: Story = {
   },
 }
 
-export const SearchFlexibility: Story = {
-  render: (args) => (
-    <Layout>
-      <YogaTypePicker {...args} />
-    </Layout>
-  ),
-  args: {
-    items,
-    personas,
-    query: 'flexibility',
-    skin: 'ulyxes',
-  },
-}
+// Lean version: removed search story for simplicity

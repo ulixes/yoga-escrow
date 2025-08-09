@@ -42,10 +42,8 @@ const GlobalStyles: React.FC = () => (
 .yui-yoga-picker__persona-btn { font: inherit; padding: 6px 10px; border: 1px solid currentColor; background: transparent; border-radius: 999px; }
 .yui-yoga-picker__persona-btn[data-active='true'] { background: currentColor; color: #fff; }
 .yui-yoga-picker__search-input { font: inherit; padding: 8px 10px; }
-.yui-yoga-picker__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
-.yui-yoga-picker__card { display: grid; gap: 8px; border: 1px solid currentColor; border-radius: 12px; padding: 12px; }
-.yui-yoga-picker__card-header { display: grid; grid-template-columns: 40px 1fr; gap: 8px; align-items: center; }
-.yui-yoga-picker__icon { width: 28px; height: 28px; border: 2px solid currentColor; border-radius: 50%; display: inline-block; }
+.yui-yoga-picker__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.yui-yoga-picker__card { display: grid; gap: 8px; border: 1px solid currentColor; border-radius: 10px; padding: 10px; }
 .yui-yoga-picker__benefits { display: grid; gap: 8px; }
 .yui-yoga-picker__benefits-group { display: grid; gap: 4px; }
 .yui-yoga-picker__benefits-list { margin: 0; padding-left: 18px; }
