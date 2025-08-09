@@ -40,52 +40,98 @@ const mockVerifyAlwaysFail = async () => {
   throw new Error('Invalid code')
 }
 
+const Layout: React.FC<React.PropsWithChildren> = ({ children }) => (
+  <div style={{ display: 'grid', gap: 12 }}>
+    <Brand
+      logo={<div style={{ width: 28, height: 28, borderRadius: '50%', border: '2px solid currentColor' }} />}
+      slogan="Ulyxes. Yoga everywhere.. anytime.."
+      skin="ulyxes"
+    />
+    {children}
+  </div>
+)
+
 export const EnterEmail: Story = {
+  render: (args) => (
+    <Layout>
+      <PasswordlessSignup {...args} />
+    </Layout>
+  ),
   args: {
     step: 'enterEmail',
     translations: { enterEmailTitle: 'Sign up or log in' },
     onRequestCode: mockRequestCode,
     onVerifyCode: mockVerifyCode,
+    skin: 'ulyxes',
   },
 }
 
 export const SendingCode: Story = {
+  render: (args) => (
+    <Layout>
+      <PasswordlessSignup {...args} />
+    </Layout>
+  ),
   args: {
     step: 'sendingCode',
     initialEmail: 'yogi@example.com',
     onRequestCode: mockRequestCode,
     onVerifyCode: mockVerifyCode,
+    skin: 'ulyxes',
   },
 }
 
 export const EnterCode: Story = {
+  render: (args) => (
+    <Layout>
+      <PasswordlessSignup {...args} />
+    </Layout>
+  ),
   args: {
     step: 'enterCode',
     initialEmail: 'yogi@example.com',
     onRequestCode: mockRequestCode,
     onVerifyCode: mockVerifyCode,
+    skin: 'ulyxes',
   },
 }
 
 export const Verifying: Story = {
+  render: (args) => (
+    <Layout>
+      <PasswordlessSignup {...args} />
+    </Layout>
+  ),
   args: {
     step: 'verifyingCode',
     initialEmail: 'yogi@example.com',
     onRequestCode: mockRequestCode,
     onVerifyCode: mockVerifyCode,
+    skin: 'ulyxes',
   },
 }
 
 export const Success: Story = {
+  render: (args) => (
+    <Layout>
+      <PasswordlessSignup {...args} />
+    </Layout>
+  ),
   args: {
     step: 'success',
     initialEmail: 'yogi@example.com',
     onRequestCode: mockRequestCode,
     onVerifyCode: mockVerifyCode,
+    skin: 'ulyxes',
   },
 }
 
 export const ErrorState: Story = {
+  render: (args) => (
+    <Layout>
+      <PasswordlessSignup {...args} />
+    </Layout>
+  ),
   args: {
     step: 'error',
     initialEmail: 'yogi@example.com',
@@ -95,6 +141,7 @@ export const ErrorState: Story = {
       await mockDelay(400)
       throw new Error('Server unreachable')
     },
+    skin: 'ulyxes',
   },
 }
 

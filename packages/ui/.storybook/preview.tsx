@@ -31,7 +31,7 @@ const GlobalStyles: React.FC = () => (
 
 /* Brand baseline */
 .yui-brand { display: inline-block; }
-.yui-brand__row { display: inline-flex; align-items: center; gap: 8px; }
+.yui-brand__row { display: grid; gap: 6px; justify-items: start; }
 .yui-brand__logo { display: inline-grid; place-items: center; }
 .yui-brand__slogan { margin: 0; font: inherit; opacity: 0.9; }
 
