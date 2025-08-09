@@ -29,6 +29,12 @@ const GlobalStyles: React.FC = () => (
 /* Button baseline, still unstyled */
 .yui-btn { font: inherit; cursor: pointer; }
 
+/* Brand baseline */
+.yui-brand { display: inline-block; }
+.yui-brand__row { display: inline-flex; align-items: center; gap: 8px; }
+.yui-brand__logo { display: inline-grid; place-items: center; }
+.yui-brand__slogan { margin: 0; font: inherit; opacity: 0.9; }
+
 /* Ulyxes minimal black & white skin */
 [data-skin='ulyxes'] .yui-pwls {
   border: 1px solid #111;

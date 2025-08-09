@@ -7,3 +7,6 @@ export type {
   PasswordlessSignupStep,
 } from './lib/PasswordlessSignup'
 
+export { Brand } from './lib/Brand'
+export type { BrandProps } from './lib/Brand'
+
