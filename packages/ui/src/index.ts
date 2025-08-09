@@ -10,3 +10,6 @@ export type {
 export { Brand } from './lib/Brand'
 export type { BrandProps } from './lib/Brand'
 
+export { YogaTypePicker } from './lib/YogaTypePicker'
+export type { YogaTypePickerProps, YogaTypeItem } from './lib/YogaTypePicker'
+

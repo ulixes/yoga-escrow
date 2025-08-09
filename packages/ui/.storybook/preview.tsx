@@ -35,6 +35,24 @@ const GlobalStyles: React.FC = () => (
 .yui-brand__logo { display: inline-grid; place-items: center; }
 .yui-brand__slogan { margin: 0; font: inherit; opacity: 0.9; }
 
+/* YogaTypePicker baseline */
+.yui-yoga-picker { display: grid; gap: 12px; }
+.yui-yoga-picker__controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.yui-yoga-picker__personas { display: flex; gap: 6px; }
+.yui-yoga-picker__persona-btn { font: inherit; padding: 6px 10px; border: 1px solid currentColor; background: transparent; border-radius: 999px; }
+.yui-yoga-picker__persona-btn[data-active='true'] { background: currentColor; color: #fff; }
+.yui-yoga-picker__search-input { font: inherit; padding: 8px 10px; }
+.yui-yoga-picker__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.yui-yoga-picker__card { display: grid; gap: 8px; border: 1px solid currentColor; border-radius: 12px; padding: 12px; }
+.yui-yoga-picker__card-header { display: grid; grid-template-columns: 40px 1fr; gap: 8px; align-items: center; }
+.yui-yoga-picker__icon { width: 28px; height: 28px; border: 2px solid currentColor; border-radius: 50%; display: inline-block; }
+.yui-yoga-picker__benefits { display: grid; gap: 8px; }
+.yui-yoga-picker__benefits-group { display: grid; gap: 4px; }
+.yui-yoga-picker__benefits-list { margin: 0; padding-left: 18px; }
+.yui-yoga-picker__persona-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.yui-yoga-picker__tag { border: 1px solid currentColor; border-radius: 999px; padding: 2px 8px; font-size: 12px; }
+.yui-yoga-picker__select { padding: 8px 12px; }
+
 /* Ulyxes minimal black & white skin */
 [data-skin='ulyxes'] { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
 [data-skin='ulyxes'] .yui-pwls {
