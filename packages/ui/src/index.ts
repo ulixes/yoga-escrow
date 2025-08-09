@@ -13,3 +13,6 @@ export type { BrandProps } from './lib/Brand'
 export { YogaTypePicker } from './lib/YogaTypePicker'
 export type { YogaTypePickerProps, YogaTypeItem } from './lib/YogaTypePicker'
 
+export { TeacherPicker } from './lib/TeacherPicker'
+export type { TeacherPickerProps, TeacherItem } from './lib/TeacherPicker'
+

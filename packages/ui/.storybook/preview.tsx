@@ -54,6 +54,24 @@ const GlobalStyles: React.FC = () => (
 .yui-yoga-picker__tag { border: 1px solid currentColor; border-radius: 999px; padding: 2px 8px; font-size: 12px; }
 .yui-yoga-picker__select { padding: 8px 12px; }
 
+/* TeacherPicker baseline */
+.yui-teacher-picker { display: grid; gap: 16px; }
+.yui-teacher-picker__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.yui-teacher-picker__card { display: grid; gap: 10px; border: 1px solid currentColor; border-radius: 14px; padding: 12px; }
+.yui-teacher-picker__header { display: grid; grid-template-columns: 56px 1fr; gap: 10px; align-items: center; }
+.yui-teacher-picker__avatar { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; display: block; }
+.yui-teacher-picker__title { display: grid; gap: 4px; }
+.yui-teacher-picker__name { margin: 0; font-weight: 600; }
+.yui-teacher-picker__bio { margin: 0; opacity: 0.75; }
+.yui-teacher-picker__tags { display: grid; gap: 6px; }
+.yui-teacher-picker__personas, .yui-teacher-picker__yoga-types { display: flex; flex-wrap: wrap; gap: 6px; }
+.yui-teacher-picker__tag { border: 1px solid currentColor; border-radius: 999px; padding: 2px 8px; font-size: 12px; }
+.yui-teacher-picker__meta { display: flex; gap: 10px; font-size: 12px; opacity: 0.8; }
+.yui-teacher-picker__posts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.yui-teacher-picker__post { aspect-ratio: 1/1; width: 100%; object-fit: cover; border-radius: 8px; }
+.yui-teacher-picker__actions { display: none; }
+.yui-teacher-picker__card:hover .yui-teacher-picker__actions { display: block; }
+
 /* Ulyxes minimal black & white skin */
 [data-skin='ulyxes'] { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
 [data-skin='ulyxes'] .yui-pwls {
