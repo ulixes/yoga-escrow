@@ -36,57 +36,60 @@ const GlobalStyles: React.FC = () => (
 .yui-brand__slogan { margin: 0; font: inherit; opacity: 0.9; }
 
 /* Ulyxes minimal black & white skin */
+[data-skin='ulyxes'] { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
 [data-skin='ulyxes'] .yui-pwls {
   border: 1px solid #111;
-  border-radius: 10px;
-  padding: 14px;
+  border-radius: 12px;
+  padding: 16px;
   background: #fff;
   color: #111;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
 }
 [data-skin='ulyxes'] .yui-pwls__title {
   font-weight: 600;
-  letter-spacing: 0.2px;
+  font-size: 18px;
+  letter-spacing: 0.15px;
 }
-[data-skin='ulyxes'] .yui-pwls__description {
-  opacity: 0.75;
-}
+[data-skin='ulyxes'] .yui-pwls__description { opacity: 0.7; }
 [data-skin='ulyxes'] .yui-pwls__input {
   border: 1px solid #111;
-  border-radius: 8px;
-  padding: 8px 10px;
+  border-radius: 10px;
+  padding: 10px 12px;
   background: #fff;
   color: #111;
+  transition: box-shadow 150ms ease, transform 120ms ease;
 }
 [data-skin='ulyxes'] .yui-pwls__input:focus {
   outline: none;
-  box-shadow: inset 0 0 0 1px #000;
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.12) inset;
 }
-[data-skin='ulyxes'] .yui-pwls__code-boxes { gap: 6px; }
+[data-skin='ulyxes'] .yui-pwls__code-boxes { gap: 8px; }
 [data-skin='ulyxes'] .yui-pwls__code-box {
   border: 1px solid #111;
-  border-radius: 8px;
+  border-radius: 10px;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  transition: background-color 150ms ease, color 150ms ease, transform 120ms ease;
 }
-[data-skin='ulyxes'] .yui-pwls__code-box[data-filled='true'] {
-  background: #111;
-  color: #fff;
-}
-[data-skin='ulyxes'] .yui-pwls__actions { gap: 6px; }
+[data-skin='ulyxes'] .yui-pwls__code-box[data-filled='true'] { background: #111; color: #fff; }
+[data-skin='ulyxes'] .yui-pwls__code-box[data-filled='true'] .yui-pwls__code-digit { transform: translateY(-1px); }
+[data-skin='ulyxes'] .yui-pwls__code-digit { transition: transform 120ms ease; }
+[data-skin='ulyxes'] .yui-pwls__actions { gap: 8px; }
 [data-skin='ulyxes'] .yui-btn {
-  border-radius: 8px;
-  padding: 8px 12px;
+  border-radius: 10px;
+  padding: 10px 14px;
   border: 1px solid #111;
   background: #fff;
   color: #111;
+  transition: background-color 160ms ease, color 160ms ease, transform 120ms ease, box-shadow 160ms ease;
 }
-[data-skin='ulyxes'] .yui-btn--primary {
-  background: #111;
-  color: #fff;
-}
-[data-skin='ulyxes'] .yui-btn--secondary {
-  background: #fff;
-  color: #111;
-}
+[data-skin='ulyxes'] .yui-btn--primary { background: #111; color: #fff; }
+[data-skin='ulyxes'] .yui-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+[data-skin='ulyxes'] .yui-btn:active:not(:disabled) { transform: translateY(0); box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+[data-skin='ulyxes'] .yui-btn:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+
+/* Brand – monochrome elegance */
+[data-skin='ulyxes'] .yui-brand__slogan { letter-spacing: 0.2px; }
+[data-skin='ulyxes'] .yui-brand__glyph { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #111; display: inline-block; }
     `}
   </style>
 )
