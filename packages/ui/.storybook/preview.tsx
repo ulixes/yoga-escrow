@@ -54,12 +54,13 @@ const GlobalStyles: React.FC = () => (
 /* Ulyxes minimal black & white skin */
 [data-skin='ulyxes'] { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
 [data-skin='ulyxes'] .yui-pwls {
-  border: 1px solid #111;
-  border-radius: 12px;
-  padding: 16px;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 16px;
+  padding: 20px;
   background: #fff;
   color: #111;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+  gap: 16px;
 }
 [data-skin='ulyxes'] .yui-pwls__title {
   font-weight: 600;
@@ -68,16 +69,17 @@ const GlobalStyles: React.FC = () => (
 }
 [data-skin='ulyxes'] .yui-pwls__description { opacity: 0.7; }
 [data-skin='ulyxes'] .yui-pwls__input {
-  border: 1px solid #111;
-  border-radius: 10px;
-  padding: 10px 12px;
-  background: #fff;
+  border: none;
+  border-bottom: 1px solid rgba(0,0,0,0.25);
+  border-radius: 0;
+  padding: 8px 0;
+  background: transparent;
   color: #111;
-  transition: box-shadow 150ms ease, transform 120ms ease;
+  transition: border-color 150ms ease;
 }
 [data-skin='ulyxes'] .yui-pwls__input:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(0,0,0,0.12) inset;
+  border-bottom-color: #111;
 }
 [data-skin='ulyxes'] .yui-pwls__code-boxes { gap: 8px; }
 [data-skin='ulyxes'] .yui-pwls__code-box {
@@ -91,21 +93,44 @@ const GlobalStyles: React.FC = () => (
 [data-skin='ulyxes'] .yui-pwls__code-digit { transition: transform 120ms ease; }
 [data-skin='ulyxes'] .yui-pwls__actions { gap: 8px; }
 [data-skin='ulyxes'] .yui-btn {
-  border-radius: 10px;
-  padding: 10px 14px;
-  border: 1px solid #111;
-  background: #fff;
+  border: none;
+  background: transparent;
   color: #111;
-  transition: background-color 160ms ease, color 160ms ease, transform 120ms ease, box-shadow 160ms ease;
+  padding: 0;
+  border-radius: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
-[data-skin='ulyxes'] .yui-btn--primary { background: #111; color: #fff; }
-[data-skin='ulyxes'] .yui-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
-[data-skin='ulyxes'] .yui-btn:active:not(:disabled) { transform: translateY(0); box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
-[data-skin='ulyxes'] .yui-btn:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+[data-skin='ulyxes'] .yui-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* Brand – monochrome elegance */
 [data-skin='ulyxes'] .yui-brand__slogan { letter-spacing: 0.2px; }
-[data-skin='ulyxes'] .yui-brand__glyph { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #111; display: inline-block; }
+[data-skin='ulyxes'] .yui-brand__glyph { width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.6); display: inline-block; }
+
+/* Ulyxes – YogaTypePicker airy, minimal */
+[data-skin='ulyxes'] .yui-yoga-picker { gap: 18px; }
+[data-skin='ulyxes'] .yui-yoga-picker__personas { gap: 10px; }
+[data-skin='ulyxes'] .yui-yoga-picker__persona-btn {
+  border: none;
+  background: transparent;
+  padding: 2px 0;
+  border-radius: 0;
+  text-decoration: none;
+}
+[data-skin='ulyxes'] .yui-yoga-picker__persona-btn[data-active='true'] { text-decoration: underline; text-underline-offset: 4px; }
+[data-skin='ulyxes'] .yui-yoga-picker__grid { gap: 16px; }
+[data-skin='ulyxes'] .yui-yoga-picker__card {
+  border: none;
+  padding: 14px 16px;
+  border-radius: 14px;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.08);
+}
+[data-skin='ulyxes'] .yui-yoga-picker__card-title { font-weight: 600; letter-spacing: 0.2px; margin: 0; }
+[data-skin='ulyxes'] .yui-yoga-picker__card-tagline { margin: 0; opacity: 0.65; }
+[data-skin='ulyxes'] .yui-yoga-picker__benefits-list { margin: 8px 0 0; padding-left: 18px; opacity: 0.9; }
+[data-skin='ulyxes'] .yui-yoga-picker__persona-tags { gap: 8px; }
+[data-skin='ulyxes'] .yui-yoga-picker__tag { border: none; padding: 0; text-decoration: underline; text-underline-offset: 3px; font-size: 13px; }
+[data-skin='ulyxes'] .yui-yoga-picker__select { text-decoration: underline; text-underline-offset: 3px; align-self: start; }
     `}
   </style>
 )
