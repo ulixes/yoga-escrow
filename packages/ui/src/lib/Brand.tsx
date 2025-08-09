@@ -7,6 +7,7 @@ export type BrandProps = {
   subtitle?: string
   orientation?: 'vertical' | 'horizontal'
   size?: 'sm' | 'md' | 'lg'
+  logoVariant?: 'none' | 'openCircle' | 'lotus' | 'wave'
   className?: string
   containerProps?: React.HTMLAttributes<HTMLDivElement>
   logoProps?: React.HTMLAttributes<HTMLDivElement>
@@ -23,6 +24,7 @@ export const Brand: React.FC<BrandProps> = ({
   subtitle,
   orientation = 'vertical',
   size = 'md',
+  logoVariant = 'openCircle',
   className,
   containerProps,
   logoProps,
@@ -41,11 +43,44 @@ export const Brand: React.FC<BrandProps> = ({
     .join(' ')
   const skinAttr = skin ? { 'data-skin': skin } : {}
 
+  const renderLogoByVariant = () => {
+    if (logo) return logo
+    if (logoVariant === 'none') return <span className="yui-brand__glyph" aria-hidden />
+    const stroke = 'currentColor'
+    const strokeWidth = 2
+    const common = { fill: 'none', stroke, strokeWidth, vectorEffect: 'non-scaling-stroke' as const }
+    switch (logoVariant) {
+      case 'openCircle':
+        return (
+          <svg className="yui-brand__glyph yui-brand__logo-svg" width="32" height="32" viewBox="0 0 32 32" aria-hidden>
+            <circle cx="16" cy="16" r="12" strokeLinecap="round" strokeDasharray="56 20" {...common} />
+          </svg>
+        )
+      case 'lotus':
+        return (
+          <svg className="yui-brand__glyph yui-brand__logo-svg" width="32" height="32" viewBox="0 0 32 32" aria-hidden>
+            <path d="M16 22c4-2 6-5 6-8" {...common} />
+            <path d="M16 22c-4-2-6-5-6-8" {...common} />
+            <path d="M16 22c0-3 1-6 3-8" {...common} />
+            <path d="M16 22c0-3-1-6-3-8" {...common} />
+          </svg>
+        )
+      case 'wave':
+        return (
+          <svg className="yui-brand__glyph yui-brand__logo-svg" width="36" height="24" viewBox="0 0 36 24" aria-hidden>
+            <path d="M2 12c6-8 10 8 16 0s10-8 16 0" {...common} />
+            <circle cx="26" cy="6" r="1.2" fill={stroke} />
+            <path d="M26 7v4" {...common} />
+          </svg>
+        )
+    }
+  }
+
   return (
     <div className={classes} {...skinAttr} {...containerProps}>
       <div className="yui-brand__row">
         <div className="yui-brand__logo" {...logoProps}>
-          {logo ?? <span className="yui-brand__glyph" aria-hidden />}
+          {renderLogoByVariant()}
         </div>
         <div className="yui-brand__text">
           {title ? (

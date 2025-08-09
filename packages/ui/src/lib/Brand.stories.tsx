@@ -46,7 +46,7 @@ export const WithLogo: Story = {
     subtitle: 'Move with breath. Find your space.',
     orientation: 'vertical',
     size: 'md',
-    logo: <PlaceholderLogo />,
+    logoVariant: 'openCircle',
   },
 }
 
@@ -57,7 +57,7 @@ export const UlyxesSkin: Story = {
     subtitle: 'Move with breath. Find your space.',
     orientation: 'vertical',
     size: 'md',
-    logo: <PlaceholderLogo />,
+    logoVariant: 'openCircle',
     skin: 'ulyxes',
   },
 }
@@ -70,7 +70,20 @@ export const Hero: Story = {
     subtitle: 'Move with breath. Find your space.',
     orientation: 'vertical',
     size: 'lg',
-    logo: <PlaceholderLogo />,
+    logoVariant: 'wave',
+    skin: 'ulyxes',
+  },
+}
+
+export const LotusMark: Story = {
+  name: 'Lotus Variant',
+  args: {
+    title: 'Ulyxes',
+    slogan: 'Yoga everywhere.. anytime..',
+    subtitle: 'Move with breath. Find your space.',
+    orientation: 'vertical',
+    size: 'md',
+    logoVariant: 'lotus',
     skin: 'ulyxes',
   },
 }
