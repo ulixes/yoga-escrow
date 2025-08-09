@@ -3,6 +3,18 @@ pragma solidity ^0.8.26;
 
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
+/**
+ * @title YogaClassEscrow
+ * @author Yoga Escrow Development Team
+ * @notice Escrow contract for secure yoga class bookings with ETH payments
+ * @dev Implements a complete booking lifecycle with dispute resolution and automatic payment release
+ * 
+ * Key features:
+ * - Students create bookings with exactly 3 time slots, 3 yoga types, and 3 teacher handles
+ * - Teachers confirm bookings by selecting one slot and yoga type
+ * - Payments are held in escrow until class completion or automatic release
+ * - Built-in dispute resolution for conflict handling
+ */
 contract YogaClassEscrow is ReentrancyGuard {
     enum BookingStatus {
         Pending, // Student created booking, awaiting teacher acceptance
@@ -84,6 +96,16 @@ contract YogaClassEscrow is ReentrancyGuard {
         _;
     }
 
+    /**
+     * @notice Creates a new yoga class booking with ETH payment
+     * @dev Requires exactly 3 options for each parameter array
+     * @param teacherHandles Array of 3 acceptable teacher social handles (lowercase)
+     * @param availableSlots Array of 3 possible time slots for the class
+     * @param yogaTypes Array of 3 yoga type preferences
+     * @param acceptanceDeadline Seconds the teacher has to accept the booking
+     * @param completionWindow Seconds after class end to mark as completed
+     * @return bookingId Unique identifier for the created booking
+     */
     function createBooking(
         string[] calldata teacherHandles,
         TimeSlot[] calldata availableSlots,
@@ -119,6 +141,14 @@ contract YogaClassEscrow is ReentrancyGuard {
         emit BookingCreated(bookingId, msg.sender, msg.value, acceptanceDeadline, completionWindow);
     }
 
+    /**
+     * @notice Teacher confirms a booking by selecting slot and yoga type
+     * @dev Only callable within acceptance deadline for pending bookings
+     * @param bookingId The ID of the booking to confirm
+     * @param slotIndex Index of selected time slot (0, 1, or 2)
+     * @param yogaTypeIndex Index of selected yoga type (0, 1, or 2)
+     * @param teacherHandle Teacher's handle matching one from the booking
+     */
     function confirmBooking(uint256 bookingId, uint8 slotIndex, uint8 yogaTypeIndex, string calldata teacherHandle)
         external
         nonReentrant
@@ -150,6 +180,11 @@ contract YogaClassEscrow is ReentrancyGuard {
         emit BookingConfirmed(bookingId, msg.sender, slotIndex, yogaTypeIndex, teacherHandle);
     }
 
+    /**
+     * @notice Student marks class as completed and releases payment to teacher
+     * @dev Only callable by student for confirmed bookings
+     * @param bookingId The ID of the booking to complete
+     */
     function completeClass(uint256 bookingId)
         external
         nonReentrant
@@ -169,6 +204,11 @@ contract YogaClassEscrow is ReentrancyGuard {
         emit BookingCompleted(bookingId, teacherAddress, payment);
     }
 
+    /**
+     * @notice Student cancels a pending booking and receives full refund
+     * @dev Only works for bookings in Pending status
+     * @param bookingId The ID of the booking to cancel
+     */
     function cancelBooking(uint256 bookingId)
         external
         nonReentrant
@@ -189,6 +229,11 @@ contract YogaClassEscrow is ReentrancyGuard {
         emit BookingCancelled(bookingId);
     }
 
+    /**
+     * @notice Automatically releases payment after completion window expires
+     * @dev Callable by anyone after class end time + completion window
+     * @param bookingId The ID of the booking to auto-release
+     */
     function automaticPaymentRelease(uint256 bookingId)
         external
         nonReentrant
@@ -216,6 +261,11 @@ contract YogaClassEscrow is ReentrancyGuard {
         emit BookingCompleted(bookingId, teacherAddress, payment);
     }
 
+    /**
+     * @notice Either party can raise a dispute for a confirmed booking
+     * @dev Freezes the booking for external resolution
+     * @param bookingId The ID of the booking to dispute
+     */
     function raiseDispute(uint256 bookingId) external onlyBookingStatus(bookingId, BookingStatus.Confirmed) {
         ClassBooking storage booking = bookings[bookingId];
         require(
