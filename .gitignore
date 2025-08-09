@@ -15,7 +15,13 @@ docs/
 .env*
 
 
-lib/
+# Global lib vendor folder (Foundry, etc.)
+# contracts libs (allow UI src)
+packages/contracts/lib/
+
+# Exceptions: keep UI source under packages/ui/src/lib
+!packages/ui/src/lib/
+!packages/ui/src/lib/**
 node_modules/
 .DS_Store
 

@@ -28,6 +28,59 @@ const GlobalStyles: React.FC = () => (
 
 /* Button baseline, still unstyled */
 .yui-btn { font: inherit; cursor: pointer; }
+
+/* Ulyxes minimal black & white skin */
+[data-skin='ulyxes'] .yui-pwls {
+  border: 1px solid #111;
+  border-radius: 10px;
+  padding: 14px;
+  background: #fff;
+  color: #111;
+}
+[data-skin='ulyxes'] .yui-pwls__title {
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+[data-skin='ulyxes'] .yui-pwls__description {
+  opacity: 0.75;
+}
+[data-skin='ulyxes'] .yui-pwls__input {
+  border: 1px solid #111;
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: #fff;
+  color: #111;
+}
+[data-skin='ulyxes'] .yui-pwls__input:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 1px #000;
+}
+[data-skin='ulyxes'] .yui-pwls__code-boxes { gap: 6px; }
+[data-skin='ulyxes'] .yui-pwls__code-box {
+  border: 1px solid #111;
+  border-radius: 8px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+[data-skin='ulyxes'] .yui-pwls__code-box[data-filled='true'] {
+  background: #111;
+  color: #fff;
+}
+[data-skin='ulyxes'] .yui-pwls__actions { gap: 6px; }
+[data-skin='ulyxes'] .yui-btn {
+  border-radius: 8px;
+  padding: 8px 12px;
+  border: 1px solid #111;
+  background: #fff;
+  color: #111;
+}
+[data-skin='ulyxes'] .yui-btn--primary {
+  background: #111;
+  color: #fff;
+}
+[data-skin='ulyxes'] .yui-btn--secondary {
+  background: #fff;
+  color: #111;
+}
     `}
   </style>
 )
