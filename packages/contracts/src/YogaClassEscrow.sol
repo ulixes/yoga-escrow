@@ -6,12 +6,12 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 /**
  * @title YogaClassEscrow
  * @author Yoga Escrow Development Team
- * @notice Escrow contract for secure yoga class bookings with ETH payments
- * @dev Implements a complete booking lifecycle with dispute resolution and automatic payment release
- * 
+ * @notice Minimal escrow contract for yoga class bookings with ETH payments
+ * @dev Simplified booking system with 3 time slots and yoga type preferences
+ *
  * Key features:
- * - Students create bookings with exactly 3 time slots, 3 yoga types, and 3 teacher handles
- * - Teachers confirm bookings by selecting one slot and yoga type
+ * - Students create bookings with exactly 3 time slots and at least 1 yoga type preference
+ * - Teachers confirm bookings by selecting one slot
  * - Payments are held in escrow until class completion or automatic release
  * - Built-in dispute resolution for conflict handling
  */
@@ -26,9 +26,14 @@ contract YogaClassEscrow is ReentrancyGuard {
     }
 
     enum YogaType {
-        Hatha, // Gentle, slow-paced stretching
-        Vinyasa, // Flow-based, dynamic movement
-        Ashtanga // Structured, athletic practice
+        Vinyasa, // Flow-based sequences linking breath with movement
+        Yin, // Slow, deep stretches held for minutes
+        Hatha, // Balanced, foundational poses with breathwork
+        Ashtanga, // Structured, vigorous, athletic series
+        Restorative, // Passive poses with props for deep relaxation
+        Iyengar, // Precise alignment with props
+        Kundalini, // Poses, breathwork, chanting, meditation
+        Power // Fast-paced, strength-focused Vinyasa
 
     }
 
@@ -44,32 +49,24 @@ contract YogaClassEscrow is ReentrancyGuard {
         uint256 paymentAmount; // Payment amount in wei
         BookingStatus status; // Current booking status
         uint64 createdTimestamp; // When booking was created
-        uint32 acceptanceDeadline; // Seconds teacher has to accept
         uint32 completionWindow; // Seconds after class to mark complete
-        string[] teacherHandles; // Possible teacher social handles (lowercase)
         TimeSlot[] availableSlots; // 3 possible time slots
-        YogaType[] yogaTypes; // 3 yoga type options
+        YogaType[] yogaTypes; // Yoga type preferences (at least 1)
         uint8 selectedSlotIndex; // Which time slot was chosen
-        uint8 selectedYogaType; // Which yoga type was chosen
     }
 
     uint8 private constant NOT_SELECTED = 255;
-    uint256 private constant MAX_OPTIONS = 3;
+    uint256 private constant MAX_TIME_SLOTS = 3;
+    uint256 private constant MAX_YOGA_TYPES = 8;
 
     mapping(uint256 => ClassBooking) public bookings;
     uint256 public nextBookingId;
 
     event BookingCreated(
-        uint256 indexed bookingId,
-        address indexed student,
-        uint256 paymentAmount,
-        uint32 acceptanceDeadline,
-        uint32 completionWindow
+        uint256 indexed bookingId, address indexed student, uint256 paymentAmount, uint32 completionWindow
     );
 
-    event BookingConfirmed(
-        uint256 indexed bookingId, address indexed teacher, uint8 slotIndex, uint8 yogaTypeIndex, string teacherHandle
-    );
+    event BookingConfirmed(uint256 indexed bookingId, address indexed teacher, uint8 slotIndex);
 
     event BookingCompleted(uint256 indexed bookingId, address indexed teacher, uint256 paymentReleased);
 
@@ -81,7 +78,6 @@ contract YogaClassEscrow is ReentrancyGuard {
     error InvalidBookingStatus();
     error InvalidTimeSlot();
     error InvalidYogaType();
-    error AcceptanceDeadlinePassed();
     error CompletionWindowNotReached();
     error NoPaymentToRefund();
     error InvalidNumberOfOptions();
@@ -97,27 +93,22 @@ contract YogaClassEscrow is ReentrancyGuard {
     }
 
     /**
-     * @notice Creates a new yoga class booking with ETH payment
-     * @dev Requires exactly 3 options for each parameter array
-     * @param teacherHandles Array of 3 acceptable teacher social handles (lowercase)
-     * @param availableSlots Array of 3 possible time slots for the class
-     * @param yogaTypes Array of 3 yoga type preferences
-     * @param acceptanceDeadline Seconds the teacher has to accept the booking
+     * @notice Creates a new minimal yoga class booking with ETH payment
+     * @dev Requires exactly 3 time slots and at least 1 yoga type preference
+     * @param availableSlots Array of exactly 3 possible time slots for the class
+     * @param yogaTypes Array of yoga type preferences (at least 1, max 8)
      * @param completionWindow Seconds after class end to mark as completed
      * @return bookingId Unique identifier for the created booking
      */
-    function createBooking(
-        string[] calldata teacherHandles,
-        TimeSlot[] calldata availableSlots,
-        YogaType[] calldata yogaTypes,
-        uint32 acceptanceDeadline,
-        uint32 completionWindow
-    ) external payable nonReentrant returns (uint256 bookingId) {
+    function createBooking(TimeSlot[] calldata availableSlots, YogaType[] calldata yogaTypes, uint32 completionWindow)
+        external
+        payable
+        nonReentrant
+        returns (uint256 bookingId)
+    {
         require(msg.value > 0, "Payment required");
-        require(teacherHandles.length == MAX_OPTIONS, "Exactly 3 teacher handles required");
-        require(availableSlots.length == MAX_OPTIONS, "Exactly 3 time slots required");
-        require(yogaTypes.length == MAX_OPTIONS, "Exactly 3 yoga types required");
-        require(acceptanceDeadline > 0, "Acceptance deadline must be positive");
+        require(availableSlots.length == MAX_TIME_SLOTS, "Exactly 3 time slots required");
+        require(yogaTypes.length > 0 && yogaTypes.length <= MAX_YOGA_TYPES, "Must have 1-8 yoga type preferences");
         require(completionWindow > 0, "Completion window must be positive");
 
         bookingId = nextBookingId++;
@@ -127,57 +118,40 @@ contract YogaClassEscrow is ReentrancyGuard {
         booking.paymentAmount = msg.value;
         booking.status = BookingStatus.Pending;
         booking.createdTimestamp = uint64(block.timestamp);
-        booking.acceptanceDeadline = acceptanceDeadline;
         booking.completionWindow = completionWindow;
         booking.selectedSlotIndex = NOT_SELECTED;
-        booking.selectedYogaType = NOT_SELECTED;
 
-        for (uint256 i = 0; i < MAX_OPTIONS; i++) {
-            booking.teacherHandles.push(teacherHandles[i]);
+        for (uint256 i = 0; i < MAX_TIME_SLOTS; i++) {
             booking.availableSlots.push(availableSlots[i]);
+        }
+
+        for (uint256 i = 0; i < yogaTypes.length; i++) {
             booking.yogaTypes.push(yogaTypes[i]);
         }
 
-        emit BookingCreated(bookingId, msg.sender, msg.value, acceptanceDeadline, completionWindow);
+        emit BookingCreated(bookingId, msg.sender, msg.value, completionWindow);
     }
 
     /**
-     * @notice Teacher confirms a booking by selecting slot and yoga type
-     * @dev Only callable within acceptance deadline for pending bookings
+     * @notice Teacher confirms a booking by selecting a time slot
+     * @dev Only callable for pending bookings
      * @param bookingId The ID of the booking to confirm
      * @param slotIndex Index of selected time slot (0, 1, or 2)
-     * @param yogaTypeIndex Index of selected yoga type (0, 1, or 2)
-     * @param teacherHandle Teacher's handle matching one from the booking
      */
-    function confirmBooking(uint256 bookingId, uint8 slotIndex, uint8 yogaTypeIndex, string calldata teacherHandle)
+    function confirmBooking(uint256 bookingId, uint8 slotIndex)
         external
         nonReentrant
         onlyBookingStatus(bookingId, BookingStatus.Pending)
     {
         ClassBooking storage booking = bookings[bookingId];
 
-        if (block.timestamp > booking.createdTimestamp + booking.acceptanceDeadline) {
-            revert AcceptanceDeadlinePassed();
-        }
-
-        if (slotIndex >= MAX_OPTIONS) revert InvalidTimeSlot();
-        if (yogaTypeIndex >= MAX_OPTIONS) revert InvalidYogaType();
-
-        bool handleMatched = false;
-        for (uint256 i = 0; i < booking.teacherHandles.length; i++) {
-            if (keccak256(bytes(booking.teacherHandles[i])) == keccak256(bytes(teacherHandle))) {
-                handleMatched = true;
-                break;
-            }
-        }
-        require(handleMatched, "Teacher handle not in approved list");
+        if (slotIndex >= MAX_TIME_SLOTS) revert InvalidTimeSlot();
 
         booking.teacher = msg.sender;
         booking.selectedSlotIndex = slotIndex;
-        booking.selectedYogaType = yogaTypeIndex;
         booking.status = BookingStatus.Confirmed;
 
-        emit BookingConfirmed(bookingId, msg.sender, slotIndex, yogaTypeIndex, teacherHandle);
+        emit BookingConfirmed(bookingId, msg.sender, slotIndex);
     }
 
     /**
@@ -280,10 +254,6 @@ contract YogaClassEscrow is ReentrancyGuard {
         return bookings[bookingId];
     }
 
-    function getTeacherHandles(uint256 bookingId) external view returns (string[] memory) {
-        return bookings[bookingId].teacherHandles;
-    }
-
     function getTimeSlots(uint256 bookingId) external view returns (TimeSlot[] memory) {
         return bookings[bookingId].availableSlots;
     }
@@ -293,9 +263,14 @@ contract YogaClassEscrow is ReentrancyGuard {
     }
 
     function getYogaTypeName(YogaType yogaType) external pure returns (string memory) {
-        if (yogaType == YogaType.Hatha) return "Hatha";
         if (yogaType == YogaType.Vinyasa) return "Vinyasa";
+        if (yogaType == YogaType.Yin) return "Yin";
+        if (yogaType == YogaType.Hatha) return "Hatha";
         if (yogaType == YogaType.Ashtanga) return "Ashtanga";
+        if (yogaType == YogaType.Restorative) return "Restorative";
+        if (yogaType == YogaType.Iyengar) return "Iyengar";
+        if (yogaType == YogaType.Kundalini) return "Kundalini";
+        if (yogaType == YogaType.Power) return "Power";
         return "Unknown";
     }
 }
