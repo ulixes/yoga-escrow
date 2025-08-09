@@ -14,6 +14,9 @@ export type YogaTypePickerProps = {
   filterPersona?: string | null
   onFilterPersona?: (persona: string | null) => void
   onSelect?: (id: string) => void
+  selectedIds?: string[]
+  selectionMode?: 'single' | 'multiple'
+  pickingId?: string | null
   className?: string
   containerProps?: React.HTMLAttributes<HTMLDivElement>
   skin?: string
@@ -25,6 +28,9 @@ export const YogaTypePicker: React.FC<YogaTypePickerProps> = ({
   filterPersona: controlledPersona,
   onFilterPersona,
   onSelect,
+  selectedIds,
+  selectionMode = 'single',
+  pickingId = null,
   className,
   containerProps,
   skin,
@@ -45,6 +51,7 @@ export const YogaTypePicker: React.FC<YogaTypePickerProps> = ({
 
   const classes = ['yui-yoga-picker', className].filter(Boolean).join(' ')
   const skinAttr = skin ? { 'data-skin': skin } : {}
+  const selectedSet = React.useMemo(() => new Set(selectedIds || []), [selectedIds])
 
   return (
     <div className={classes} {...skinAttr} {...containerProps}>
@@ -73,8 +80,18 @@ export const YogaTypePicker: React.FC<YogaTypePickerProps> = ({
       </div>
 
       <div className="yui-yoga-picker__grid" role="list">
-        {filtered.map((item) => (
-          <article key={item.id} role="listitem" className="yui-yoga-picker__card" data-personas={item.personas.join(' ')}>
+        {filtered.map((item) => {
+          const isSelected = selectedSet.has(item.id)
+          const isPicking = pickingId === item.id
+          return (
+          <article
+            key={item.id}
+            role="listitem"
+            className="yui-yoga-picker__card"
+            data-personas={item.personas.join(' ')}
+            data-selected={isSelected}
+            data-picking={isPicking}
+          >
             <h3 className="yui-yoga-picker__card-title">{item.name}</h3>
             {item.tagline ? <p className="yui-yoga-picker__card-tagline">{item.tagline}</p> : null}
 
@@ -93,12 +110,18 @@ export const YogaTypePicker: React.FC<YogaTypePickerProps> = ({
             )}
 
             {onSelect && (
-              <button type="button" className="yui-btn yui-yoga-picker__select" onClick={() => onSelect(item.id)}>
-                Select
+              <button
+                type="button"
+                className="yui-btn yui-yoga-picker__select"
+                onClick={() => onSelect(item.id)}
+                disabled={selectionMode === 'single' && isSelected}
+                aria-pressed={isSelected}
+              >
+                {isSelected ? 'Selected' : 'Select'}
               </button>
             )}
           </article>
-        ))}
+        )})}
         {filtered.length === 0 && (
           <div className="yui-yoga-picker__empty" role="status">No types match your filters</div>
         )}

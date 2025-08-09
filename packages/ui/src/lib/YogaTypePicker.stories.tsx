@@ -138,6 +138,8 @@ export const Default: Story = {
     items,
     personas,
     skin: 'ulyxes',
+    selectedIds: ['vinyasa'],
+    pickingId: 'vinyasa',
   },
 }
 
@@ -152,6 +154,7 @@ export const FilterRunners: Story = {
     personas,
     filterPersona: 'Runner',
     skin: 'ulyxes',
+    selectedIds: ['ashtanga'],
   },
 }
 

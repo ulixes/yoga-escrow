@@ -47,6 +47,8 @@ const GlobalStyles: React.FC = () => (
 .yui-yoga-picker__search-input { font: inherit; padding: 8px 10px; }
 .yui-yoga-picker__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
 .yui-yoga-picker__card { display: grid; gap: 8px; border: 1px solid currentColor; border-radius: 10px; padding: 10px; }
+.yui-yoga-picker__card[data-selected='true'] { outline: 2px solid currentColor; outline-offset: 2px; }
+.yui-yoga-picker__card[data-picking='true'] { opacity: 0.6; }
 .yui-yoga-picker__benefits { display: grid; gap: 8px; }
 .yui-yoga-picker__benefits-group { display: grid; gap: 4px; }
 .yui-yoga-picker__benefits-list { margin: 0; padding-left: 18px; }
@@ -58,6 +60,8 @@ const GlobalStyles: React.FC = () => (
 .yui-teacher-picker { display: grid; gap: 16px; }
 .yui-teacher-picker__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
 .yui-teacher-picker__card { display: grid; gap: 10px; border: 1px solid currentColor; border-radius: 14px; padding: 12px; }
+.yui-teacher-picker__card[data-selected='true'] { outline: 2px solid currentColor; outline-offset: 2px; }
+.yui-teacher-picker__card[data-picking='true'] { opacity: 0.6; }
 .yui-teacher-picker__header { display: grid; grid-template-columns: 56px 1fr; gap: 10px; align-items: center; }
 .yui-teacher-picker__avatar { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; display: block; }
 .yui-teacher-picker__title { display: grid; gap: 4px; }

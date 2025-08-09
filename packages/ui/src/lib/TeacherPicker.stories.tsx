@@ -86,5 +86,7 @@ export const Default: Story = {
   args: {
     items: mockTeachers,
     skin: 'ulyxes',
+    selectedIds: ['t2'],
+    pickingId: 't1',
   },
 }

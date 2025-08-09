@@ -15,6 +15,8 @@ export type TeacherItem = {
 export type TeacherPickerProps = {
   items: TeacherItem[]
   onSelect?: (id: string) => void
+  selectedIds?: string[]
+  pickingId?: string | null
   className?: string
   containerProps?: React.HTMLAttributes<HTMLDivElement>
   skin?: string
@@ -24,6 +26,8 @@ export type TeacherPickerProps = {
 export const TeacherPicker: React.FC<TeacherPickerProps> = ({
   items,
   onSelect,
+  selectedIds,
+  pickingId = null,
   className,
   containerProps,
   skin,
@@ -31,12 +35,16 @@ export const TeacherPicker: React.FC<TeacherPickerProps> = ({
 }) => {
   const classes = ['yui-teacher-picker', className].filter(Boolean).join(' ')
   const skinAttr = skin ? { 'data-skin': skin } : {}
+  const selectedSet = React.useMemo(() => new Set(selectedIds || []), [selectedIds])
 
   return (
     <div className={classes} {...skinAttr} {...containerProps}>
       <div className="yui-teacher-picker__grid" role="list">
-        {items.map((t) => (
-          <article key={t.id} role="listitem" className="yui-teacher-picker__card">
+        {items.map((t) => {
+          const isSelected = selectedSet.has(t.id)
+          const isPicking = pickingId === t.id
+          return (
+          <article key={t.id} role="listitem" className="yui-teacher-picker__card" data-selected={isSelected} data-picking={isPicking}>
             <header className="yui-teacher-picker__header">
               <div className="yui-teacher-picker__avatar-wrap" aria-hidden>
                 {renderAvatar ? (
@@ -93,13 +101,19 @@ export const TeacherPicker: React.FC<TeacherPickerProps> = ({
 
             {onSelect && (
               <div className="yui-teacher-picker__actions">
-                <button type="button" className="yui-btn yui-teacher-picker__select" onClick={() => onSelect(t.id)}>
-                  Select Teacher
+                <button
+                  type="button"
+                  className="yui-btn yui-teacher-picker__select"
+                  onClick={() => onSelect(t.id)}
+                  aria-pressed={isSelected}
+                  disabled={isSelected}
+                >
+                  {isSelected ? 'Selected' : 'Select Teacher'}
                 </button>
               </div>
             )}
           </article>
-        ))}
+        )})}
       </div>
     </div>
   )
