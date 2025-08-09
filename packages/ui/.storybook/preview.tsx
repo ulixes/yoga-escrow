@@ -33,7 +33,10 @@ const GlobalStyles: React.FC = () => (
 .yui-brand { display: inline-block; }
 .yui-brand__row { display: grid; gap: 6px; justify-items: start; }
 .yui-brand__logo { display: inline-grid; place-items: center; }
+.yui-brand__text { display: grid; gap: 2px; }
+.yui-brand__title { font-weight: 700; letter-spacing: 0.2px; }
 .yui-brand__slogan { margin: 0; font: inherit; opacity: 0.9; }
+.yui-brand__subtitle { margin: 0; opacity: 0.65; }
 
 /* YogaTypePicker baseline */
 .yui-yoga-picker { display: grid; gap: 12px; }
@@ -104,7 +107,9 @@ const GlobalStyles: React.FC = () => (
 [data-skin='ulyxes'] .yui-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* Brand – monochrome elegance */
+[data-skin='ulyxes'] .yui-brand__title { font-size: 22px; letter-spacing: 0.2px; }
 [data-skin='ulyxes'] .yui-brand__slogan { letter-spacing: 0.2px; }
+[data-skin='ulyxes'] .yui-brand__subtitle { letter-spacing: 0.15px; }
 [data-skin='ulyxes'] .yui-brand__glyph { width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.6); display: inline-block; }
 
 /* Ulyxes – YogaTypePicker airy, minimal */

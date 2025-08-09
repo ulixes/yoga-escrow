@@ -31,20 +31,45 @@ const PlaceholderLogo = () => (
 
 export const Default: Story = {
   args: {
-    slogan: 'Ulyxes. Yoga everywhere.. anytime..',
+    title: 'Ulyxes',
+    slogan: 'Yoga everywhere.. anytime..',
+    subtitle: 'Move with breath. Find your space.',
+    orientation: 'vertical',
+    size: 'md',
   },
 }
 
 export const WithLogo: Story = {
   args: {
-    slogan: 'Ulyxes. Yoga everywhere.. anytime..',
+    title: 'Ulyxes',
+    slogan: 'Yoga everywhere.. anytime..',
+    subtitle: 'Move with breath. Find your space.',
+    orientation: 'vertical',
+    size: 'md',
     logo: <PlaceholderLogo />,
   },
 }
 
 export const UlyxesSkin: Story = {
   args: {
-    slogan: 'Ulyxes. Yoga everywhere.. anytime..',
+    title: 'Ulyxes',
+    slogan: 'Yoga everywhere.. anytime..',
+    subtitle: 'Move with breath. Find your space.',
+    orientation: 'vertical',
+    size: 'md',
+    logo: <PlaceholderLogo />,
+    skin: 'ulyxes',
+  },
+}
+
+export const Hero: Story = {
+  name: 'Hero (Large, Vertical)',
+  args: {
+    title: 'Ulyxes',
+    slogan: 'Yoga everywhere.. anytime..',
+    subtitle: 'Move with breath. Find your space.',
+    orientation: 'vertical',
+    size: 'lg',
     logo: <PlaceholderLogo />,
     skin: 'ulyxes',
   },
