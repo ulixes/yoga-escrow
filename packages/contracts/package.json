@@ -1,0 +1,16 @@
+{
+  "name": "@yoga/contracts",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "forge build",
+    "test": "forge test",
+    "test:watch": "forge test --watch",
+    "test:gas": "forge test --gas-report",
+    "snapshot": "forge snapshot",
+    "fmt": "forge fmt",
+    "anvil": "anvil",
+    "deploy": "bash Deploy.sh",
+    "clean": "forge clean"
+  }
+}

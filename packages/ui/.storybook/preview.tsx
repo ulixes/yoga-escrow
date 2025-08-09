@@ -15,37 +15,19 @@ export const parameters: Preview['parameters'] = {
 const GlobalStyles: React.FC = () => (
   <style>
     {`
-:root {
-  --yoga-primary: #3b82f6;
-  --yoga-on-primary: #ffffff;
-  --yoga-surface: #ffffff;
-  --yoga-on-surface: #0f172a;
-  --yoga-outline: #e2e8f0;
-  --yoga-input: #f8fafc;
-  --yoga-radius: 12px;
-  --yoga-elevation: 0 6px 24px rgba(2, 6, 23, 0.08);
-}
+/* Raw, class-only baseline. No visual opinion. */
+.yui-pwls { display: grid; gap: 12px; max-width: 420px; }
+.yui-pwls__form { display: block; }
+.yui-pwls__section { display: grid; gap: 8px; }
+.yui-pwls__title { font: inherit; font-weight: 600; margin: 0; }
+.yui-pwls__description { margin: 0; opacity: 0.9; }
+.yui-pwls__input { font: inherit; }
+.yui-pwls__code-boxes { display: grid; gap: 8px; }
+.yui-pwls__code-box { display: grid; place-items: center; height: 44px; }
+.yui-pwls__actions { display: flex; gap: 8px; }
 
-/* Example skins */
-[data-skin='zen'] {
-  --yoga-primary: #10b981;
-  --yoga-on-primary: #052e1c;
-  --yoga-surface: #f0fdf4;
-  --yoga-on-surface: #052e1a;
-  --yoga-outline: #bbf7d0;
-  --yoga-input: #dcfce7;
-  --yoga-radius: 16px;
-}
-
-[data-skin='dark'] {
-  --yoga-primary: #60a5fa;
-  --yoga-on-primary: #0b1220;
-  --yoga-surface: #0b1220;
-  --yoga-on-surface: #e2e8f0;
-  --yoga-outline: #1f2937;
-  --yoga-input: #111827;
-  --yoga-radius: 10px;
-}
+/* Button baseline, still unstyled */
+.yui-btn { font: inherit; cursor: pointer; }
     `}
   </style>
 )

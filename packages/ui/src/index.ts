@@ -5,6 +5,5 @@ export { PasswordlessSignup } from './lib/PasswordlessSignup'
 export type {
   PasswordlessSignupProps,
   PasswordlessSignupStep,
-  PasswordlessSignupTheme,
 } from './lib/PasswordlessSignup'
 
