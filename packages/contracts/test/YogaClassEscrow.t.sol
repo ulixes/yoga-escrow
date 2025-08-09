@@ -7,151 +7,183 @@ import "../src/YogaClassEscrow.sol";
 contract YogaClassEscrowTest is Test {
     YogaClassEscrow public escrow;
 
-    address student = makeAddr("student");
-    address teacher = makeAddr("teacher");
+    address payer = makeAddr("payer");
+    address teacher1 = makeAddr("teacher1");
+    address teacher2 = makeAddr("teacher2");
+    address teacher3 = makeAddr("teacher3");
     address other = makeAddr("other");
 
-    uint256 constant PAYMENT_AMOUNT = 0.1 ether;
-    uint32 constant COMPLETION_WINDOW = 3 days;
+    uint256 constant ESCROW_AMOUNT = 0.1 ether;
+
+    string constant HANDLE_1 = "@yogamaster";
+    string constant HANDLE_2 = "@zenteacher";
+    string constant HANDLE_3 = "@vinyasapro";
 
     function setUp() public {
         escrow = new YogaClassEscrow();
-        vm.deal(student, 10 ether);
-        vm.deal(teacher, 1 ether);
+        vm.deal(payer, 10 ether);
+        vm.deal(teacher1, 1 ether);
+        vm.deal(teacher2, 1 ether);
+        vm.deal(teacher3, 1 ether);
+        vm.deal(other, 1 ether);
     }
 
-    function createSampleBooking() internal returns (uint256) {
-        YogaClassEscrow.TimeSlot[] memory slots = new YogaClassEscrow.TimeSlot[](3);
-        slots[0] = YogaClassEscrow.TimeSlot({
+    function createSampleEscrow() internal returns (uint256) {
+        string[3] memory teacherHandles = [HANDLE_1, HANDLE_2, HANDLE_3];
+        
+        YogaClassEscrow.YogaType[3] memory yogaTypes = [
+            YogaClassEscrow.YogaType.Vinyasa,
+            YogaClassEscrow.YogaType.Hatha,
+            YogaClassEscrow.YogaType.Yin
+        ];
+        
+        YogaClassEscrow.TimeSlot[3] memory timeSlots;
+        timeSlots[0] = YogaClassEscrow.TimeSlot({
             startTime: uint64(block.timestamp + 2 days),
             durationMinutes: 60,
             timezoneOffset: -300
         });
-        slots[1] = YogaClassEscrow.TimeSlot({
+        timeSlots[1] = YogaClassEscrow.TimeSlot({
             startTime: uint64(block.timestamp + 3 days),
             durationMinutes: 90,
             timezoneOffset: -300
         });
-        slots[2] = YogaClassEscrow.TimeSlot({
+        timeSlots[2] = YogaClassEscrow.TimeSlot({
             startTime: uint64(block.timestamp + 4 days),
             durationMinutes: 75,
             timezoneOffset: -300
         });
 
-        YogaClassEscrow.YogaType[] memory yogaTypes = new YogaClassEscrow.YogaType[](2);
-        yogaTypes[0] = YogaClassEscrow.YogaType.Vinyasa;
-        yogaTypes[1] = YogaClassEscrow.YogaType.Hatha;
-
-        vm.prank(student);
-        return escrow.createBooking{value: PAYMENT_AMOUNT}(slots, yogaTypes, COMPLETION_WINDOW);
+        uint64 futureTime = uint64(block.timestamp + 7 days);
+        
+        vm.prank(payer);
+        return escrow.createEscrow{value: ESCROW_AMOUNT}(
+            teacherHandles,
+            yogaTypes,
+            timeSlots,
+            futureTime,
+            "Yoga class payment"
+        );
     }
 
-    function test_CreateBooking() public {
-        uint256 bookingId = createSampleBooking();
+    function test_CreateEscrow() public {
+        uint256 escrowId = createSampleEscrow();
 
-        YogaClassEscrow.ClassBooking memory booking = escrow.getBooking(bookingId);
-        assertEq(booking.student, student);
-        assertEq(booking.paymentAmount, PAYMENT_AMOUNT);
-        assertEq(uint8(booking.status), uint8(YogaClassEscrow.BookingStatus.Pending));
-        assertEq(booking.completionWindow, COMPLETION_WINDOW);
+        YogaClassEscrow.Escrow memory escrowData = escrow.getEscrow(escrowId);
+        assertEq(escrowData.payer, payer);
+        assertEq(escrowData.amount, ESCROW_AMOUNT);
+        assertEq(uint8(escrowData.status), uint8(YogaClassEscrow.EscrowStatus.Created));
+        assertEq(escrowData.description, "Yoga class payment");
+
+        // Check teacher handles
+        string[3] memory teacherHandles = escrow.getTeacherHandles(escrowId);
+        assertEq(teacherHandles[0], HANDLE_1);
+        assertEq(teacherHandles[1], HANDLE_2);
+        assertEq(teacherHandles[2], HANDLE_3);
+
+        // Check yoga types
+        YogaClassEscrow.YogaType[3] memory yogaTypes = escrow.getYogaTypes(escrowId);
+        assertEq(uint8(yogaTypes[0]), uint8(YogaClassEscrow.YogaType.Vinyasa));
+        assertEq(uint8(yogaTypes[1]), uint8(YogaClassEscrow.YogaType.Hatha));
+        assertEq(uint8(yogaTypes[2]), uint8(YogaClassEscrow.YogaType.Yin));
     }
 
-    function test_ConfirmBooking() public {
-        uint256 bookingId = createSampleBooking();
+    function test_AssignPayee() public {
+        uint256 escrowId = createSampleEscrow();
 
-        vm.prank(teacher);
-        escrow.confirmBooking(bookingId, 1);
+        vm.prank(payer);
+        escrow.assignPayee(escrowId, teacher2, HANDLE_2, 0, 2); // Select teacher2 with @zenteacher handle, Vinyasa, timeSlot[2]
 
-        YogaClassEscrow.ClassBooking memory booking = escrow.getBooking(bookingId);
-        assertEq(booking.teacher, teacher);
-        assertEq(booking.selectedSlotIndex, 1);
-        assertEq(uint8(booking.status), uint8(YogaClassEscrow.BookingStatus.Confirmed));
+        YogaClassEscrow.Escrow memory escrowData = escrow.getEscrow(escrowId);
+        assertEq(escrowData.payee, teacher2);
+        assertEq(escrowData.selectedHandle, HANDLE_2);
+        assertEq(uint8(escrowData.status), uint8(YogaClassEscrow.EscrowStatus.Assigned));
+
+        (uint8 payeeIndex, uint8 yogaIndex, uint8 timeIndex) = escrow.getSelectedOptions(escrowId);
+        assertEq(payeeIndex, 1); // HANDLE_2 is at index 1
+        assertEq(yogaIndex, 0);
+        assertEq(timeIndex, 2);
     }
 
-    function test_CompleteClass() public {
-        uint256 bookingId = createSampleBooking();
+    function test_ReleasePayment() public {
+        uint256 escrowId = createSampleEscrow();
 
-        vm.prank(teacher);
-        escrow.confirmBooking(bookingId, 0);
+        vm.prank(payer);
+        escrow.assignPayee(escrowId, teacher1, HANDLE_1, 1, 0); // Select teacher1 with @yogamaster, Hatha, timeSlot[0]
 
-        uint256 teacherBalanceBefore = teacher.balance;
+        uint256 teacher1BalanceBefore = teacher1.balance;
 
-        vm.prank(student);
-        escrow.completeClass(bookingId);
+        vm.prank(payer);
+        escrow.releasePayment(escrowId);
 
-        assertEq(teacher.balance, teacherBalanceBefore + PAYMENT_AMOUNT);
+        assertEq(teacher1.balance, teacher1BalanceBefore + ESCROW_AMOUNT);
 
-        YogaClassEscrow.ClassBooking memory booking = escrow.getBooking(bookingId);
-        assertEq(uint8(booking.status), uint8(YogaClassEscrow.BookingStatus.Completed));
-        assertEq(booking.paymentAmount, 0);
+        YogaClassEscrow.Escrow memory escrowData = escrow.getEscrow(escrowId);
+        assertEq(uint8(escrowData.status), uint8(YogaClassEscrow.EscrowStatus.Completed));
+        assertEq(escrowData.amount, 0);
     }
 
-    function test_CancelBooking() public {
-        uint256 bookingId = createSampleBooking();
+    function test_CancelEscrow() public {
+        uint256 escrowId = createSampleEscrow();
 
-        uint256 studentBalanceBefore = student.balance;
+        uint256 payerBalanceBefore = payer.balance;
 
-        vm.prank(student);
-        escrow.cancelBooking(bookingId);
+        vm.prank(payer);
+        escrow.cancelEscrow(escrowId);
 
-        assertEq(student.balance, studentBalanceBefore + PAYMENT_AMOUNT);
+        assertEq(payer.balance, payerBalanceBefore + ESCROW_AMOUNT);
 
-        YogaClassEscrow.ClassBooking memory booking = escrow.getBooking(bookingId);
-        assertEq(uint8(booking.status), uint8(YogaClassEscrow.BookingStatus.Cancelled));
-        assertEq(booking.paymentAmount, 0);
+        YogaClassEscrow.Escrow memory escrowData = escrow.getEscrow(escrowId);
+        assertEq(uint8(escrowData.status), uint8(YogaClassEscrow.EscrowStatus.Cancelled));
+        assertEq(escrowData.amount, 0);
     }
 
-    function test_AutomaticPaymentRelease() public {
-        uint256 bookingId = createSampleBooking();
+    function test_AutoRelease() public {
+        uint256 escrowId = createSampleEscrow();
 
-        vm.prank(teacher);
-        escrow.confirmBooking(bookingId, 0);
+        vm.prank(payer);
+        escrow.assignPayee(escrowId, teacher3, HANDLE_3, 2, 1); // Select teacher3 with @vinyasapro, Yin, timeSlot[1]
 
-        YogaClassEscrow.TimeSlot[] memory slots = escrow.getTimeSlots(bookingId);
-        uint256 classEndTime = uint256(slots[0].startTime) + uint256(slots[0].durationMinutes) * 60;
+        // Fast forward past expiration
+        uint64 futureTime = uint64(block.timestamp + 7 days);
+        vm.warp(futureTime + 1);
 
-        vm.warp(classEndTime + COMPLETION_WINDOW + 1);
+        uint256 teacher3BalanceBefore = teacher3.balance;
 
-        uint256 teacherBalanceBefore = teacher.balance;
-
+        // Anyone can trigger auto-release
         vm.prank(other);
-        escrow.automaticPaymentRelease(bookingId);
+        escrow.autoRelease(escrowId);
 
-        assertEq(teacher.balance, teacherBalanceBefore + PAYMENT_AMOUNT);
+        assertEq(teacher3.balance, teacher3BalanceBefore + ESCROW_AMOUNT);
+
+        YogaClassEscrow.Escrow memory escrowData = escrow.getEscrow(escrowId);
+        assertEq(uint8(escrowData.status), uint8(YogaClassEscrow.EscrowStatus.Completed));
     }
 
     function test_RaiseDispute() public {
-        uint256 bookingId = createSampleBooking();
+        uint256 escrowId = createSampleEscrow();
 
-        vm.prank(teacher);
-        escrow.confirmBooking(bookingId, 0);
+        vm.prank(payer);
+        escrow.assignPayee(escrowId, teacher1, HANDLE_1, 0, 0);
 
-        vm.prank(student);
-        escrow.raiseDispute(bookingId);
+        vm.prank(payer);
+        escrow.raiseDispute(escrowId);
 
-        YogaClassEscrow.ClassBooking memory booking = escrow.getBooking(bookingId);
-        assertEq(uint8(booking.status), uint8(YogaClassEscrow.BookingStatus.Disputed));
+        YogaClassEscrow.Escrow memory escrowData = escrow.getEscrow(escrowId);
+        assertEq(uint8(escrowData.status), uint8(YogaClassEscrow.EscrowStatus.Disputed));
     }
 
-    function test_RevertIfNotExactly3TimeSlots() public {
-        YogaClassEscrow.TimeSlot[] memory slots = new YogaClassEscrow.TimeSlot[](2);
-        slots[0] = YogaClassEscrow.TimeSlot({
-            startTime: uint64(block.timestamp + 2 days),
-            durationMinutes: 60,
-            timezoneOffset: -300
-        });
-        slots[1] = YogaClassEscrow.TimeSlot({
-            startTime: uint64(block.timestamp + 3 days),
-            durationMinutes: 90,
-            timezoneOffset: -300
-        });
+    function test_PayeeCanAlsoRaiseDispute() public {
+        uint256 escrowId = createSampleEscrow();
 
-        YogaClassEscrow.YogaType[] memory yogaTypes = new YogaClassEscrow.YogaType[](1);
-        yogaTypes[0] = YogaClassEscrow.YogaType.Vinyasa;
+        vm.prank(payer);
+        escrow.assignPayee(escrowId, teacher2, HANDLE_2, 1, 1);
 
-        vm.prank(student);
-        vm.expectRevert("Exactly 3 time slots required");
-        escrow.createBooking{value: PAYMENT_AMOUNT}(slots, yogaTypes, COMPLETION_WINDOW);
+        vm.prank(teacher2); // teacher2 was assigned
+        escrow.raiseDispute(escrowId);
+
+        YogaClassEscrow.Escrow memory escrowData = escrow.getEscrow(escrowId);
+        assertEq(uint8(escrowData.status), uint8(YogaClassEscrow.EscrowStatus.Disputed));
     }
 
     function test_GetYogaTypeName() public view {
@@ -163,5 +195,158 @@ contract YogaClassEscrowTest is Test {
         assertEq(escrow.getYogaTypeName(YogaClassEscrow.YogaType.Iyengar), "Iyengar");
         assertEq(escrow.getYogaTypeName(YogaClassEscrow.YogaType.Kundalini), "Kundalini");
         assertEq(escrow.getYogaTypeName(YogaClassEscrow.YogaType.Power), "Power");
+    }
+
+    // Error condition tests
+    function test_RevertCreateEscrowWithZeroValue() public {
+        string[3] memory teacherHandles = [HANDLE_1, HANDLE_2, HANDLE_3];
+        YogaClassEscrow.YogaType[3] memory yogaTypes = [
+            YogaClassEscrow.YogaType.Vinyasa,
+            YogaClassEscrow.YogaType.Hatha,
+            YogaClassEscrow.YogaType.Yin
+        ];
+        YogaClassEscrow.TimeSlot[3] memory timeSlots;
+
+        vm.prank(payer);
+        vm.expectRevert(YogaClassEscrow.ZeroAmount.selector);
+        escrow.createEscrow{value: 0}(
+            teacherHandles,
+            yogaTypes,
+            timeSlots,
+            uint64(block.timestamp + 7 days),
+            "Test"
+        );
+    }
+
+    function test_RevertCreateEscrowWithDuplicateHandles() public {
+        string[3] memory teacherHandles = [HANDLE_1, HANDLE_1, HANDLE_3]; // Duplicate HANDLE_1
+        YogaClassEscrow.YogaType[3] memory yogaTypes = [
+            YogaClassEscrow.YogaType.Vinyasa,
+            YogaClassEscrow.YogaType.Hatha,
+            YogaClassEscrow.YogaType.Yin
+        ];
+        YogaClassEscrow.TimeSlot[3] memory timeSlots;
+
+        vm.prank(payer);
+        vm.expectRevert(YogaClassEscrow.DuplicateHandle.selector);
+        escrow.createEscrow{value: ESCROW_AMOUNT}(
+            teacherHandles,
+            yogaTypes,
+            timeSlots,
+            uint64(block.timestamp + 7 days),
+            "Test"
+        );
+    }
+
+    function test_RevertCreateEscrowWithEmptyHandle() public {
+        string[3] memory teacherHandles = [HANDLE_1, "", HANDLE_3]; // Empty string
+        YogaClassEscrow.YogaType[3] memory yogaTypes = [
+            YogaClassEscrow.YogaType.Vinyasa,
+            YogaClassEscrow.YogaType.Hatha,
+            YogaClassEscrow.YogaType.Yin
+        ];
+        YogaClassEscrow.TimeSlot[3] memory timeSlots;
+
+        vm.prank(payer);
+        vm.expectRevert(YogaClassEscrow.EmptyHandle.selector);
+        escrow.createEscrow{value: ESCROW_AMOUNT}(
+            teacherHandles,
+            yogaTypes,
+            timeSlots,
+            uint64(block.timestamp + 7 days),
+            "Test"
+        );
+    }
+
+    function test_RevertAssignPayeeHandleMismatch() public {
+        uint256 escrowId = createSampleEscrow();
+
+        vm.prank(payer);
+        vm.expectRevert(YogaClassEscrow.HandleMismatch.selector);
+        escrow.assignPayee(escrowId, teacher1, "@wronghandle", 0, 0); // Wrong handle
+    }
+
+    function test_RevertAssignPayeeInvalidYogaIndex() public {
+        uint256 escrowId = createSampleEscrow();
+
+        vm.prank(payer);
+        vm.expectRevert(YogaClassEscrow.InvalidYogaIndex.selector);
+        escrow.assignPayee(escrowId, teacher1, HANDLE_1, 3, 0); // Index 3 is invalid
+    }
+
+    function test_RevertAssignPayeeInvalidTimeIndex() public {
+        uint256 escrowId = createSampleEscrow();
+
+        vm.prank(payer);
+        vm.expectRevert(YogaClassEscrow.InvalidTimeIndex.selector);
+        escrow.assignPayee(escrowId, teacher1, HANDLE_1, 0, 3); // Index 3 is invalid
+    }
+
+    function test_RevertAssignPayeeZeroAddress() public {
+        uint256 escrowId = createSampleEscrow();
+
+        vm.prank(payer);
+        vm.expectRevert("Invalid teacher address");
+        escrow.assignPayee(escrowId, address(0), HANDLE_1, 0, 0);
+    }
+
+    function test_RevertAssignPayeePayerAsTeacher() public {
+        uint256 escrowId = createSampleEscrow();
+
+        vm.prank(payer);
+        vm.expectRevert("Teacher cannot be payer");
+        escrow.assignPayee(escrowId, payer, HANDLE_1, 0, 0);
+    }
+
+    function test_RevertAssignPayeeNotPayer() public {
+        uint256 escrowId = createSampleEscrow();
+
+        vm.prank(other);
+        vm.expectRevert(YogaClassEscrow.NotPayer.selector);
+        escrow.assignPayee(escrowId, teacher1, HANDLE_1, 0, 0);
+    }
+
+    function test_RevertReleasePaymentNotPayer() public {
+        uint256 escrowId = createSampleEscrow();
+
+        vm.prank(payer);
+        escrow.assignPayee(escrowId, teacher1, HANDLE_1, 0, 0);
+
+        vm.prank(other);
+        vm.expectRevert(YogaClassEscrow.NotPayer.selector);
+        escrow.releasePayment(escrowId);
+    }
+
+    function test_RevertCancelEscrowAfterAssigned() public {
+        uint256 escrowId = createSampleEscrow();
+
+        vm.prank(payer);
+        escrow.assignPayee(escrowId, teacher1, HANDLE_1, 0, 0);
+
+        vm.prank(payer);
+        vm.expectRevert(YogaClassEscrow.InvalidEscrowStatus.selector);
+        escrow.cancelEscrow(escrowId);
+    }
+
+    function test_RevertAutoReleaseBeforeExpiration() public {
+        uint256 escrowId = createSampleEscrow();
+
+        vm.prank(payer);
+        escrow.assignPayee(escrowId, teacher1, HANDLE_1, 0, 0);
+
+        vm.prank(other);
+        vm.expectRevert(YogaClassEscrow.EscrowNotExpired.selector);
+        escrow.autoRelease(escrowId);
+    }
+
+    function test_RevertDisputeUnauthorized() public {
+        uint256 escrowId = createSampleEscrow();
+
+        vm.prank(payer);
+        escrow.assignPayee(escrowId, teacher1, HANDLE_1, 0, 0);
+
+        vm.prank(other);
+        vm.expectRevert(YogaClassEscrow.NotAuthorized.selector);
+        escrow.raiseDispute(escrowId);
     }
 }

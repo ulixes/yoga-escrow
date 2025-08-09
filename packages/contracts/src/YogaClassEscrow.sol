@@ -6,262 +6,383 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 /**
  * @title YogaClassEscrow
  * @author Yoga Escrow Development Team
- * @notice Minimal escrow contract for yoga class bookings with ETH payments
- * @dev Simplified booking system with 3 time slots and yoga type preferences
+ * @notice Pure escrow contract for yoga class payments with ETH
+ * @dev Simple escrow system focusing on secure fund holding and release
  *
  * Key features:
- * - Students create bookings with exactly 3 time slots and at least 1 yoga type preference
- * - Teachers confirm bookings by selecting one slot
- * - Payments are held in escrow until class completion or automatic release
+ * - Students deposit ETH into escrow for services
+ * - Teachers can be assigned to receive payments
+ * - Payments held securely until manual release or automatic timeout
  * - Built-in dispute resolution for conflict handling
  */
 contract YogaClassEscrow is ReentrancyGuard {
-    enum BookingStatus {
-        Pending, // Student created booking, awaiting teacher acceptance
-        Confirmed, // Teacher accepted the booking
-        Completed, // Class completed, payment released
-        Cancelled, // Booking cancelled before confirmation
-        Disputed // Either party raised a dispute
-
+    enum EscrowStatus {
+        Created,    // Escrow created with funds deposited
+        Assigned,   // Teacher assigned to this escrow
+        Completed,  // Service completed, payment released
+        Cancelled,  // Escrow cancelled, funds returned
+        Disputed    // Either party raised a dispute
     }
 
     enum YogaType {
-        Vinyasa, // Flow-based sequences linking breath with movement
-        Yin, // Slow, deep stretches held for minutes
-        Hatha, // Balanced, foundational poses with breathwork
-        Ashtanga, // Structured, vigorous, athletic series
+        Vinyasa,     // Flow-based sequences linking breath with movement
+        Yin,         // Slow, deep stretches held for minutes
+        Hatha,       // Balanced, foundational poses with breathwork
+        Ashtanga,    // Structured, vigorous, athletic series
         Restorative, // Passive poses with props for deep relaxation
-        Iyengar, // Precise alignment with props
-        Kundalini, // Poses, breathwork, chanting, meditation
-        Power // Fast-paced, strength-focused Vinyasa
-
+        Iyengar,     // Precise alignment with props
+        Kundalini,   // Poses, breathwork, chanting, meditation
+        Power        // Fast-paced, strength-focused Vinyasa
     }
 
     struct TimeSlot {
-        uint64 startTime; // Unix timestamp for class start
-        uint32 durationMinutes; // Class duration in minutes
-        int16 timezoneOffset; // Timezone offset in minutes from UTC
+        uint64 startTime;        // Unix timestamp for class start
+        uint32 durationMinutes;  // Class duration in minutes
+        int16 timezoneOffset;    // Timezone offset in minutes from UTC
     }
 
-    struct ClassBooking {
-        address student; // Person booking the class
-        address teacher; // Teacher who accepts the booking
-        uint256 paymentAmount; // Payment amount in wei
-        BookingStatus status; // Current booking status
-        uint64 createdTimestamp; // When booking was created
-        uint32 completionWindow; // Seconds after class to mark complete
-        TimeSlot[] availableSlots; // 3 possible time slots
-        YogaType[] yogaTypes; // Yoga type preferences (at least 1)
-        uint8 selectedSlotIndex; // Which time slot was chosen
+    struct Escrow {
+        address payer;              // Person who deposited funds
+        address payee;              // Person who will receive funds (selected teacher)
+        uint256 amount;             // Amount held in escrow (wei)
+        EscrowStatus status;        // Current escrow status
+        uint64 createdAt;           // When escrow was created
+        uint64 expiresAt;           // When escrow can be auto-released
+        string description;         // Optional description of service
+        string[3] teacherHandles;   // 3 unique handles for potential teachers
+        YogaType[3] yogaTypes;      // 3 yoga type options
+        TimeSlot[3] timeSlots;      // 3 time slot options
+        uint8 selectedPayeeIndex;   // Which teacher was selected (0-2)
+        uint8 selectedYogaIndex;    // Which yoga type was selected (0-2)
+        uint8 selectedTimeIndex;    // Which time slot was selected (0-2)
+        string selectedHandle;      // The handle of the selected teacher
     }
 
     uint8 private constant NOT_SELECTED = 255;
-    uint256 private constant MAX_TIME_SLOTS = 3;
-    uint256 private constant MAX_YOGA_TYPES = 8;
+    uint8 private constant OPTIONS_COUNT = 3;
 
-    mapping(uint256 => ClassBooking) public bookings;
-    uint256 public nextBookingId;
+    mapping(uint256 => Escrow) public escrows;
+    uint256 public nextEscrowId;
 
-    event BookingCreated(
-        uint256 indexed bookingId, address indexed student, uint256 paymentAmount, uint32 completionWindow
+    event EscrowCreated(
+        uint256 indexed escrowId, address indexed payer, uint256 amount, uint64 expiresAt
     );
 
-    event BookingConfirmed(uint256 indexed bookingId, address indexed teacher, uint8 slotIndex);
+    event EscrowAssigned(uint256 indexed escrowId, address indexed payee, uint8 payeeIndex, uint8 yogaIndex, uint8 timeIndex);
 
-    event BookingCompleted(uint256 indexed bookingId, address indexed teacher, uint256 paymentReleased);
+    event EscrowCompleted(uint256 indexed escrowId, address indexed payee, uint256 amountReleased);
 
-    event BookingCancelled(uint256 indexed bookingId);
-    event BookingDisputed(uint256 indexed bookingId);
+    event EscrowCancelled(uint256 indexed escrowId, address indexed payer, uint256 amountRefunded);
+    event EscrowDisputed(uint256 indexed escrowId);
+    event EscrowAutoReleased(uint256 indexed escrowId, address indexed payee, uint256 amountReleased);
 
-    error NotStudent();
-    error NotTeacher();
-    error InvalidBookingStatus();
-    error InvalidTimeSlot();
-    error InvalidYogaType();
-    error CompletionWindowNotReached();
-    error NoPaymentToRefund();
-    error InvalidNumberOfOptions();
+    error NotPayer();
+    error NotPayee();
+    error NotAuthorized();
+    error InvalidEscrowStatus();
+    error EscrowNotExpired();
+    error NoFundsToRelease();
+    error ZeroAmount();
+    error InvalidExpiration();
+    error InvalidPayeeIndex();
+    error InvalidYogaIndex();
+    error InvalidTimeIndex();
+    error DuplicateHandle();
+    error EmptyHandle();
+    error HandleMismatch();
 
-    modifier onlyStudent(uint256 bookingId) {
-        if (msg.sender != bookings[bookingId].student) revert NotStudent();
+    modifier onlyPayer(uint256 escrowId) {
+        if (msg.sender != escrows[escrowId].payer) revert NotPayer();
         _;
     }
 
-    modifier onlyBookingStatus(uint256 bookingId, BookingStatus requiredStatus) {
-        if (bookings[bookingId].status != requiredStatus) revert InvalidBookingStatus();
+    modifier onlyPayee(uint256 escrowId) {
+        if (msg.sender != escrows[escrowId].payee) revert NotPayee();
+        _;
+    }
+
+    modifier onlyEscrowStatus(uint256 escrowId, EscrowStatus requiredStatus) {
+        if (escrows[escrowId].status != requiredStatus) revert InvalidEscrowStatus();
+        _;
+    }
+
+    modifier onlyParties(uint256 escrowId) {
+        if (msg.sender != escrows[escrowId].payer && msg.sender != escrows[escrowId].payee) {
+            revert NotAuthorized();
+        }
         _;
     }
 
     /**
-     * @notice Creates a new minimal yoga class booking with ETH payment
-     * @dev Requires exactly 3 time slots and at least 1 yoga type preference
-     * @param availableSlots Array of exactly 3 possible time slots for the class
-     * @param yogaTypes Array of yoga type preferences (at least 1, max 8)
-     * @param completionWindow Seconds after class end to mark as completed
-     * @return bookingId Unique identifier for the created booking
+     * @notice Creates a new escrow with ETH deposit and choice options
+     * @dev Funds are held until released or expired. Payer specifies 3 options for each category
+     * @param teacherHandles Array of exactly 3 unique teacher handles (e.g., "@yogamaster", "@zenteacher")
+     * @param yogaTypes Array of exactly 3 yoga type preferences  
+     * @param timeSlots Array of exactly 3 possible time slots
+     * @param expirationTime Unix timestamp when funds can be auto-released
+     * @param description Optional description of the service
+     * @return escrowId Unique identifier for the created escrow
      */
-    function createBooking(TimeSlot[] calldata availableSlots, YogaType[] calldata yogaTypes, uint32 completionWindow)
+    function createEscrow(
+        string[3] calldata teacherHandles,
+        YogaType[3] calldata yogaTypes,
+        TimeSlot[3] calldata timeSlots,
+        uint64 expirationTime,
+        string calldata description
+    )
         external
         payable
         nonReentrant
-        returns (uint256 bookingId)
+        returns (uint256 escrowId)
     {
-        require(msg.value > 0, "Payment required");
-        require(availableSlots.length == MAX_TIME_SLOTS, "Exactly 3 time slots required");
-        require(yogaTypes.length > 0 && yogaTypes.length <= MAX_YOGA_TYPES, "Must have 1-8 yoga type preferences");
-        require(completionWindow > 0, "Completion window must be positive");
-
-        bookingId = nextBookingId++;
-        ClassBooking storage booking = bookings[bookingId];
-
-        booking.student = msg.sender;
-        booking.paymentAmount = msg.value;
-        booking.status = BookingStatus.Pending;
-        booking.createdTimestamp = uint64(block.timestamp);
-        booking.completionWindow = completionWindow;
-        booking.selectedSlotIndex = NOT_SELECTED;
-
-        for (uint256 i = 0; i < MAX_TIME_SLOTS; i++) {
-            booking.availableSlots.push(availableSlots[i]);
+        if (msg.value == 0) revert ZeroAmount();
+        if (expirationTime <= block.timestamp) revert InvalidExpiration();
+        
+        // Validate handles - no empty strings and no duplicates
+        for (uint8 i = 0; i < OPTIONS_COUNT; i++) {
+            if (bytes(teacherHandles[i]).length == 0) revert EmptyHandle();
+            
+            for (uint8 j = i + 1; j < OPTIONS_COUNT; j++) {
+                if (keccak256(bytes(teacherHandles[i])) == keccak256(bytes(teacherHandles[j]))) {
+                    revert DuplicateHandle();
+                }
+            }
         }
 
-        for (uint256 i = 0; i < yogaTypes.length; i++) {
-            booking.yogaTypes.push(yogaTypes[i]);
+        escrowId = nextEscrowId++;
+        Escrow storage escrow = escrows[escrowId];
+
+        escrow.payer = msg.sender;
+        escrow.amount = msg.value;
+        escrow.status = EscrowStatus.Created;
+        escrow.createdAt = uint64(block.timestamp);
+        escrow.expiresAt = expirationTime;
+        escrow.description = description;
+        escrow.selectedPayeeIndex = NOT_SELECTED;
+        escrow.selectedYogaIndex = NOT_SELECTED;
+        escrow.selectedTimeIndex = NOT_SELECTED;
+        
+        // Store the options
+        for (uint8 i = 0; i < OPTIONS_COUNT; i++) {
+            escrow.teacherHandles[i] = teacherHandles[i];
+            escrow.yogaTypes[i] = yogaTypes[i];
+            escrow.timeSlots[i] = timeSlots[i];
         }
 
-        emit BookingCreated(bookingId, msg.sender, msg.value, completionWindow);
+        emit EscrowCreated(escrowId, msg.sender, msg.value, expirationTime);
     }
 
     /**
-     * @notice Teacher confirms a booking by selecting a time slot
-     * @dev Only callable for pending bookings
-     * @param bookingId The ID of the booking to confirm
-     * @param slotIndex Index of selected time slot (0, 1, or 2)
+     * @notice Assigns a payee (teacher) and selects yoga type & time slot from the predefined options
+     * @dev Payer provides teacher address and handle - must match one of the preset handles
+     * @param escrowId The ID of the escrow to assign
+     * @param teacherAddress The actual wallet address of the teacher
+     * @param teacherHandle The handle that matches one of the 3 preset handles
+     * @param yogaIndex Index (0-2) of which yoga type to select  
+     * @param timeIndex Index (0-2) of which time slot to select
      */
-    function confirmBooking(uint256 bookingId, uint8 slotIndex)
+    function assignPayee(
+        uint256 escrowId, 
+        address teacherAddress,
+        string calldata teacherHandle,
+        uint8 yogaIndex, 
+        uint8 timeIndex
+    )
         external
         nonReentrant
-        onlyBookingStatus(bookingId, BookingStatus.Pending)
+        onlyPayer(escrowId)
+        onlyEscrowStatus(escrowId, EscrowStatus.Created)
     {
-        ClassBooking storage booking = bookings[bookingId];
+        require(teacherAddress != address(0), "Invalid teacher address");
+        require(teacherAddress != msg.sender, "Teacher cannot be payer");
+        if (yogaIndex >= OPTIONS_COUNT) revert InvalidYogaIndex();
+        if (timeIndex >= OPTIONS_COUNT) revert InvalidTimeIndex();
 
-        if (slotIndex >= MAX_TIME_SLOTS) revert InvalidTimeSlot();
+        Escrow storage escrow = escrows[escrowId];
+        
+        // Find matching handle and get its index
+        uint8 payeeIndex = NOT_SELECTED;
+        for (uint8 i = 0; i < OPTIONS_COUNT; i++) {
+            if (keccak256(bytes(escrow.teacherHandles[i])) == keccak256(bytes(teacherHandle))) {
+                payeeIndex = i;
+                break;
+            }
+        }
+        
+        if (payeeIndex == NOT_SELECTED) revert HandleMismatch();
+        
+        // Assign the selections
+        escrow.payee = teacherAddress;
+        escrow.selectedPayeeIndex = payeeIndex;
+        escrow.selectedYogaIndex = yogaIndex;
+        escrow.selectedTimeIndex = timeIndex;
+        escrow.selectedHandle = teacherHandle;
+        escrow.status = EscrowStatus.Assigned;
 
-        booking.teacher = msg.sender;
-        booking.selectedSlotIndex = slotIndex;
-        booking.status = BookingStatus.Confirmed;
-
-        emit BookingConfirmed(bookingId, msg.sender, slotIndex);
+        emit EscrowAssigned(escrowId, teacherAddress, payeeIndex, yogaIndex, timeIndex);
     }
 
     /**
-     * @notice Student marks class as completed and releases payment to teacher
-     * @dev Only callable by student for confirmed bookings
-     * @param bookingId The ID of the booking to complete
+     * @notice Payer releases funds to the assigned payee
+     * @dev Only callable by payer for assigned escrows
+     * @param escrowId The ID of the escrow to complete
      */
-    function completeClass(uint256 bookingId)
+    function releasePayment(uint256 escrowId)
         external
         nonReentrant
-        onlyStudent(bookingId)
-        onlyBookingStatus(bookingId, BookingStatus.Confirmed)
+        onlyPayer(escrowId)
+        onlyEscrowStatus(escrowId, EscrowStatus.Assigned)
     {
-        ClassBooking storage booking = bookings[bookingId];
-        uint256 payment = booking.paymentAmount;
-        address teacherAddress = booking.teacher;
+        Escrow storage escrow = escrows[escrowId];
+        uint256 amount = escrow.amount;
+        address payeeAddress = escrow.payee;
 
-        booking.paymentAmount = 0;
-        booking.status = BookingStatus.Completed;
+        escrow.amount = 0;
+        escrow.status = EscrowStatus.Completed;
 
-        (bool success,) = payable(teacherAddress).call{value: payment}("");
+        (bool success,) = payable(payeeAddress).call{value: amount}("");
         require(success, "Payment transfer failed");
 
-        emit BookingCompleted(bookingId, teacherAddress, payment);
+        emit EscrowCompleted(escrowId, payeeAddress, amount);
     }
 
     /**
-     * @notice Student cancels a pending booking and receives full refund
-     * @dev Only works for bookings in Pending status
-     * @param bookingId The ID of the booking to cancel
+     * @notice Cancels escrow and refunds payer (only if not yet assigned)
+     * @dev Only works for escrows in Created status
+     * @param escrowId The ID of the escrow to cancel
      */
-    function cancelBooking(uint256 bookingId)
+    function cancelEscrow(uint256 escrowId)
         external
         nonReentrant
-        onlyStudent(bookingId)
-        onlyBookingStatus(bookingId, BookingStatus.Pending)
+        onlyPayer(escrowId)
+        onlyEscrowStatus(escrowId, EscrowStatus.Created)
     {
-        ClassBooking storage booking = bookings[bookingId];
-        uint256 refundAmount = booking.paymentAmount;
+        Escrow storage escrow = escrows[escrowId];
+        uint256 refundAmount = escrow.amount;
 
-        if (refundAmount == 0) revert NoPaymentToRefund();
+        if (refundAmount == 0) revert NoFundsToRelease();
 
-        booking.paymentAmount = 0;
-        booking.status = BookingStatus.Cancelled;
+        escrow.amount = 0;
+        escrow.status = EscrowStatus.Cancelled;
 
-        (bool success,) = payable(booking.student).call{value: refundAmount}("");
+        (bool success,) = payable(escrow.payer).call{value: refundAmount}("");
         require(success, "Refund transfer failed");
 
-        emit BookingCancelled(bookingId);
+        emit EscrowCancelled(escrowId, escrow.payer, refundAmount);
     }
 
     /**
-     * @notice Automatically releases payment after completion window expires
-     * @dev Callable by anyone after class end time + completion window
-     * @param bookingId The ID of the booking to auto-release
+     * @notice Automatically releases payment after expiration time
+     * @dev Callable by anyone after escrow expiration time
+     * @param escrowId The ID of the escrow to auto-release
      */
-    function automaticPaymentRelease(uint256 bookingId)
+    function autoRelease(uint256 escrowId)
         external
         nonReentrant
-        onlyBookingStatus(bookingId, BookingStatus.Confirmed)
+        onlyEscrowStatus(escrowId, EscrowStatus.Assigned)
     {
-        ClassBooking storage booking = bookings[bookingId];
-        require(booking.selectedSlotIndex != NOT_SELECTED, "No time slot selected");
+        Escrow storage escrow = escrows[escrowId];
 
-        TimeSlot memory selectedSlot = booking.availableSlots[booking.selectedSlotIndex];
-        uint256 classEndTime = uint256(selectedSlot.startTime) + uint256(selectedSlot.durationMinutes) * 60;
-
-        if (block.timestamp < classEndTime + booking.completionWindow) {
-            revert CompletionWindowNotReached();
+        if (block.timestamp < escrow.expiresAt) {
+            revert EscrowNotExpired();
         }
 
-        uint256 payment = booking.paymentAmount;
-        address teacherAddress = booking.teacher;
+        uint256 amount = escrow.amount;
+        address payeeAddress = escrow.payee;
 
-        booking.paymentAmount = 0;
-        booking.status = BookingStatus.Completed;
+        escrow.amount = 0;
+        escrow.status = EscrowStatus.Completed;
 
-        (bool success,) = payable(teacherAddress).call{value: payment}("");
-        require(success, "Automatic payment release failed");
+        (bool success,) = payable(payeeAddress).call{value: amount}("");
+        require(success, "Auto-release transfer failed");
 
-        emit BookingCompleted(bookingId, teacherAddress, payment);
+        emit EscrowAutoReleased(escrowId, payeeAddress, amount);
     }
 
     /**
-     * @notice Either party can raise a dispute for a confirmed booking
-     * @dev Freezes the booking for external resolution
-     * @param bookingId The ID of the booking to dispute
+     * @notice Either party can raise a dispute for an assigned escrow
+     * @dev Freezes the escrow for external resolution
+     * @param escrowId The ID of the escrow to dispute
      */
-    function raiseDispute(uint256 bookingId) external onlyBookingStatus(bookingId, BookingStatus.Confirmed) {
-        ClassBooking storage booking = bookings[bookingId];
-        require(
-            msg.sender == booking.student || msg.sender == booking.teacher, "Only student or teacher can raise dispute"
-        );
-
-        booking.status = BookingStatus.Disputed;
-        emit BookingDisputed(bookingId);
+    function raiseDispute(uint256 escrowId) 
+        external 
+        onlyEscrowStatus(escrowId, EscrowStatus.Assigned) 
+        onlyParties(escrowId) 
+    {
+        Escrow storage escrow = escrows[escrowId];
+        escrow.status = EscrowStatus.Disputed;
+        
+        emit EscrowDisputed(escrowId);
     }
 
-    function getBooking(uint256 bookingId) external view returns (ClassBooking memory) {
-        return bookings[bookingId];
+    /**
+     * @notice Get escrow details
+     * @param escrowId The ID of the escrow to query
+     * @return The escrow struct
+     */
+    function getEscrow(uint256 escrowId) external view returns (Escrow memory) {
+        return escrows[escrowId];
     }
 
-    function getTimeSlots(uint256 bookingId) external view returns (TimeSlot[] memory) {
-        return bookings[bookingId].availableSlots;
+    /**
+     * @notice Check if escrow is expired and can be auto-released
+     * @param escrowId The ID of the escrow to check
+     * @return Whether the escrow has expired
+     */
+    function isExpired(uint256 escrowId) external view returns (bool) {
+        return block.timestamp >= escrows[escrowId].expiresAt;
     }
 
-    function getYogaTypes(uint256 bookingId) external view returns (YogaType[] memory) {
-        return bookings[bookingId].yogaTypes;
+    /**
+     * @notice Get total number of escrows created
+     * @return The next escrow ID (total count)
+     */
+    function getTotalEscrows() external view returns (uint256) {
+        return nextEscrowId;
     }
 
+    /**
+     * @notice Get the teacher handles for an escrow
+     * @param escrowId The ID of the escrow to query
+     * @return Array of 3 teacher handles
+     */
+    function getTeacherHandles(uint256 escrowId) external view returns (string[3] memory) {
+        return escrows[escrowId].teacherHandles;
+    }
+
+    /**
+     * @notice Get the yoga type options for an escrow
+     * @param escrowId The ID of the escrow to query
+     * @return Array of 3 yoga types
+     */
+    function getYogaTypes(uint256 escrowId) external view returns (YogaType[3] memory) {
+        return escrows[escrowId].yogaTypes;
+    }
+
+    /**
+     * @notice Get the time slot options for an escrow
+     * @param escrowId The ID of the escrow to query
+     * @return Array of 3 time slots
+     */
+    function getTimeSlots(uint256 escrowId) external view returns (TimeSlot[3] memory) {
+        return escrows[escrowId].timeSlots;
+    }
+
+    /**
+     * @notice Get the selected options for an assigned escrow
+     * @param escrowId The ID of the escrow to query
+     * @return payeeIndex Selected teacher index, yogaIndex Selected yoga type index, timeIndex Selected time slot index
+     */
+    function getSelectedOptions(uint256 escrowId) external view returns (uint8 payeeIndex, uint8 yogaIndex, uint8 timeIndex) {
+        Escrow memory escrow = escrows[escrowId];
+        return (escrow.selectedPayeeIndex, escrow.selectedYogaIndex, escrow.selectedTimeIndex);
+    }
+
+    /**
+     * @notice Get yoga type name as string
+     * @param yogaType The yoga type enum value
+     * @return The name of the yoga type
+     */
     function getYogaTypeName(YogaType yogaType) external pure returns (string memory) {
         if (yogaType == YogaType.Vinyasa) return "Vinyasa";
         if (yogaType == YogaType.Yin) return "Yin";
