@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import { PasswordlessSignup } from './PasswordlessSignup'
+import { Brand } from './Brand'
 
 const meta: Meta<typeof PasswordlessSignup> = {
   title: 'Auth/PasswordlessSignup',
@@ -115,6 +116,22 @@ export const FlowUnhappy: Story = {
     initialEmail: 'yogi@example.com',
     onRequestCode: mockRequestCode,
     onVerifyCode: mockVerifyAlwaysFail,
+    skin: 'ulyxes',
+  },
+}
+
+export const WithBrandAbove: Story = {
+  name: 'Login with Brand',
+  render: (args) => (
+    <div style={{ display: 'grid', gap: 12 }}>
+      <Brand logo={<div style={{ width: 28, height: 28, borderRadius: '50%', border: '2px solid currentColor' }} />} slogan="Ulyxes. Yoga everywhere.. anytime.." skin="ulyxes" />
+      <PasswordlessSignup {...args} />
+    </div>
+  ),
+  args: {
+    initialEmail: '',
+    onRequestCode: mockRequestCode,
+    onVerifyCode: mockVerifyAlwaysOk,
     skin: 'ulyxes',
   },
 }

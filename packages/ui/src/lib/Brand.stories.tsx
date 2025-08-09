@@ -31,20 +31,20 @@ const PlaceholderLogo = () => (
 
 export const Default: Story = {
   args: {
-    slogan: 'Ulyxes. Yoga every… anytime.',
+    slogan: 'Ulyxes. Yoga everywhere.. anytime..',
   },
 }
 
 export const WithLogo: Story = {
   args: {
-    slogan: 'Ulyxes. Yoga every… anytime.',
+    slogan: 'Ulyxes. Yoga everywhere.. anytime..',
     logo: <PlaceholderLogo />,
   },
 }
 
 export const UlyxesSkin: Story = {
   args: {
-    slogan: 'Ulyxes. Yoga every… anytime.',
+    slogan: 'Ulyxes. Yoga everywhere.. anytime..',
     logo: <PlaceholderLogo />,
     skin: 'ulyxes',
   },

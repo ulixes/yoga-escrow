@@ -12,7 +12,7 @@ export type BrandProps = {
 
 export const Brand: React.FC<BrandProps> = ({
   logo,
-  slogan = 'Ulyxes. Yoga every… anytime.',
+  slogan = 'Ulyxes. Yoga everywhere.. anytime..',
   className,
   containerProps,
   logoProps,
