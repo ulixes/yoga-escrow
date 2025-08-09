@@ -41,10 +41,14 @@ const mockVerifyAlwaysFail = async () => {
 }
 
 const Layout: React.FC<React.PropsWithChildren> = ({ children }) => (
-  <div style={{ display: 'grid', gap: 12 }}>
+  <div style={{ display: 'grid', gap: 16 }}>
     <Brand
-      logo={<div style={{ width: 28, height: 28, borderRadius: '50%', border: '2px solid currentColor' }} />}
-      slogan="Ulyxes. Yoga everywhere.. anytime.."
+      title="Ulyxes"
+      slogan="Yoga everywhere.. anytime.."
+      subtitle="Move with breath. Find your space."
+      orientation="vertical"
+      size="lg"
+      logoVariant="wave"
       skin="ulyxes"
     />
     {children}
@@ -170,10 +174,9 @@ export const FlowUnhappy: Story = {
 export const WithBrandAbove: Story = {
   name: 'Login with Brand',
   render: (args) => (
-    <div style={{ display: 'grid', gap: 12 }}>
-      <Brand logo={<div style={{ width: 28, height: 28, borderRadius: '50%', border: '2px solid currentColor' }} />} slogan="Ulyxes. Yoga everywhere.. anytime.." skin="ulyxes" />
+    <Layout>
       <PasswordlessSignup {...args} />
-    </div>
+    </Layout>
   ),
   args: {
     initialEmail: '',
