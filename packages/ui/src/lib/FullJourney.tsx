@@ -1,0 +1,245 @@
+import React from 'react'
+import { Brand } from './Brand'
+import { YogaTypePicker, YogaTypeItem } from './YogaTypePicker'
+import { LocationPicker, LocationPickerProps } from './LocationPicker'
+import { YogaTimeBlocksPicker, YogaDay, Persona } from './YogaTimeBlocksPicker'
+
+export type JourneyPersona = 'Dancer' | 'Runner' | 'Traveler'
+export type JourneyGoal = 'Flexibility' | 'Recovery' | 'Strength' | 'Calm' | 'None'
+
+export type FullJourneyResult = {
+  persona: JourneyPersona
+  goal: JourneyGoal | 'None'
+  yogaTypeId: string
+  location: { country: string; city: string; specificLocation: string }
+  timeIds: string[] // dayId:HH:mm
+  student: { name: string; email: string }
+}
+
+export type FullJourneyProps = {
+  yogaTypes: YogaTypeItem[]
+  yogaTypePersonas: string[]
+  days: YogaDay[]
+  defaultPersona?: JourneyPersona
+  skin?: string
+  className?: string
+  onSubmit?: (result: FullJourneyResult) => void
+  locationProps?: Pick<LocationPickerProps, 'country' | 'city' | 'options'>
+}
+
+type Step = 1 | 2 | 3 | 4 | 5 | 6
+
+export function FullJourney(props: FullJourneyProps) {
+  const {
+    yogaTypes,
+    yogaTypePersonas,
+    days,
+    defaultPersona = 'Traveler',
+    skin = 'ulyxes',
+    className,
+    onSubmit,
+    locationProps,
+  } = props
+
+  const [step, setStep] = React.useState<Step>(1)
+
+  // Step 1
+  const [persona, setPersona] = React.useState<JourneyPersona>(defaultPersona)
+  const [goal, setGoal] = React.useState<JourneyGoal>('None')
+
+  // Step 2
+  const [selectedYogaTypeId, setSelectedYogaTypeId] = React.useState<string>('')
+
+  // Step 3
+  const [location, setLocation] = React.useState<{ country: string; city: string; specificLocation: string } | null>(
+    null,
+  )
+
+  // Step 4
+  const [selectedTimes, setSelectedTimes] = React.useState<string[]>([])
+
+  // Step 5 - details
+  const [studentName, setStudentName] = React.useState('')
+  const [studentEmail, setStudentEmail] = React.useState('')
+
+  const totalSteps: Step = 6
+
+  const canNext = React.useMemo(() => {
+    switch (step) {
+      case 1:
+        return Boolean(persona)
+      case 2:
+        return Boolean(selectedYogaTypeId)
+      case 3:
+        return Boolean(location)
+      case 4:
+        return selectedTimes.length >= 3
+      case 5:
+        return studentName.trim().length > 1 && /@/.test(studentEmail)
+      default:
+        return true
+    }
+  }, [step, persona, selectedYogaTypeId, location, selectedTimes, studentName, studentEmail])
+
+  const handleNext = () => {
+    if (step === totalSteps) return
+    if (step === 5) {
+      // Submit before moving to confirmation
+      const result: FullJourneyResult = {
+        persona,
+        goal,
+        yogaTypeId: selectedYogaTypeId,
+        location: location!,
+        timeIds: selectedTimes,
+        student: { name: studentName.trim(), email: studentEmail.trim() },
+      }
+      onSubmit?.(result)
+    }
+    setStep((s) => ((s + 1) as Step))
+  }
+
+  const handleBack = () => {
+    if (step === 1) return
+    setStep((s) => ((s - 1) as Step))
+  }
+
+  const personaToInternal: Record<JourneyPersona, Persona> = {
+    Dancer: 'dancer',
+    Runner: 'runner',
+    Traveler: 'traveler',
+  }
+
+  return (
+    <div data-skin={skin} className={['yui-journey', className].filter(Boolean).join(' ')}>
+      <header className="yui-journey__header">
+        <div className="yui-journey__brand">
+          <Brand
+            title="Ulyxes"
+            slogan="Yoga everywhere. anytime."
+            subtitle="Start your journey"
+            orientation="vertical"
+            size="md"
+            logoVariant="wave"
+            skin={skin}
+          />
+        </div>
+        <div className="yui-journey__progress">
+          <div className="yui-journey__progress-text">Step {step}/{totalSteps}</div>
+          <div className="yui-journey__progress-bar"><span style={{ width: `${(step / totalSteps) * 100}%` }} /></div>
+        </div>
+      </header>
+
+      <main className="yui-journey__content">
+        {step === 1 && (
+          <section className="yui-journey__step yui-journey__welcome" aria-label="Welcome">
+            <div className="yui-journey__hero">
+              <h2 className="yui-journey__title">Start Your Journey</h2>
+              <p className="yui-journey__subtitle">Pick a persona and an optional goal</p>
+            </div>
+            <div className="yui-journey__cards">
+              {(['Dancer', 'Runner', 'Traveler'] as JourneyPersona[]).map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  className="yui-journey__persona"
+                  data-active={persona === p}
+                  onClick={() => setPersona(p)}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
+            <div className="yui-journey__goals">
+              {(['None', 'Flexibility', 'Recovery', 'Strength', 'Calm'] as JourneyGoal[]).map((g) => (
+                <button key={g} type="button" className="yui-journey__goal" data-active={goal === g} onClick={() => setGoal(g)}>
+                  {g}
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {step === 2 && (
+          <section className="yui-journey__step" aria-label="Choose Yoga Type">
+            <YogaTypePicker
+              items={yogaTypes}
+              personas={yogaTypePersonas}
+              filterPersona={personaToInternal[persona]}
+              onFilterPersona={() => {}}
+              selectedIds={selectedYogaTypeId ? [selectedYogaTypeId] : []}
+              selectionMode="single"
+              onSelect={(id) => setSelectedYogaTypeId(id)}
+              onDeselect={(id) => setSelectedYogaTypeId('')}
+              skin={skin}
+            />
+          </section>
+        )}
+
+        {step === 3 && (
+          <section className="yui-journey__step" aria-label="Choose Location">
+            <LocationPicker
+              {...locationProps}
+              value={location}
+              onChange={(loc) => setLocation(loc)}
+              onDone={(loc) => setLocation(loc)}
+              skin={skin}
+            />
+          </section>
+        )}
+
+        {step === 4 && (
+          <section className="yui-journey__step" aria-label="Choose Times">
+            <YogaTimeBlocksPicker
+              days={days}
+              selectedIds={selectedTimes}
+              onChange={setSelectedTimes}
+              minSelections={3}
+              onDone={setSelectedTimes}
+              persona={personaToInternal[persona]}
+              skin={skin}
+            />
+          </section>
+        )}
+
+        {step === 5 && (
+          <section className="yui-journey__step" aria-label="Review & Details">
+            <div className="yui-journey__review">
+              <h3>Review your choices</h3>
+              <ul className="yui-journey__summary">
+                <li><strong>Persona:</strong> {persona}</li>
+                <li><strong>Goal:</strong> {goal}</li>
+                <li><strong>Yoga:</strong> {selectedYogaTypeId || '—'}</li>
+                <li><strong>Location:</strong> {location ? `${location.country}, ${location.city} — ${location.specificLocation}` : '—'}</li>
+                <li><strong>Times:</strong> {selectedTimes.length ? selectedTimes.join(', ') : '—'}</li>
+              </ul>
+            </div>
+            <div className="yui-journey__details">
+              <label className="yui-journey__field">
+                <span>Name</span>
+                <input className="yui-journey__input" value={studentName} onChange={(e) => setStudentName(e.target.value)} />
+              </label>
+              <label className="yui-journey__field">
+                <span>Email</span>
+                <input className="yui-journey__input" type="email" value={studentEmail} onChange={(e) => setStudentEmail(e.target.value)} />
+              </label>
+            </div>
+          </section>
+        )}
+
+        {step === 6 && (
+          <section className="yui-journey__step yui-journey__confirm" aria-label="Confirmation">
+            <h2 className="yui-journey__title">You're all set</h2>
+            <p className="yui-journey__subtitle">We’ll match your preferences and reach out shortly.</p>
+          </section>
+        )}
+      </main>
+
+      <footer className="yui-journey__footer">
+        <button type="button" className="yui-btn yui-journey__back" onClick={handleBack} disabled={step === 1}>Back</button>
+        <button type="button" className="yui-btn yui-journey__next" onClick={handleNext} disabled={!canNext}>
+          {step === 5 ? 'Confirm' : step === 6 ? 'Done' : 'Next'}
+        </button>
+      </footer>
+    </div>
+  )
+}

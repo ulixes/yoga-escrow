@@ -213,3 +213,33 @@
 [data-skin='ulyxes'] .yui-time-blocks__day { border: none; box-shadow: 0 1px 0 rgba(0,0,0,0.08); padding: 8px 0; }
 [data-skin='ulyxes'] .yui-time-blocks__block { border: none; box-shadow: 0 1px 0 rgba(0,0,0,0.06); }
 [data-skin='ulyxes'] .yui-time-blocks__progress-bar { background: rgba(0,0,0,0.06); }
+
+/* FullJourney – orchestrated flow */
+.yui-journey { display: grid; gap: 16px; }
+.yui-journey__header { display: flex; align-items: center; justify-content: space-between; }
+.yui-journey__progress { display: grid; gap: 6px; width: 180px; }
+.yui-journey__progress-text { text-align: right; font-size: 12px; opacity: 0.8; }
+.yui-journey__progress-bar { height: 4px; background: rgba(0,0,0,0.08); border-radius: 999px; overflow: hidden; }
+.yui-journey__progress-bar > span { display: block; height: 100%; background: #111; }
+.yui-journey__content { display: grid; gap: 16px; }
+.yui-journey__welcome { display: grid; gap: 16px; }
+.yui-journey__hero { display: grid; gap: 6px; }
+.yui-journey__title { margin: 0; font-weight: 700; letter-spacing: 0.2px; }
+.yui-journey__subtitle { margin: 0; opacity: 0.75; }
+.yui-journey__cards { display: flex; flex-wrap: wrap; gap: 10px; }
+.yui-journey__persona { padding: 10px 12px; border-radius: 999px; border: 1px solid currentColor; background: transparent; }
+.yui-journey__persona[data-active='true'] { background: currentColor; color: #fff; }
+.yui-journey__goals { display: flex; flex-wrap: wrap; gap: 8px; }
+.yui-journey__goal { padding: 8px 10px; border: 1px solid currentColor; border-radius: 999px; background: transparent; }
+.yui-journey__goal[data-active='true'] { background: currentColor; color: #fff; }
+.yui-journey__review { display: grid; gap: 8px; }
+.yui-journey__summary { margin: 0; padding-left: 18px; }
+.yui-journey__details { display: grid; gap: 10px; }
+.yui-journey__field { display: grid; gap: 4px; }
+.yui-journey__input { font: inherit; padding: 8px 0; border: none; border-bottom: 1px solid rgba(0,0,0,0.25); background: transparent; }
+.yui-journey__footer { display: flex; justify-content: space-between; }
+
+[data-skin='ulyxes'] .yui-journey__persona, [data-skin='ulyxes'] .yui-journey__goal, [data-skin='ulyxes'] .yui-journey__next, [data-skin='ulyxes'] .yui-journey__back {
+  text-decoration: underline; text-underline-offset: 3px; border: none; border-radius: 0; background: transparent; padding: 0;
+}
+[data-skin='ulyxes'] .yui-journey__input:focus { outline: none; border-bottom-color: #111; }

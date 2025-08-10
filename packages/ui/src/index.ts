@@ -28,3 +28,5 @@ export type { LocationPickerProps } from './lib/LocationPicker'
 export { YogaTimeBlocksPicker } from './lib/YogaTimeBlocksPicker'
 export type { YogaTimeBlocksPickerProps, Persona } from './lib/YogaTimeBlocksPicker'
 
+export { FullJourney } from './lib/FullJourney'
+export type { FullJourneyProps, FullJourneyResult, JourneyPersona, JourneyGoal } from './lib/FullJourney'
