@@ -105,14 +105,19 @@ export function YogaTimeBlocksPicker(props: YogaTimeBlocksPickerProps) {
     <div data-skin={skin} className={className}>
       <section className="yui-time-blocks" aria-label="Yoga time picker (blocks)">
         <header className="yui-time-blocks__header">
-          <div className="yui-time-blocks__title">Pick at least {minSelections} times</div>
+          <div className="yui-time-blocks__title">Choose your preferred times</div>
           <div className="yui-time-blocks__progress" aria-live="polite">
-            <div className="yui-time-blocks__progress-text">{selectedIds.length}/{minSelections}</div>
+            <div className="yui-time-blocks__progress-text">
+              {selectedIds.length < minSelections 
+                ? `${selectedIds.length}/${minSelections}` 
+                : `${selectedIds.length} selected`
+              }
+            </div>
             <div className="yui-time-blocks__progress-bar"><span style={{width: `${Math.min(100, (selectedIds.length/minSelections)*100)}%`}} /></div>
           </div>
         </header>
         <div className="yui-time-blocks__actions">
-          <button type="button" className="yui-btn yui-time-blocks__quick" onClick={quickPick3}>Quick Pick 3</button>
+          <button type="button" className="yui-btn yui-time-blocks__quick" onClick={quickPick3}>Quick pick {minSelections}</button>
           {!hideDoneButton && (
             <button type="button" className="yui-btn yui-time-blocks__done" disabled={!canDone} onClick={() => canDone && onDone?.(selectedIds)}>Done</button>
           )}

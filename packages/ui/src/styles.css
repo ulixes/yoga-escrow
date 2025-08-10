@@ -225,6 +225,8 @@
 [data-skin='ulyxes'] .yui-time-blocks__day { border: none; box-shadow: 0 1px 0 rgba(0,0,0,0.08); padding: 8px 0; }
 [data-skin='ulyxes'] .yui-time-blocks__block { border: none; box-shadow: 0 1px 0 rgba(0,0,0,0.06); }
 [data-skin='ulyxes'] .yui-time-blocks__progress-bar { background: rgba(0,0,0,0.06); }
+[data-skin='ulyxes'] .yui-time-blocks__quick { text-decoration: underline; text-underline-offset: 3px; border: none; background: transparent; padding: 0; }
+[data-skin='ulyxes'] .yui-time-blocks__title { text-decoration: underline; text-underline-offset: 3px; }
 
 /* FullJourney – orchestrated flow */
 .yui-journey { display: grid; gap: 16px; }
