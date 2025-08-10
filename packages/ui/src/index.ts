@@ -22,3 +22,6 @@ export const UIStyles = './styles.css'
 export { YogaTimePicker } from './lib/YogaTimePicker'
 export type { YogaTimePickerProps, YogaDay, YogaTimeItem } from './lib/YogaTimePicker'
 
+export { LocationPicker } from './lib/LocationPicker'
+export type { LocationPickerProps } from './lib/LocationPicker'
+
