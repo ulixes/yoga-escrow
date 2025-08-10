@@ -227,10 +227,10 @@
 .yui-journey__title { margin: 0; font-weight: 700; letter-spacing: 0.2px; }
 .yui-journey__subtitle { margin: 0; opacity: 0.75; }
 .yui-journey__cards { display: flex; flex-wrap: wrap; gap: 10px; }
-.yui-journey__persona { padding: 10px 12px; border-radius: 999px; border: 1px solid currentColor; background: transparent; }
+.yui-journey__persona { padding: 10px 12px; border-radius: 999px; border: 1px solid currentColor; background: transparent; cursor: pointer; }
 .yui-journey__persona[data-active='true'] { background: currentColor; color: #fff; }
 .yui-journey__goals { display: flex; flex-wrap: wrap; gap: 8px; }
-.yui-journey__goal { padding: 8px 10px; border: 1px solid currentColor; border-radius: 999px; background: transparent; }
+.yui-journey__goal { padding: 8px 10px; border: 1px solid currentColor; border-radius: 999px; background: transparent; cursor: pointer; }
 .yui-journey__goal[data-active='true'] { background: currentColor; color: #fff; }
 .yui-journey__review { display: grid; gap: 8px; }
 .yui-journey__summary { margin: 0; padding-left: 18px; }

@@ -147,7 +147,7 @@ export function FullJourney(props: FullJourneyProps) {
                 <button
                   key={p}
                   type="button"
-                  className="yui-journey__persona"
+                  className="yui-btn yui-journey__persona"
                   data-active={persona === p}
                   onClick={() => setPersona(p)}
                 >
