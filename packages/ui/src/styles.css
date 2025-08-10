@@ -148,47 +148,25 @@
   text-decoration: underline; text-underline-offset: 3px;
 }
 
-/* TimeSlotPicker – List-based, spacious */
-.yui-slot-picker { display: grid; gap: 12px; }
-.yui-slot-picker__header { display: flex; gap: 10px; align-items: baseline; justify-content: space-between; }
-.yui-slot-picker__progress { font-weight: 600; }
-.yui-slot-picker__hint { opacity: 0.7; }
-.yui-slot-picker__days { display: grid; gap: 10px; }
-.yui-slot-picker__day { border: 1px solid currentColor; border-radius: 12px; padding: 8px; }
-.yui-slot-picker__day-toggle { width: 100%; display: flex; justify-content: space-between; align-items: baseline; background: transparent; border: none; padding: 8px; font: inherit; cursor: pointer; }
-.yui-slot-picker__hours { display: grid; gap: 6px; padding: 8px; margin: 0; list-style: none; }
-.yui-slot-picker__hour-row { display: block; }
-.yui-slot-picker__hour { display: flex; gap: 8px; align-items: center; }
-.yui-slot-picker__checkbox { width: 16px; height: 16px; }
-.yui-slot-picker__hour-label { font-size: 14px; }
-.yui-slot-picker__footer { opacity: 0.8; }
-.yui-slot-picker__validation[data-error] { color: #b3261e; }
-.yui-slot-picker__validation[data-ok] { color: #0a7c33; }
+/* YogaTimePicker – minimal, list-based per day */
+.yui-time-picker { display: grid; gap: 12px; }
+.yui-time-picker__header { display: flex; gap: 10px; align-items: baseline; justify-content: space-between; }
+.yui-time-picker__progress { font-weight: 600; }
+.yui-time-picker__days { display: grid; gap: 10px; }
+.yui-time-picker__day { border: 1px solid currentColor; border-radius: 12px; padding: 8px; }
+.yui-time-picker__day-label { font-weight: 600; padding: 8px; }
+.yui-time-picker__list { display: grid; gap: 6px; padding: 8px; margin: 0; list-style: none; }
+.yui-time-picker__row { display: block; }
+.yui-time-picker__time { display: flex; gap: 8px; align-items: center; }
+.yui-time-picker__checkbox { width: 16px; height: 16px; }
+.yui-time-picker__time-text { display: grid; }
+.yui-time-picker__time-label { font-size: 14px; }
+.yui-time-picker__time-sublabel { font-size: 12px; opacity: 0.75; }
+.yui-time-picker__actions { display: flex; justify-content: flex-end; }
 
-/* Ulyxes skin for TimeSlotPicker */
-[data-skin='ulyxes'] .yui-slot-picker { gap: 16px; }
-[data-skin='ulyxes'] .yui-slot-picker__day { border: none; box-shadow: 0 1px 0 rgba(0,0,0,0.08); border-radius: 14px; padding: 8px 0; }
-[data-skin='ulyxes'] .yui-slot-picker__day-toggle { padding: 12px 16px; }
-[data-skin='ulyxes'] .yui-slot-picker__hours { padding: 4px 16px 12px; }
-[data-skin='ulyxes'] .yui-slot-picker__hour-label { text-underline-offset: 3px; }
-
-/* TimeSlotCarousel – curated card deck */
-.yui-slot-carousel { display: grid; gap: 12px; align-items: start; }
-.yui-slot-carousel__header { display: flex; gap: 10px; align-items: baseline; justify-content: space-between; }
-.yui-slot-carousel__progress { font-weight: 600; }
-.yui-slot-carousel__deck { display: grid; grid-auto-flow: column; grid-auto-columns: 260px; gap: 12px; overflow-x: auto; padding-bottom: 6px; }
-.yui-slot-carousel__card { display: grid; gap: 8px; border: 1px solid currentColor; border-radius: 14px; padding: 12px; min-height: 140px; background: linear-gradient(180deg, rgba(0,0,0,0.03), rgba(0,0,0,0)); }
-.yui-slot-carousel__card[data-selected='true'] { outline: 2px solid currentColor; outline-offset: 2px; }
-.yui-slot-carousel__card-head { display: flex; gap: 8px; align-items: baseline; justify-content: space-between; }
-.yui-slot-carousel__title { margin: 0; font-weight: 600; }
-.yui-slot-carousel__tag { border: 1px solid currentColor; border-radius: 999px; padding: 2px 8px; font-size: 12px; }
-.yui-slot-carousel__actions { margin-top: 4px; }
-.yui-slot-carousel__selection { display: grid; gap: 8px; }
-.yui-slot-carousel__selected-list { display: grid; gap: 6px; list-style: none; padding: 0; margin: 0; }
-.yui-slot-carousel__selected-item { display: flex; gap: 8px; align-items: baseline; }
-.yui-slot-carousel__footer { display: flex; gap: 8px; }
-
-[data-skin='ulyxes'] .yui-slot-carousel__card { border: none; box-shadow: 0 1px 0 rgba(0,0,0,0.08); }
-[data-skin='ulyxes'] .yui-slot-carousel__select, [data-skin='ulyxes'] .yui-slot-carousel__remove, [data-skin='ulyxes'] .yui-slot-carousel__customize, [data-skin='ulyxes'] .yui-slot-carousel__done {
-  text-decoration: underline; text-underline-offset: 3px;
-}
+/* Ulyxes skin for YogaTimePicker */
+[data-skin='ulyxes'] .yui-time-picker { gap: 16px; }
+[data-skin='ulyxes'] .yui-time-picker__day { border: none; box-shadow: 0 1px 0 rgba(0,0,0,0.08); border-radius: 14px; padding: 8px 0; }
+[data-skin='ulyxes'] .yui-time-picker__list { padding: 4px 16px 12px; }
+[data-skin='ulyxes'] .yui-time-picker__day-label { padding: 12px 16px; }
+[data-skin='ulyxes'] .yui-time-picker__time-label { text-underline-offset: 3px; }
