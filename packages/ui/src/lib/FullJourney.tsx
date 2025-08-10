@@ -20,6 +20,7 @@ export type FullJourneyProps = {
   yogaTypePersonas: string[]
   days: YogaDay[]
   defaultPersona?: JourneyPersona
+  defaultStudentEmail?: string
   skin?: string
   className?: string
   onSubmit?: (result: FullJourneyResult) => void
@@ -34,6 +35,7 @@ export function FullJourney(props: FullJourneyProps) {
     yogaTypePersonas,
     days,
     defaultPersona = 'Traveler',
+    defaultStudentEmail,
     skin = 'ulyxes',
     className,
     onSubmit,
@@ -59,7 +61,13 @@ export function FullJourney(props: FullJourneyProps) {
   const [selectedTimes, setSelectedTimes] = React.useState<string[]>([])
 
   // Step 5 - details
-  const [studentEmail, setStudentEmail] = React.useState('')
+  const [studentEmail, setStudentEmail] = React.useState<string>(defaultStudentEmail || '')
+  React.useEffect(() => {
+    // Prefill when provided; do not overwrite if user already typed something different
+    if (defaultStudentEmail && (studentEmail === '' || studentEmail === undefined)) {
+      setStudentEmail(defaultStudentEmail)
+    }
+  }, [defaultStudentEmail])
 
   const totalSteps: Step = 6
 
