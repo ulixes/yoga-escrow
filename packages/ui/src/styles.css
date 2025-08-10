@@ -489,6 +489,12 @@
 
 .yui-payment { display: grid; gap: 10px; }
 .yui-payment__row { display: flex; justify-content: space-between; }
+.yui-payment__row--total {
+  border-top: 1px solid #e0e0e0;
+  font-weight: 600;
+  margin-top: 8px;
+  padding-top: 8px;
+}
 .yui-payment__actions { display: flex; gap: 8px; }
 
 /* Loading */
@@ -500,6 +506,7 @@
 .yui-tx-confirm { display: grid; gap: 10px; }
 .yui-tx-confirm__row { display: flex; justify-content: space-between; align-items: center; }
 .yui-tx-confirm__hash { display: flex; gap: 8px; align-items: center; }
+.yui-tx-confirm__actions { display: flex; gap: 16px; justify-content: center; margin-top: 16px; }
 .yui-copy { }
 .yui-tx-error { display: grid; gap: 10px; color: #b3261e; }
 .yui-tx-error__title { font-weight: 600; }
