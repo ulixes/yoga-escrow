@@ -12,7 +12,7 @@ export type FullJourneyResult = {
   yogaTypeId: string
   location: { country: string; city: string; specificLocation: string }
   timeIds: string[] // dayId:HH:mm
-  student: { name: string; email: string }
+  student: { email: string }
 }
 
 export type FullJourneyProps = {
@@ -59,7 +59,6 @@ export function FullJourney(props: FullJourneyProps) {
   const [selectedTimes, setSelectedTimes] = React.useState<string[]>([])
 
   // Step 5 - details
-  const [studentName, setStudentName] = React.useState('')
   const [studentEmail, setStudentEmail] = React.useState('')
 
   const totalSteps: Step = 6
@@ -75,11 +74,11 @@ export function FullJourney(props: FullJourneyProps) {
       case 4:
         return selectedTimes.length >= 3
       case 5:
-        return studentName.trim().length > 1 && /@/.test(studentEmail)
+        return /@/.test(studentEmail)
       default:
         return true
     }
-  }, [step, persona, selectedYogaTypeId, location, selectedTimes, studentName, studentEmail])
+  }, [step, persona, selectedYogaTypeId, location, selectedTimes, studentEmail])
 
   const handleNext = () => {
     if (step === totalSteps) return
@@ -91,7 +90,7 @@ export function FullJourney(props: FullJourneyProps) {
         yogaTypeId: selectedYogaTypeId,
         location: location!,
         timeIds: selectedTimes,
-        student: { name: studentName.trim(), email: studentEmail.trim() },
+        student: { email: studentEmail.trim() },
       }
       onSubmit?.(result)
     }
@@ -213,10 +212,6 @@ export function FullJourney(props: FullJourneyProps) {
               </ul>
             </div>
             <div className="yui-journey__details">
-              <label className="yui-journey__field">
-                <span>Name</span>
-                <input className="yui-journey__input" value={studentName} onChange={(e) => setStudentName(e.target.value)} />
-              </label>
               <label className="yui-journey__field">
                 <span>Email</span>
                 <input className="yui-journey__input" type="email" value={studentEmail} onChange={(e) => setStudentEmail(e.target.value)} />
