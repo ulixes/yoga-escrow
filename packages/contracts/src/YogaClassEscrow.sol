@@ -17,45 +17,55 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
  */
 contract YogaClassEscrow is ReentrancyGuard {
     enum EscrowStatus {
-        Created,    // Escrow created with funds deposited
-        Assigned,   // Teacher assigned to this escrow
-        Completed,  // Service completed, payment released
-        Cancelled,  // Escrow cancelled, funds returned
-        Disputed    // Either party raised a dispute
+        Created, // Escrow created with funds deposited
+        Assigned, // Teacher assigned to this escrow
+        Completed, // Service completed, payment released
+        Cancelled, // Escrow cancelled, funds returned
+        Disputed // Either party raised a dispute
+
     }
 
     enum YogaType {
-        Vinyasa,     // Flow-based sequences linking breath with movement
-        Yin,         // Slow, deep stretches held for minutes
-        Hatha,       // Balanced, foundational poses with breathwork
-        Ashtanga,    // Structured, vigorous, athletic series
+        Vinyasa, // Flow-based sequences linking breath with movement
+        Yin, // Slow, deep stretches held for minutes
+        Hatha, // Balanced, foundational poses with breathwork
+        Ashtanga, // Structured, vigorous, athletic series
         Restorative, // Passive poses with props for deep relaxation
-        Iyengar,     // Precise alignment with props
-        Kundalini,   // Poses, breathwork, chanting, meditation
-        Power        // Fast-paced, strength-focused Vinyasa
+        Iyengar, // Precise alignment with props
+        Kundalini, // Poses, breathwork, chanting, meditation
+        Power // Fast-paced, strength-focused Vinyasa
+
     }
 
     struct TimeSlot {
-        uint64 startTime;        // Unix timestamp for class start
-        uint32 durationMinutes;  // Class duration in minutes
-        int16 timezoneOffset;    // Timezone offset in minutes from UTC
+        uint64 startTime; // Unix timestamp for class start
+        uint32 durationMinutes; // Class duration in minutes
+        int16 timezoneOffset; // Timezone offset in minutes from UTC
+    }
+
+    struct Location {
+        string country; // Country where the class will be held
+        string city; // City where the class will be held
+        string specificLocation; // Specific location details (e.g., "Vake Park", "Central Gym")
     }
 
     struct Escrow {
-        address payer;              // Person who deposited funds
-        address payee;              // Person who will receive funds (selected teacher)
-        uint256 amount;             // Amount held in escrow (wei)
-        EscrowStatus status;        // Current escrow status
-        uint64 createdAt;           // When escrow was created
-        uint64 expiresAt;           // When escrow can be auto-released
-        string description;         // Optional description of service
-        string[3] teacherHandles;   // 3 unique handles for potential teachers
-        YogaType[3] yogaTypes;      // 3 yoga type options
-        TimeSlot[3] timeSlots;      // 3 time slot options
-        uint8 selectedPayeeIndex;   // Which teacher was selected (0-2)
-        uint8 selectedYogaIndex;    // Which yoga type was selected (0-2)
-        uint8 selectedTimeIndex;    // Which time slot was selected (0-2)
-        string selectedHandle;      // The handle of the selected teacher
+        address payer; // Person who deposited funds
+        address payee; // Person who will receive funds (selected teacher)
+        uint256 amount; // Amount held in escrow (wei)
+        EscrowStatus status; // Current escrow status
+        uint64 createdAt; // When escrow was created
+        uint64 expiresAt; // When escrow can be auto-released
+        string description; // Optional description of service
+        string[3] teacherHandles; // 3 unique handles for potential teachers
+        YogaType[3] yogaTypes; // 3 yoga type options
+        TimeSlot[3] timeSlots; // 3 time slot options
+        Location[3] locations; // 3 location options for the class
+        uint8 selectedPayeeIndex; // Which teacher was selected (0-2)
+        uint8 selectedYogaIndex; // Which yoga type was selected (0-2)
+        uint8 selectedTimeIndex; // Which time slot was selected (0-2)
+        uint8 selectedLocationIndex; // Which location was selected (0-2)
+        string selectedHandle; // The handle of the selected teacher
     }
 
     uint8 private constant NOT_SELECTED = 255;
@@ -64,11 +74,16 @@ contract YogaClassEscrow is ReentrancyGuard {
     mapping(uint256 => Escrow) public escrows;
     uint256 public nextEscrowId;
 
-    event EscrowCreated(
-        uint256 indexed escrowId, address indexed payer, uint256 amount, uint64 expiresAt
-    );
+    event EscrowCreated(uint256 indexed escrowId, address indexed payer, uint256 amount, uint64 expiresAt);
 
-    event EscrowAssigned(uint256 indexed escrowId, address indexed payee, uint8 payeeIndex, uint8 yogaIndex, uint8 timeIndex);
+    event EscrowAssigned(
+        uint256 indexed escrowId,
+        address indexed payee,
+        uint8 payeeIndex,
+        uint8 yogaIndex,
+        uint8 timeIndex,
+        uint8 locationIndex
+    );
 
     event EscrowCompleted(uint256 indexed escrowId, address indexed payee, uint256 amountReleased);
 
@@ -87,9 +102,11 @@ contract YogaClassEscrow is ReentrancyGuard {
     error InvalidPayeeIndex();
     error InvalidYogaIndex();
     error InvalidTimeIndex();
+    error InvalidLocationIndex();
     error DuplicateHandle();
     error EmptyHandle();
     error HandleMismatch();
+    error EmptyLocation();
 
     modifier onlyPayer(uint256 escrowId) {
         if (msg.sender != escrows[escrowId].payer) revert NotPayer();
@@ -117,8 +134,9 @@ contract YogaClassEscrow is ReentrancyGuard {
      * @notice Creates a new escrow with ETH deposit and choice options
      * @dev Funds are held until released or expired. Payer specifies 3 options for each category
      * @param teacherHandles Array of exactly 3 unique teacher handles (e.g., "@yogamaster", "@zenteacher")
-     * @param yogaTypes Array of exactly 3 yoga type preferences  
+     * @param yogaTypes Array of exactly 3 yoga type preferences
      * @param timeSlots Array of exactly 3 possible time slots
+     * @param locations Array of exactly 3 possible locations for the class
      * @param expirationTime Unix timestamp when funds can be auto-released
      * @param description Optional description of the service
      * @return escrowId Unique identifier for the created escrow
@@ -127,25 +145,31 @@ contract YogaClassEscrow is ReentrancyGuard {
         string[3] calldata teacherHandles,
         YogaType[3] calldata yogaTypes,
         TimeSlot[3] calldata timeSlots,
+        Location[3] calldata locations,
         uint64 expirationTime,
         string calldata description
-    )
-        external
-        payable
-        nonReentrant
-        returns (uint256 escrowId)
-    {
+    ) external payable nonReentrant returns (uint256 escrowId) {
         if (msg.value == 0) revert ZeroAmount();
         if (expirationTime <= block.timestamp) revert InvalidExpiration();
-        
+
         // Validate handles - no empty strings and no duplicates
         for (uint8 i = 0; i < OPTIONS_COUNT; i++) {
             if (bytes(teacherHandles[i]).length == 0) revert EmptyHandle();
-            
+
             for (uint8 j = i + 1; j < OPTIONS_COUNT; j++) {
                 if (keccak256(bytes(teacherHandles[i])) == keccak256(bytes(teacherHandles[j]))) {
                     revert DuplicateHandle();
                 }
+            }
+        }
+
+        // Validate locations - ensure all fields are non-empty
+        for (uint8 i = 0; i < OPTIONS_COUNT; i++) {
+            if (
+                bytes(locations[i].country).length == 0 || bytes(locations[i].city).length == 0
+                    || bytes(locations[i].specificLocation).length == 0
+            ) {
+                revert EmptyLocation();
             }
         }
 
@@ -161,45 +185,45 @@ contract YogaClassEscrow is ReentrancyGuard {
         escrow.selectedPayeeIndex = NOT_SELECTED;
         escrow.selectedYogaIndex = NOT_SELECTED;
         escrow.selectedTimeIndex = NOT_SELECTED;
-        
+        escrow.selectedLocationIndex = NOT_SELECTED;
+
         // Store the options
         for (uint8 i = 0; i < OPTIONS_COUNT; i++) {
             escrow.teacherHandles[i] = teacherHandles[i];
             escrow.yogaTypes[i] = yogaTypes[i];
             escrow.timeSlots[i] = timeSlots[i];
+            escrow.locations[i] = locations[i];
         }
 
         emit EscrowCreated(escrowId, msg.sender, msg.value, expirationTime);
     }
 
     /**
-     * @notice Assigns a payee (teacher) and selects yoga type & time slot from the predefined options
+     * @notice Assigns a payee (teacher) and selects yoga type, time slot & location from the predefined options
      * @dev Payer provides teacher address and handle - must match one of the preset handles
      * @param escrowId The ID of the escrow to assign
      * @param teacherAddress The actual wallet address of the teacher
      * @param teacherHandle The handle that matches one of the 3 preset handles
-     * @param yogaIndex Index (0-2) of which yoga type to select  
+     * @param yogaIndex Index (0-2) of which yoga type to select
      * @param timeIndex Index (0-2) of which time slot to select
+     * @param locationIndex Index (0-2) of which location to select
      */
     function assignPayee(
-        uint256 escrowId, 
+        uint256 escrowId,
         address teacherAddress,
         string calldata teacherHandle,
-        uint8 yogaIndex, 
-        uint8 timeIndex
-    )
-        external
-        nonReentrant
-        onlyPayer(escrowId)
-        onlyEscrowStatus(escrowId, EscrowStatus.Created)
-    {
+        uint8 yogaIndex,
+        uint8 timeIndex,
+        uint8 locationIndex
+    ) external nonReentrant onlyPayer(escrowId) onlyEscrowStatus(escrowId, EscrowStatus.Created) {
         require(teacherAddress != address(0), "Invalid teacher address");
         require(teacherAddress != msg.sender, "Teacher cannot be payer");
         if (yogaIndex >= OPTIONS_COUNT) revert InvalidYogaIndex();
         if (timeIndex >= OPTIONS_COUNT) revert InvalidTimeIndex();
+        if (locationIndex >= OPTIONS_COUNT) revert InvalidLocationIndex();
 
         Escrow storage escrow = escrows[escrowId];
-        
+
         // Find matching handle and get its index
         uint8 payeeIndex = NOT_SELECTED;
         for (uint8 i = 0; i < OPTIONS_COUNT; i++) {
@@ -208,18 +232,19 @@ contract YogaClassEscrow is ReentrancyGuard {
                 break;
             }
         }
-        
+
         if (payeeIndex == NOT_SELECTED) revert HandleMismatch();
-        
+
         // Assign the selections
         escrow.payee = teacherAddress;
         escrow.selectedPayeeIndex = payeeIndex;
         escrow.selectedYogaIndex = yogaIndex;
         escrow.selectedTimeIndex = timeIndex;
+        escrow.selectedLocationIndex = locationIndex;
         escrow.selectedHandle = teacherHandle;
         escrow.status = EscrowStatus.Assigned;
 
-        emit EscrowAssigned(escrowId, teacherAddress, payeeIndex, yogaIndex, timeIndex);
+        emit EscrowAssigned(escrowId, teacherAddress, payeeIndex, yogaIndex, timeIndex, locationIndex);
     }
 
     /**
@@ -276,11 +301,7 @@ contract YogaClassEscrow is ReentrancyGuard {
      * @dev Callable by anyone after escrow expiration time
      * @param escrowId The ID of the escrow to auto-release
      */
-    function autoRelease(uint256 escrowId)
-        external
-        nonReentrant
-        onlyEscrowStatus(escrowId, EscrowStatus.Assigned)
-    {
+    function autoRelease(uint256 escrowId) external nonReentrant onlyEscrowStatus(escrowId, EscrowStatus.Assigned) {
         Escrow storage escrow = escrows[escrowId];
 
         if (block.timestamp < escrow.expiresAt) {
@@ -304,14 +325,14 @@ contract YogaClassEscrow is ReentrancyGuard {
      * @dev Freezes the escrow for external resolution
      * @param escrowId The ID of the escrow to dispute
      */
-    function raiseDispute(uint256 escrowId) 
-        external 
-        onlyEscrowStatus(escrowId, EscrowStatus.Assigned) 
-        onlyParties(escrowId) 
+    function raiseDispute(uint256 escrowId)
+        external
+        onlyEscrowStatus(escrowId, EscrowStatus.Assigned)
+        onlyParties(escrowId)
     {
         Escrow storage escrow = escrows[escrowId];
         escrow.status = EscrowStatus.Disputed;
-        
+
         emit EscrowDisputed(escrowId);
     }
 
@@ -369,13 +390,28 @@ contract YogaClassEscrow is ReentrancyGuard {
     }
 
     /**
+     * @notice Get the location options for an escrow
+     * @param escrowId The ID of the escrow to query
+     * @return Array of 3 locations
+     */
+    function getLocations(uint256 escrowId) external view returns (Location[3] memory) {
+        return escrows[escrowId].locations;
+    }
+
+    /**
      * @notice Get the selected options for an assigned escrow
      * @param escrowId The ID of the escrow to query
-     * @return payeeIndex Selected teacher index, yogaIndex Selected yoga type index, timeIndex Selected time slot index
+     * @return payeeIndex Selected teacher index, yogaIndex Selected yoga type index, timeIndex Selected time slot index, locationIndex Selected location index
      */
-    function getSelectedOptions(uint256 escrowId) external view returns (uint8 payeeIndex, uint8 yogaIndex, uint8 timeIndex) {
+    function getSelectedOptions(uint256 escrowId)
+        external
+        view
+        returns (uint8 payeeIndex, uint8 yogaIndex, uint8 timeIndex, uint8 locationIndex)
+    {
         Escrow memory escrow = escrows[escrowId];
-        return (escrow.selectedPayeeIndex, escrow.selectedYogaIndex, escrow.selectedTimeIndex);
+        return (
+            escrow.selectedPayeeIndex, escrow.selectedYogaIndex, escrow.selectedTimeIndex, escrow.selectedLocationIndex
+        );
     }
 
     /**
