@@ -19,3 +19,6 @@ export type { TeacherPickerProps, TeacherItem } from './lib/TeacherPicker'
 // Import this in your app to get the UI component styles
 export const UIStyles = './styles.css'
 
+export { TimeSlotPicker } from './lib/TimeSlotPicker'
+export type { TimeSlotPickerProps } from './lib/TimeSlotPicker'
+

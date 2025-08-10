@@ -147,3 +147,27 @@
 [data-skin='ulyxes'] .yui-teacher-picker__select, [data-skin='ulyxes'] .yui-teacher-picker__deselect {
   text-decoration: underline; text-underline-offset: 3px;
 }
+
+/* TimeSlotPicker – List-based, spacious */
+.yui-slot-picker { display: grid; gap: 12px; }
+.yui-slot-picker__header { display: flex; gap: 10px; align-items: baseline; justify-content: space-between; }
+.yui-slot-picker__progress { font-weight: 600; }
+.yui-slot-picker__hint { opacity: 0.7; }
+.yui-slot-picker__days { display: grid; gap: 10px; }
+.yui-slot-picker__day { border: 1px solid currentColor; border-radius: 12px; padding: 8px; }
+.yui-slot-picker__day-toggle { width: 100%; display: flex; justify-content: space-between; align-items: baseline; background: transparent; border: none; padding: 8px; font: inherit; cursor: pointer; }
+.yui-slot-picker__hours { display: grid; gap: 6px; padding: 8px; margin: 0; list-style: none; }
+.yui-slot-picker__hour-row { display: block; }
+.yui-slot-picker__hour { display: flex; gap: 8px; align-items: center; }
+.yui-slot-picker__checkbox { width: 16px; height: 16px; }
+.yui-slot-picker__hour-label { font-size: 14px; }
+.yui-slot-picker__footer { opacity: 0.8; }
+.yui-slot-picker__validation[data-error] { color: #b3261e; }
+.yui-slot-picker__validation[data-ok] { color: #0a7c33; }
+
+/* Ulyxes skin for TimeSlotPicker */
+[data-skin='ulyxes'] .yui-slot-picker { gap: 16px; }
+[data-skin='ulyxes'] .yui-slot-picker__day { border: none; box-shadow: 0 1px 0 rgba(0,0,0,0.08); border-radius: 14px; padding: 8px 0; }
+[data-skin='ulyxes'] .yui-slot-picker__day-toggle { padding: 12px 16px; }
+[data-skin='ulyxes'] .yui-slot-picker__hours { padding: 4px 16px 12px; }
+[data-skin='ulyxes'] .yui-slot-picker__hour-label { text-underline-offset: 3px; }
