@@ -121,7 +121,8 @@ export function useYogaEscrow(ethUsdPrice: number = 3000) {
   // Create public client for gas estimation
   const publicClient = createPublicClient({
     chain: NETWORK === 'base' ? base : baseSepolia,
-    transport: http()
+    transport: http(),
+    batch: { multicall: false }
   })
 
   const estimateGas = useCallback(async (payload: ContractBookingPayload, fromAddress: string): Promise<GasEstimate> => {
@@ -209,11 +210,14 @@ export function useYogaEscrow(ethUsdPrice: number = 3000) {
         ]
       })
 
-      // Send transaction
+      // Send transaction (EIP-1193 style: hex-encoded value)
+      const wei = parseEther(payload.amount)
+      const valueHex = `0x${wei.toString(16)}`
+
       const tx = await sendTransaction({
         to: YOGA_ESCROW_CONTRACT_ADDRESS as `0x${string}`,
         data,
-        value: parseEther(payload.amount),
+        value: valueHex,
         chainId: CHAIN_ID
       })
 
