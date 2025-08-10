@@ -320,7 +320,7 @@ export default function App() {
         <div style={{ maxWidth: 600, margin: '0 auto', padding: 24 }}>
           <TransactionConfirmation
             transactionHash={transactionHash}
-            escrowId={escrowId || undefined}
+            escrowId={escrowId?.toString()}
             onViewTransaction={() => {
               window.open(`https://sepolia.basescan.org/tx/${transactionHash}`, '_blank')
             }}

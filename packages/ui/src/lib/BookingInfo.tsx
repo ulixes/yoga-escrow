@@ -36,11 +36,10 @@ export function BookingInfo(props: BookingInfoProps) {
   const { heading = 'Safe & Simple Yoga Booking', items = DEFAULT_ITEMS, variant = 'full', skin = 'ulyxes', className } = props
   const [open, setOpen] = React.useState<boolean>(variant !== 'accordion')
 
-  const containerProps: React.HTMLAttributes<HTMLDivElement> = {
-    'data-skin': skin,
-    'data-variant': variant,
+  const containerProps = {
+    ...({ 'data-skin': skin, 'data-variant': variant } as any),
     className: ['yui-booking-info', className].filter(Boolean).join(' '),
-  }
+  } as React.HTMLAttributes<HTMLDivElement>
 
   const content = (
     <div className="yui-booking-info__items" role="list">
