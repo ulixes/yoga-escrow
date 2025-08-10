@@ -25,7 +25,7 @@
 .yui-yoga-picker { display: grid; gap: 12px; }
 .yui-yoga-picker__controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .yui-yoga-picker__personas { display: flex; gap: 6px; }
-.yui-yoga-picker__persona-btn { font: inherit; padding: 6px 10px; border: 1px solid currentColor; background: transparent; border-radius: 999px; }
+.yui-yoga-picker__persona-btn { font: inherit; padding: 6px 10px; border: 1px solid currentColor; background: transparent; border-radius: 999px; cursor: pointer; }
 .yui-yoga-picker__persona-btn[data-active='true'] { background: currentColor; color: #fff; }
 .yui-yoga-picker__search-input { font: inherit; padding: 8px 10px; }
 .yui-yoga-picker__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
