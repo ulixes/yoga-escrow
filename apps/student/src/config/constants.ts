@@ -4,13 +4,13 @@
 const IS_PRODUCTION = process.env.NODE_ENV === 'production'
 
 // Pricing
-export const CLASS_PRICE_USD = IS_PRODUCTION ? 10 : 5 // $10 for production, $5 for testing
-export const CLASS_PRICE_ETH = IS_PRODUCTION ? '0.003' : '0.002' // ~$10 in ETH for production
-export const CLASS_PRICE_ETH_DISPLAY = IS_PRODUCTION ? '0.003 ETH' : '0.002 ETH'
+export const CLASS_PRICE_USD = 5 // $5 for both testing and production
+export const CLASS_PRICE_ETH = '0.002' // ~$5 in ETH for both environments
+export const CLASS_PRICE_ETH_DISPLAY = '0.002 ETH'
 
 // Legacy USDC values (keeping for balance display compatibility)
-export const CLASS_PRICE_USDC = IS_PRODUCTION ? '10.00' : '5.00' 
-export const CLASS_PRICE_USDC_RAW = IS_PRODUCTION ? '10000000' : '5000000' // USDC with 6 decimals
+export const CLASS_PRICE_USDC = '5.00' 
+export const CLASS_PRICE_USDC_RAW = '5000000' // 5 USDC with 6 decimals
 
 // Contract addresses
 export const YOGA_ESCROW_CONTRACT_ADDRESS = IS_PRODUCTION 

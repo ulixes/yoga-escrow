@@ -19,7 +19,7 @@ export type PaymentConfirmationProps = {
 export function PaymentConfirmation({ summary, onConfirm, onCancel, skin = 'ulyxes', className }: PaymentConfirmationProps) {
   const { costUSDC, currentBalanceUSDC, estimatedGasFeeETH, estimatedGasFeeUSD, totalCostWithGas } = summary
   const remaining = Math.max(0, currentBalanceUSDC - (totalCostWithGas || costUSDC))
-  const fmt = (n: number) => `$${n.toFixed(2)} USDC`
+  const fmt = (n: number) => `$${n.toFixed(2)}`
   return (
     <div data-skin={skin} className={['yui-payment', className].filter(Boolean).join(' ')}>
       <div className="yui-payment__row">

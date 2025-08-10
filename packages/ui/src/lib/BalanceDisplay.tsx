@@ -9,7 +9,7 @@ export type BalanceDisplayProps = {
 
 export function BalanceDisplay({ balanceUSDC, minimumUSDC = 10, skin = 'ulyxes', className }: BalanceDisplayProps) {
   const sufficient = balanceUSDC >= minimumUSDC
-  const fmt = (n: number) => `$${n.toFixed(2)} USDC`
+  const fmt = (n: number) => `$${n.toFixed(2)}`
   return (
     <div data-skin={skin} className={['yui-balance', className].filter(Boolean).join(' ')}>
       <div className="yui-balance__row" data-ok={sufficient || undefined} data-error={!sufficient || undefined}>
