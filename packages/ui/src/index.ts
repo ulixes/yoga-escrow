@@ -25,3 +25,6 @@ export type { YogaTimePickerProps, YogaDay, YogaTimeItem } from './lib/YogaTimeP
 export { LocationPicker } from './lib/LocationPicker'
 export type { LocationPickerProps } from './lib/LocationPicker'
 
+export { YogaTimeBlocksPicker } from './lib/YogaTimeBlocksPicker'
+export type { YogaTimeBlocksPickerProps, Persona } from './lib/YogaTimeBlocksPicker'
+
