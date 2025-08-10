@@ -129,11 +129,19 @@ const Layout: React.FC<React.PropsWithChildren> = ({ children }) => (
 )
 
 export const Default: Story = {
-  render: (args) => (
-    <Layout>
-      <YogaTypePicker {...args} />
-    </Layout>
-  ),
+  render: (args) => {
+    const [selectedIds, setSelectedIds] = React.useState<string[]>(args.selectedIds || [])
+    return (
+      <Layout>
+        <YogaTypePicker
+          {...args}
+          selectedIds={selectedIds}
+          onSelect={(id) => setSelectedIds((s) => Array.from(new Set([...s, id])))}
+          onDeselect={(id) => setSelectedIds((s) => s.filter((x) => x !== id))}
+        />
+      </Layout>
+    )
+  },
   args: {
     items,
     personas,

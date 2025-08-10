@@ -85,6 +85,19 @@ export const YogaTypePicker: React.FC<YogaTypePickerProps> = ({
         {filtered.map((item) => {
           const isSelected = selectedSet.has(item.id)
           const isPicking = pickingId === item.id
+          const handleToggle = () => {
+            if (isSelected) {
+              if (onDeselect) onDeselect(item.id)
+            } else {
+              if (onSelect) onSelect(item.id)
+            }
+          }
+          const handleKeyDown: React.KeyboardEventHandler<HTMLElement> = (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              handleToggle()
+            }
+          }
           return (
           <article
             key={item.id}
@@ -93,6 +106,11 @@ export const YogaTypePicker: React.FC<YogaTypePickerProps> = ({
             data-personas={item.personas.join(' ')}
             data-selected={isSelected}
             data-picking={isPicking}
+            tabIndex={0}
+            onClick={handleToggle}
+            onKeyDown={handleKeyDown}
+            aria-selected={isSelected}
+            aria-label={`${item.name}: ${isSelected ? 'Deselect' : 'Select'}`}
           >
             <h3 className="yui-yoga-picker__card-title">{item.name}</h3>
             {item.tagline ? <p className="yui-yoga-picker__card-tagline">{item.tagline}</p> : null}
@@ -116,7 +134,7 @@ export const YogaTypePicker: React.FC<YogaTypePickerProps> = ({
                 <button
                   type="button"
                   className="yui-btn yui-yoga-picker__deselect"
-                  onClick={() => onDeselect(item.id)}
+                  onClick={(e) => { e.stopPropagation(); onDeselect(item.id) }}
                   aria-pressed={isSelected}
                 >
                   Deselect
@@ -126,7 +144,7 @@ export const YogaTypePicker: React.FC<YogaTypePickerProps> = ({
                   <button
                     type="button"
                     className="yui-btn yui-yoga-picker__select"
-                    onClick={() => onSelect(item.id)}
+                    onClick={(e) => { e.stopPropagation(); onSelect(item.id) }}
                     disabled={selectionMode === 'single' && isSelected}
                     aria-pressed={isSelected}
                   >

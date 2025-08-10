@@ -45,8 +45,32 @@ export const TeacherPicker: React.FC<TeacherPickerProps> = ({
         {items.map((t) => {
           const isSelected = selectedSet.has(t.id)
           const isPicking = pickingId === t.id
+          const handleToggle = () => {
+            if (isSelected) {
+              if (onDeselect) onDeselect(t.id)
+            } else {
+              if (onSelect) onSelect(t.id)
+            }
+          }
+          const handleKeyDown: React.KeyboardEventHandler<HTMLElement> = (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              handleToggle()
+            }
+          }
           return (
-          <article key={t.id} role="listitem" className="yui-teacher-picker__card" data-selected={isSelected} data-picking={isPicking}>
+          <article
+            key={t.id}
+            role="listitem"
+            className="yui-teacher-picker__card"
+            data-selected={isSelected}
+            data-picking={isPicking}
+            tabIndex={0}
+            onClick={handleToggle}
+            onKeyDown={handleKeyDown}
+            aria-selected={isSelected}
+            aria-label={`${t.name}: ${isSelected ? 'Deselect' : 'Select'}`}
+          >
             <header className="yui-teacher-picker__header">
               <div className="yui-teacher-picker__avatar-wrap" aria-hidden>
                 {renderAvatar ? (
@@ -106,7 +130,7 @@ export const TeacherPicker: React.FC<TeacherPickerProps> = ({
                 <button
                   type="button"
                   className="yui-btn yui-teacher-picker__deselect"
-                  onClick={() => onDeselect(t.id)}
+                  onClick={(e) => { e.stopPropagation(); onDeselect(t.id) }}
                   aria-pressed={isSelected}
                 >
                   Deselect
@@ -116,7 +140,7 @@ export const TeacherPicker: React.FC<TeacherPickerProps> = ({
                   <button
                     type="button"
                     className="yui-btn yui-teacher-picker__select"
-                    onClick={() => onSelect(t.id)}
+                    onClick={(e) => { e.stopPropagation(); onSelect(t.id) }}
                     aria-pressed={isSelected}
                     disabled={isSelected}
                   >

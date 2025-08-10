@@ -78,11 +78,19 @@ const mockTeachers: TeacherItem[] = [
 ]
 
 export const Default: Story = {
-  render: (args) => (
-    <Layout>
-      <TeacherPicker {...args} />
-    </Layout>
-  ),
+  render: (args) => {
+    const [selectedIds, setSelectedIds] = React.useState<string[]>(args.selectedIds || [])
+    return (
+      <Layout>
+        <TeacherPicker
+          {...args}
+          selectedIds={selectedIds}
+          onSelect={(id) => setSelectedIds([id])}
+          onDeselect={(id) => setSelectedIds((s) => s.filter((x) => x !== id))}
+        />
+      </Layout>
+    )
+  },
   args: {
     items: mockTeachers,
     skin: 'ulyxes',
