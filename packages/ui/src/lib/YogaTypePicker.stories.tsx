@@ -136,6 +136,7 @@ export const Default: Story = {
         <YogaTypePicker
           {...args}
           selectedIds={selectedIds}
+          selectionMode="multiple"
           onSelect={(id) => setSelectedIds((s) => Array.from(new Set([...s, id])))}
           onDeselect={(id) => setSelectedIds((s) => s.filter((x) => x !== id))}
         />

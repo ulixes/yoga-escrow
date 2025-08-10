@@ -17,6 +17,7 @@ export type TeacherPickerProps = {
   onSelect?: (id: string) => void
   onDeselect?: (id: string) => void
   selectedIds?: string[]
+  selectionMode?: 'single' | 'multiple'
   pickingId?: string | null
   className?: string
   containerProps?: React.HTMLAttributes<HTMLDivElement>
@@ -29,6 +30,7 @@ export const TeacherPicker: React.FC<TeacherPickerProps> = ({
   onSelect,
   onDeselect,
   selectedIds,
+  selectionMode = 'single',
   pickingId = null,
   className,
   containerProps,
@@ -142,7 +144,7 @@ export const TeacherPicker: React.FC<TeacherPickerProps> = ({
                     className="yui-btn yui-teacher-picker__select"
                     onClick={(e) => { e.stopPropagation(); onSelect(t.id) }}
                     aria-pressed={isSelected}
-                    disabled={isSelected}
+                    disabled={selectionMode === 'single' && isSelected}
                   >
                     Select Teacher
                   </button>

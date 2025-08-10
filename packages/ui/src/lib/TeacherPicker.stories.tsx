@@ -85,6 +85,7 @@ export const Default: Story = {
         <TeacherPicker
           {...args}
           selectedIds={selectedIds}
+          selectionMode="multiple"
           onSelect={(id) => setSelectedIds([id])}
           onDeselect={(id) => setSelectedIds((s) => s.filter((x) => x !== id))}
         />
