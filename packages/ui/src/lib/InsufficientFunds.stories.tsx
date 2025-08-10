@@ -15,7 +15,6 @@ export const Default: Story = { render: () => (
     <InsufficientFunds
       neededUSDC={1.75}
       onAddFunds={() => alert('Open funding guide...')}
-      onConnectWallet={() => alert('Connect another wallet...')}
       onCancel={() => alert('Cancel booking')}
     />
   </div>
