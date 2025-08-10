@@ -12,11 +12,13 @@
     "format": "echo 'format with prettier'"
   },
   "dependencies": {
-    "@yoga/ui": "*",
-    "@privy-io/react-auth": "latest",
     "@privy-io/js-sdk-core": "^0.53.3",
+    "@privy-io/react-auth": "latest",
+    "@yoga/ui": "*",
+    "ethers": "^5",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "viem": "^2.33.3"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",
