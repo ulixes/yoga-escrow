@@ -243,3 +243,10 @@
   text-decoration: underline; text-underline-offset: 3px; border: none; border-radius: 0; background: transparent; padding: 0;
 }
 [data-skin='ulyxes'] .yui-journey__input:focus { outline: none; border-bottom-color: #111; }
+
+/* Journey start screen */
+.yui-journey__start { display: grid; gap: 12px; place-items: start; min-height: 40vh; padding: 24px 0; }
+.yui-journey__start-title { margin: 0; font-weight: 700; letter-spacing: 0.2px; }
+.yui-journey__start-subtitle { margin: 0; opacity: 0.75; }
+.yui-journey__cta { font: inherit; }
+[data-skin='ulyxes'] .yui-journey__cta { text-decoration: underline; text-underline-offset: 3px; border: none; background: transparent; padding: 0; }

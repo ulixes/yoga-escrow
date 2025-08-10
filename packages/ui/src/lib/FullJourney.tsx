@@ -41,6 +41,7 @@ export function FullJourney(props: FullJourneyProps) {
   } = props
 
   const [step, setStep] = React.useState<Step>(1)
+  const [started, setStarted] = React.useState<boolean>(false)
 
   // Step 1
   const [persona, setPersona] = React.useState<JourneyPersona>(defaultPersona)
@@ -110,14 +111,24 @@ export function FullJourney(props: FullJourneyProps) {
 
   return (
     <div data-skin={skin} className={['yui-journey', className].filter(Boolean).join(' ')}>
-      <header className="yui-journey__header">
-        <div className="yui-journey__progress">
-          <div className="yui-journey__progress-text">Step {step}/{totalSteps}</div>
-          <div className="yui-journey__progress-bar"><span style={{ width: `${(step / totalSteps) * 100}%` }} /></div>
-        </div>
-      </header>
+      {!started ? (
+        <main className="yui-journey__start" aria-label="Start booking">
+          <h1 className="yui-journey__start-title">Book a yoga class</h1>
+          <p className="yui-journey__start-subtitle">Anywhere. Anytime.</p>
+          <button type="button" className="yui-btn yui-journey__cta" onClick={() => setStarted(true)}>
+            Start booking
+          </button>
+        </main>
+      ) : (
+        <>
+          <header className="yui-journey__header">
+            <div className="yui-journey__progress">
+              <div className="yui-journey__progress-text">Step {step}/{totalSteps}</div>
+              <div className="yui-journey__progress-bar"><span style={{ width: `${(step / totalSteps) * 100}%` }} /></div>
+            </div>
+          </header>
 
-      <main className="yui-journey__content">
+          <main className="yui-journey__content">
         {step === 1 && (
           <section className="yui-journey__step yui-journey__welcome" aria-label="Welcome">
             <div className="yui-journey__hero">
@@ -220,14 +231,16 @@ export function FullJourney(props: FullJourneyProps) {
             <p className="yui-journey__subtitle">We’ll match your preferences and reach out shortly.</p>
           </section>
         )}
-      </main>
+          </main>
 
-      <footer className="yui-journey__footer">
-        <button type="button" className="yui-btn yui-journey__back" onClick={handleBack} disabled={step === 1}>Back</button>
-        <button type="button" className="yui-btn yui-journey__next" onClick={handleNext} disabled={!canNext}>
-          {step === 5 ? 'Confirm' : step === 6 ? 'Done' : 'Next'}
-        </button>
-      </footer>
+          <footer className="yui-journey__footer">
+            <button type="button" className="yui-btn yui-journey__back" onClick={handleBack} disabled={step === 1}>Back</button>
+            <button type="button" className="yui-btn yui-journey__next" onClick={handleNext} disabled={!canNext}>
+              {step === 5 ? 'Confirm' : step === 6 ? 'Done' : 'Next'}
+            </button>
+          </footer>
+        </>
+      )}
     </div>
   )
 }
