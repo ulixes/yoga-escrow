@@ -23,6 +23,7 @@ export type YogaTimeBlocksPickerProps = {
   persona?: Persona
   skin?: string
   className?: string
+  hideDoneButton?: boolean
 }
 
 // Windows
@@ -50,7 +51,7 @@ function blockHighlightForPersona(persona?: Persona): Set<string> {
 }
 
 export function YogaTimeBlocksPicker(props: YogaTimeBlocksPickerProps) {
-  const { days, selectedIds, onChange, minSelections = 3, onDone, persona, skin = 'ulyxes', className } = props
+  const { days, selectedIds, onChange, minSelections = 3, onDone, persona, skin = 'ulyxes', className, hideDoneButton = false } = props
 
   const [openDayId, setOpenDayId] = React.useState<string | null>(days[0]?.id ?? null)
   const [openBlocks, setOpenBlocks] = React.useState<Record<string, Set<string>>>(() => ({}))
@@ -112,7 +113,9 @@ export function YogaTimeBlocksPicker(props: YogaTimeBlocksPickerProps) {
         </header>
         <div className="yui-time-blocks__actions">
           <button type="button" className="yui-btn yui-time-blocks__quick" onClick={quickPick3}>Quick Pick 3</button>
-          <button type="button" className="yui-btn yui-time-blocks__done" disabled={!canDone} onClick={() => canDone && onDone?.(selectedIds)}>Done</button>
+          {!hideDoneButton && (
+            <button type="button" className="yui-btn yui-time-blocks__done" disabled={!canDone} onClick={() => canDone && onDone?.(selectedIds)}>Done</button>
+          )}
         </div>
 
         <div className="yui-time-blocks__days">

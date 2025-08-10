@@ -195,6 +195,7 @@ export function FullJourney(props: FullJourneyProps) {
               onChange={(loc) => setLocation(loc)}
               onDone={(loc) => setLocation(loc)}
               skin={skin}
+              hideDoneButton={true}
             />
           </section>
         )}
@@ -209,6 +210,7 @@ export function FullJourney(props: FullJourneyProps) {
               onDone={setSelectedTimes}
               persona={personaToInternal[persona]}
               skin={skin}
+              hideDoneButton={true}
             />
           </section>
         )}

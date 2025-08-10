@@ -10,12 +10,18 @@ export default meta
 
 type Story = StoryObj<typeof PaymentConfirmation>
 
-export const Default: Story = { render: () => (
+export const ExactBalance: Story = { render: () => (
   <div data-skin="ulyxes">
     <PaymentConfirmation
-      summary={{ costUSDC: 10, currentBalanceUSDC: 18.5 }}
-      onConfirm={() => alert('Confirm payment')}
-      onCancel={() => alert('Cancel')}
+      summary={{ costUSDC: 10, currentBalanceUSDC: 10 }}
+    />
+  </div>
+)}
+
+export const PlentyLeft: Story = { render: () => (
+  <div data-skin="ulyxes">
+    <PaymentConfirmation
+      summary={{ costUSDC: 10, currentBalanceUSDC: 25.75 }}
     />
   </div>
 )}

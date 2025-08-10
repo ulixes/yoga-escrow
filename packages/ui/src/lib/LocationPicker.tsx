@@ -15,6 +15,7 @@ export type LocationPickerProps = {
   onDone?: (location: Location) => void
   skin?: string
   className?: string
+  hideDoneButton?: boolean
 }
 
 const DEFAULT_COUNTRY = 'Georgia'
@@ -31,6 +32,7 @@ export function LocationPicker(props: LocationPickerProps) {
     onDone,
     skin = 'ulyxes',
     className,
+    hideDoneButton = false,
   } = props
 
   const [selected, setSelected] = React.useState<string>(value?.specificLocation ?? '')
@@ -88,16 +90,18 @@ export function LocationPicker(props: LocationPickerProps) {
           })}
         </ul>
 
-        <footer className="yui-location-picker__actions">
-          <button
-            type="button"
-            className="yui-btn yui-location-picker__done"
-            onClick={handleDone}
-            disabled={!canDone}
-          >
-            Done
-          </button>
-        </footer>
+        {!hideDoneButton && (
+          <footer className="yui-location-picker__actions">
+            <button
+              type="button"
+              className="yui-btn yui-location-picker__done"
+              onClick={handleDone}
+              disabled={!canDone}
+            >
+              Done
+            </button>
+          </footer>
+        )}
       </section>
     </div>
   )

@@ -10,6 +10,10 @@ export default meta
 
 type Story = StoryObj<typeof BalanceDisplay>
 
+export const ExactlySufficient: Story = { render: () => (
+  <div data-skin="ulyxes"><BalanceDisplay balanceUSDC={10} minimumUSDC={10} /></div>
+)}
+
 export const Sufficient: Story = { render: () => (
   <div data-skin="ulyxes"><BalanceDisplay balanceUSDC={12.5} minimumUSDC={10} /></div>
 )}

@@ -123,13 +123,25 @@
 [data-skin='ulyxes'] .yui-yoga-picker { gap: 18px; }
 [data-skin='ulyxes'] .yui-yoga-picker__personas { gap: 10px; }
 [data-skin='ulyxes'] .yui-yoga-picker__persona-btn {
-  border: 1px solid currentColor;
-  background: transparent;
-  padding: 8px 12px;
-  border-radius: 999px;
+  border: 2px solid #e0e0e0;
+  background: #fff;
+  padding: 8px 16px;
+  border-radius: 20px;
   text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
 }
-[data-skin='ulyxes'] .yui-yoga-picker__persona-btn[data-active='true'] { background: currentColor; color: #fff; text-decoration: none; }
+[data-skin='ulyxes'] .yui-yoga-picker__persona-btn:hover { 
+  border-color: #111; 
+  transform: translateY(-1px);
+}
+[data-skin='ulyxes'] .yui-yoga-picker__persona-btn[data-active='true'] { 
+  background: #111; 
+  color: #fff; 
+  border-color: #111;
+  text-decoration: none; 
+}
 [data-skin='ulyxes'] .yui-yoga-picker__grid { gap: 16px; }
 [data-skin='ulyxes'] .yui-yoga-picker__card {
   border: none;
@@ -243,10 +255,26 @@
   text-decoration: underline; text-underline-offset: 3px; border: none; border-radius: 0; background: transparent; padding: 0;
 }
 [data-skin='ulyxes'] .yui-journey__persona, [data-skin='ulyxes'] .yui-journey__goal {
-  /* keep pill look for click area; subtle underline for brand */
-  text-decoration: underline; text-underline-offset: 3px;
+  /* Fix clickable appearance with proper button styling */
+  border: 2px solid #e0e0e0;
+  background: #fff;
+  padding: 10px 16px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  cursor: pointer;
+  font-weight: 500;
 }
-[data-skin='ulyxes'] .yui-journey__persona[data-active='true'], [data-skin='ulyxes'] .yui-journey__goal[data-active='true'] { background: transparent; color: inherit; text-decoration: underline; }
+[data-skin='ulyxes'] .yui-journey__persona:hover, [data-skin='ulyxes'] .yui-journey__goal:hover {
+  border-color: #111;
+  transform: translateY(-1px);
+}
+[data-skin='ulyxes'] .yui-journey__persona[data-active='true'], [data-skin='ulyxes'] .yui-journey__goal[data-active='true'] { 
+  background: #111; 
+  color: #fff; 
+  border-color: #111;
+  text-decoration: none;
+}
 [data-skin='ulyxes'] .yui-journey__input:focus { outline: none; border-bottom-color: #111; }
 
 /* Journey start screen */
