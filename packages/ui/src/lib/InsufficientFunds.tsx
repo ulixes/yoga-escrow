@@ -10,7 +10,8 @@ export type InsufficientFundsProps = {
 }
 
 export function InsufficientFunds({ neededUSDC, onAddFunds, onConnectWallet, onCancel, skin = 'ulyxes', className }: InsufficientFundsProps) {
-  const fmt = (n: number) => `$${n.toFixed(2)} USDC`
+  // Format as currency value only; append unit once in the sentence
+  const fmt = (n: number) => `$${n.toFixed(2)}`
   return (
     <div data-skin={skin} className={['yui-insufficient', className].filter(Boolean).join(' ')}>
       <div className="yui-insufficient__message">Need {fmt(neededUSDC)} more USDC</div>
