@@ -459,3 +459,17 @@
 .yui-payment { display: grid; gap: 10px; }
 .yui-payment__row { display: flex; justify-content: space-between; }
 .yui-payment__actions { display: flex; gap: 8px; }
+
+/* Loading */
+.yui-loading { display: inline-flex; gap: 8px; align-items: center; }
+.yui-loading__spinner { display: inline-block; animation: yui-spin 1s linear infinite; }
+@keyframes yui-spin { to { transform: rotate(360deg); } }
+
+/* Transaction states */
+.yui-tx-confirm { display: grid; gap: 10px; }
+.yui-tx-confirm__row { display: flex; justify-content: space-between; align-items: center; }
+.yui-tx-confirm__hash { display: flex; gap: 8px; align-items: center; }
+.yui-copy { }
+.yui-tx-error { display: grid; gap: 10px; color: #b3261e; }
+.yui-tx-error__title { font-weight: 600; }
+.yui-tx-error__actions { display: flex; gap: 8px; }

@@ -39,3 +39,20 @@ export type { InsufficientFundsProps } from './lib/InsufficientFunds'
 
 export { PaymentConfirmation } from './lib/PaymentConfirmation'
 export type { PaymentConfirmationProps, PaymentSummary } from './lib/PaymentConfirmation'
+
+export { LoadingState } from './lib/LoadingState'
+export type { LoadingStateProps } from './lib/LoadingState'
+
+export { TransactionConfirmation } from './lib/TransactionConfirmation'
+export type { TransactionConfirmationProps } from './lib/TransactionConfirmation'
+
+export { TransactionError } from './lib/TransactionError'
+export type { TransactionErrorProps } from './lib/TransactionError'
+export { ImprovedPersonaSelector } from './lib/ImprovedPersonaSelector'
+export type { ImprovedPersonaSelectorProps, PersonaType, GoalType } from './lib/ImprovedPersonaSelector'
+
+export { ImprovedYogaTypeSelector } from './lib/ImprovedYogaTypeSelector'
+export type { ImprovedYogaTypeSelectorProps, YogaTypeOption } from './lib/ImprovedYogaTypeSelector'
+
+export { WorkingSelectionDemo } from './lib/WorkingSelectionDemo'
+export type { WorkingSelectionDemoProps } from './lib/WorkingSelectionDemo'
