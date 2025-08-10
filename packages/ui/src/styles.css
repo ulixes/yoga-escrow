@@ -129,7 +129,7 @@
   border-radius: 0;
   text-decoration: none;
 }
-[data-skin='ulyxes'] .yui-yoga-picker__persona-btn[data-active='true'] { text-decoration: underline; text-underline-offset: 4px; }
+[data-skin='ulyxes'] .yui-yoga-picker__persona-btn[data-active='true'] { text-decoration: underline; text-underline-offset: 4px; background: transparent; color: inherit; }
 [data-skin='ulyxes'] .yui-yoga-picker__grid { gap: 16px; }
 [data-skin='ulyxes'] .yui-yoga-picker__card {
   border: none;
@@ -242,6 +242,7 @@
 [data-skin='ulyxes'] .yui-journey__persona, [data-skin='ulyxes'] .yui-journey__goal, [data-skin='ulyxes'] .yui-journey__next, [data-skin='ulyxes'] .yui-journey__back {
   text-decoration: underline; text-underline-offset: 3px; border: none; border-radius: 0; background: transparent; padding: 0;
 }
+[data-skin='ulyxes'] .yui-journey__persona[data-active='true'], [data-skin='ulyxes'] .yui-journey__goal[data-active='true'] { background: transparent; color: inherit; text-decoration: underline; }
 [data-skin='ulyxes'] .yui-journey__input:focus { outline: none; border-bottom-color: #111; }
 
 /* Journey start screen */
@@ -250,3 +251,17 @@
 .yui-journey__start-subtitle { margin: 0; opacity: 0.75; }
 .yui-journey__cta { font: inherit; }
 [data-skin='ulyxes'] .yui-journey__cta { text-decoration: underline; text-underline-offset: 3px; border: none; background: transparent; padding: 0; }
+
+/* Payment components */
+.yui-balance { display: grid; gap: 8px; }
+.yui-balance__row { display: flex; justify-content: space-between; }
+.yui-balance__status { font-size: 12px; opacity: 0.85; }
+.yui-balance__row[data-error] { color: #b3261e; }
+.yui-balance__row[data-ok] { color: #0a7c33; }
+
+.yui-insufficient { display: grid; gap: 10px; }
+.yui-insufficient__actions { display: flex; gap: 8px; }
+
+.yui-payment { display: grid; gap: 10px; }
+.yui-payment__row { display: flex; justify-content: space-between; }
+.yui-payment__actions { display: flex; gap: 8px; }

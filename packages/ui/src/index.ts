@@ -30,3 +30,12 @@ export type { YogaTimeBlocksPickerProps, Persona } from './lib/YogaTimeBlocksPic
 
 export { FullJourney } from './lib/FullJourney'
 export type { FullJourneyProps, FullJourneyResult, JourneyPersona, JourneyGoal } from './lib/FullJourney'
+
+export { BalanceDisplay } from './lib/BalanceDisplay'
+export type { BalanceDisplayProps } from './lib/BalanceDisplay'
+
+export { InsufficientFunds } from './lib/InsufficientFunds'
+export type { InsufficientFundsProps } from './lib/InsufficientFunds'
+
+export { PaymentConfirmation } from './lib/PaymentConfirmation'
+export type { PaymentConfirmationProps, PaymentSummary } from './lib/PaymentConfirmation'
