@@ -1,5 +1,4 @@
 import React from 'react'
-import { Brand } from './Brand'
 import { YogaTypePicker, YogaTypeItem } from './YogaTypePicker'
 import { LocationPicker, LocationPickerProps } from './LocationPicker'
 import { YogaTimeBlocksPicker, YogaDay, Persona } from './YogaTimeBlocksPicker'
@@ -112,17 +111,6 @@ export function FullJourney(props: FullJourneyProps) {
   return (
     <div data-skin={skin} className={['yui-journey', className].filter(Boolean).join(' ')}>
       <header className="yui-journey__header">
-        <div className="yui-journey__brand">
-          <Brand
-            title="Ulyxes"
-            slogan="Yoga everywhere. anytime."
-            subtitle="Start your journey"
-            orientation="vertical"
-            size="md"
-            logoVariant="wave"
-            skin={skin}
-          />
-        </div>
         <div className="yui-journey__progress">
           <div className="yui-journey__progress-text">Step {step}/{totalSteps}</div>
           <div className="yui-journey__progress-bar"><span style={{ width: `${(step / totalSteps) * 100}%` }} /></div>
