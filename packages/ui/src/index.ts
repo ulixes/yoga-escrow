@@ -48,6 +48,9 @@ export type { TransactionConfirmationProps } from './lib/TransactionConfirmation
 
 export { TransactionError } from './lib/TransactionError'
 export type { TransactionErrorProps } from './lib/TransactionError'
+
+export { BookingInfo } from './lib/BookingInfo'
+export type { BookingInfoProps, BookingInfoItem } from './lib/BookingInfo'
 export { ImprovedPersonaSelector } from './lib/ImprovedPersonaSelector'
 export type { ImprovedPersonaSelectorProps, PersonaType, GoalType } from './lib/ImprovedPersonaSelector'
 

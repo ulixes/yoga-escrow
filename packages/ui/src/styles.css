@@ -511,3 +511,17 @@
 .yui-tx-error { display: grid; gap: 10px; color: #b3261e; }
 .yui-tx-error__title { font-weight: 600; }
 .yui-tx-error__actions { display: flex; gap: 8px; }
+
+/* BookingInfo */
+.yui-booking-info { display: grid; gap: 12px; }
+.yui-booking-info__heading { font-weight: 700; letter-spacing: 0.2px; }
+.yui-booking-info__items { display: grid; gap: 10px; }
+.yui-booking-info__item { display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: start; }
+.yui-booking-info__icon { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; border: 1px solid rgba(0,0,0,0.6); font-size: 14px; }
+.yui-booking-info__title { font-weight: 600; }
+.yui-booking-info__desc { opacity: 0.85; }
+.yui-booking-info[data-variant='side'] { display: grid; grid-template-columns: 1fr; gap: 16px; }
+@media (min-width: 900px) {
+  .yui-booking-info[data-variant='side'] { grid-template-columns: 1fr 1fr; align-items: start; }
+}
+.yui-booking-info__toggle { width: 100%; text-align: left; background: transparent; border: none; padding: 0; font: inherit; cursor: pointer; }
