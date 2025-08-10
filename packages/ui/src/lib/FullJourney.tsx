@@ -116,6 +116,12 @@ export function FullJourney(props: FullJourneyProps) {
     Traveler: 'traveler',
   }
 
+  // Sync YogaTypePicker's persona filter with journey persona, but allow user to change it in step 2
+  const [ytFilterPersona, setYtFilterPersona] = React.useState<string | null>(personaToInternal[persona])
+  React.useEffect(() => {
+    setYtFilterPersona(personaToInternal[persona])
+  }, [persona])
+
   return (
     <div data-skin={skin} className={['yui-journey', className].filter(Boolean).join(' ')}>
       {!started ? (
@@ -170,8 +176,8 @@ export function FullJourney(props: FullJourneyProps) {
             <YogaTypePicker
               items={yogaTypes}
               personas={yogaTypePersonas}
-              filterPersona={personaToInternal[persona]}
-              onFilterPersona={() => {}}
+              filterPersona={ytFilterPersona}
+              onFilterPersona={(p) => setYtFilterPersona(p)}
               selectedIds={selectedYogaTypeId ? [selectedYogaTypeId] : []}
               selectionMode="single"
               onSelect={(id) => setSelectedYogaTypeId(id)}
