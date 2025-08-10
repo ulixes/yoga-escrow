@@ -15,6 +15,7 @@ export type TeacherItem = {
 export type TeacherPickerProps = {
   items: TeacherItem[]
   onSelect?: (id: string) => void
+  onDeselect?: (id: string) => void
   selectedIds?: string[]
   pickingId?: string | null
   className?: string
@@ -26,6 +27,7 @@ export type TeacherPickerProps = {
 export const TeacherPicker: React.FC<TeacherPickerProps> = ({
   items,
   onSelect,
+  onDeselect,
   selectedIds,
   pickingId = null,
   className,
@@ -99,19 +101,30 @@ export const TeacherPicker: React.FC<TeacherPickerProps> = ({
               ))}
             </div>
 
-            {onSelect && (
-              <div className="yui-teacher-picker__actions">
+            <div className="yui-teacher-picker__actions">
+              {isSelected && onDeselect ? (
                 <button
                   type="button"
-                  className="yui-btn yui-teacher-picker__select"
-                  onClick={() => onSelect(t.id)}
+                  className="yui-btn yui-teacher-picker__deselect"
+                  onClick={() => onDeselect(t.id)}
                   aria-pressed={isSelected}
-                  disabled={isSelected}
                 >
-                  {isSelected ? 'Selected' : 'Select Teacher'}
+                  Deselect
                 </button>
-              </div>
-            )}
+              ) : (
+                onSelect && (
+                  <button
+                    type="button"
+                    className="yui-btn yui-teacher-picker__select"
+                    onClick={() => onSelect(t.id)}
+                    aria-pressed={isSelected}
+                    disabled={isSelected}
+                  >
+                    Select Teacher
+                  </button>
+                )
+              )}
+            </div>
           </article>
         )})}
       </div>

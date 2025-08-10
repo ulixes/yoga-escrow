@@ -14,6 +14,7 @@ export type YogaTypePickerProps = {
   filterPersona?: string | null
   onFilterPersona?: (persona: string | null) => void
   onSelect?: (id: string) => void
+  onDeselect?: (id: string) => void
   selectedIds?: string[]
   selectionMode?: 'single' | 'multiple'
   pickingId?: string | null
@@ -28,6 +29,7 @@ export const YogaTypePicker: React.FC<YogaTypePickerProps> = ({
   filterPersona: controlledPersona,
   onFilterPersona,
   onSelect,
+  onDeselect,
   selectedIds,
   selectionMode = 'single',
   pickingId = null,
@@ -109,17 +111,30 @@ export const YogaTypePicker: React.FC<YogaTypePickerProps> = ({
               </div>
             )}
 
-            {onSelect && (
-              <button
-                type="button"
-                className="yui-btn yui-yoga-picker__select"
-                onClick={() => onSelect(item.id)}
-                disabled={selectionMode === 'single' && isSelected}
-                aria-pressed={isSelected}
-              >
-                {isSelected ? 'Selected' : 'Select'}
-              </button>
-            )}
+            <div className="yui-yoga-picker__actions">
+              {isSelected && onDeselect ? (
+                <button
+                  type="button"
+                  className="yui-btn yui-yoga-picker__deselect"
+                  onClick={() => onDeselect(item.id)}
+                  aria-pressed={isSelected}
+                >
+                  Deselect
+                </button>
+              ) : (
+                onSelect && (
+                  <button
+                    type="button"
+                    className="yui-btn yui-yoga-picker__select"
+                    onClick={() => onSelect(item.id)}
+                    disabled={selectionMode === 'single' && isSelected}
+                    aria-pressed={isSelected}
+                  >
+                    Select
+                  </button>
+                )
+              )}
+            </div>
           </article>
         )})}
         {filtered.length === 0 && (

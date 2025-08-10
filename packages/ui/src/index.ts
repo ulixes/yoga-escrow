@@ -16,3 +16,6 @@ export type { YogaTypePickerProps, YogaTypeItem } from './lib/YogaTypePicker'
 export { TeacherPicker } from './lib/TeacherPicker'
 export type { TeacherPickerProps, TeacherItem } from './lib/TeacherPicker'
 
+// Import this in your app to get the UI component styles
+export const UIStyles = './styles.css'
+
