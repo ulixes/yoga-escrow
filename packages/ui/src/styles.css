@@ -207,15 +207,16 @@
 .yui-time-blocks__progress-bar { height: 4px; background: rgba(0,0,0,0.08); border-radius: 999px; overflow: hidden; }
 .yui-time-blocks__progress-bar > span { display: block; height: 100%; background: #111; }
 .yui-time-blocks__actions { display: flex; gap: 8px; }
-.yui-time-blocks__days { display: grid; gap: 12px; }
-.yui-time-blocks__day { border: 1px solid currentColor; border-radius: 14px; padding: 8px; }
-.yui-time-blocks__day-toggle { width: 100%; display: flex; justify-content: space-between; align-items: center; background: transparent; border: none; padding: 12px 8px; font: inherit; cursor: pointer; }
-.yui-time-blocks__blocks { display: grid; gap: 10px; padding: 0 8px 8px; }
-.yui-time-blocks__block { border: 1px dashed currentColor; border-radius: 12px; padding: 8px; }
-.yui-time-blocks__block-toggle { width: 100%; display: flex; justify-content: space-between; align-items: baseline; background: transparent; border: none; padding: 8px; font: inherit; cursor: pointer; }
-.yui-time-blocks__block-label { font-weight: 600; }
-.yui-time-blocks__block-sublabel { font-size: 12px; opacity: 0.8; }
-.yui-time-blocks__list { display: grid; gap: 6px; padding: 6px 8px 10px; margin: 0; list-style: none; }
+.yui-time-blocks__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+.yui-time-blocks__day { display: grid; gap: 8px; }
+.yui-time-blocks__day-header { margin: 0; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; font-size: 16px; }
+.yui-time-blocks__times { display: grid; gap: 6px; }
+.yui-time-blocks__time-option { display: flex; gap: 8px; align-items: center; padding: 6px 8px; border-radius: 6px; cursor: pointer; transition: background-color 0.1s ease; }
+.yui-time-blocks__time-option:hover { background: rgba(0,0,0,0.04); }
+.yui-time-blocks__time-option--selected { background: rgba(0,0,0,0.06); }
+.yui-time-blocks__time-option--suggested { background: rgba(0,0,0,0.02); }
+.yui-time-blocks__time-content { display: grid; gap: 2px; }
+.yui-time-blocks__suggested-badge { font-size: 10px; }
 .yui-time-blocks__time-row { display: flex; gap: 8px; align-items: center; }
 .yui-time-blocks__checkbox { width: 16px; height: 16px; }
 .yui-time-blocks__time-text { display: grid; }

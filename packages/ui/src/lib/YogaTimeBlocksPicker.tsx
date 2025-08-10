@@ -53,7 +53,7 @@ function blockHighlightForPersona(persona?: Persona): Set<string> {
 export function YogaTimeBlocksPicker(props: YogaTimeBlocksPickerProps) {
   const { days, selectedIds, onChange, minSelections = 3, onDone, persona, skin = 'ulyxes', className, hideDoneButton = false } = props
 
-  const [openDayId, setOpenDayId] = React.useState<string | null>(days[0]?.id ?? null)
+  const [openDayId, setOpenDayId] = React.useState<string | null>(null) // null means show all days
   const [openBlocks, setOpenBlocks] = React.useState<Record<string, Set<string>>>(() => ({}))
 
   const highlightedBlocks = blockHighlightForPersona(persona)
@@ -123,50 +123,34 @@ export function YogaTimeBlocksPicker(props: YogaTimeBlocksPickerProps) {
           )}
         </div>
 
-        <div className="yui-time-blocks__days">
+        <div className="yui-time-blocks__grid">
           {days.map((day) => (
             <section key={day.id} className="yui-time-blocks__day">
-              <button type="button" className="yui-time-blocks__day-toggle" aria-expanded={openDayId===day.id} onClick={() => setOpenDayId(openDayId===day.id? null : day.id)}>
-                <span className="yui-time-blocks__day-label">{day.label}</span>
-              </button>
-
-              {openDayId === day.id && (
-                <div className="yui-time-blocks__blocks">
-                  {WINDOWS.map((w) => {
-                    const times = day.times.filter((t) => within(t.id, w.range[0], w.range[1]))
-                    if (times.length === 0) return null
-                    const open = isBlockOpen(day.id, w.key)
-                    const highlight = highlightedBlocks.has(w.key)
-                    return (
-                      <div key={w.key} className="yui-time-blocks__block" data-highlight={highlight || undefined}>
-                        <button type="button" className="yui-time-blocks__block-toggle" aria-expanded={open} onClick={() => toggleBlock(day.id, w.key)}>
-                          <span className="yui-time-blocks__block-label">{w.label}</span>
-                          {highlight ? <span className="yui-time-blocks__block-sublabel">Suggested</span> : null}
-                        </button>
-                        {open && (
-                          <ul className="yui-time-blocks__list" role="group" aria-label={`${day.label} — ${w.label}`}>
-                            {times.map((t) => {
-                              const id = `${day.id}:${t.id}`
-                              const checked = selectedIds.includes(id)
-                              return (
-                                <li key={id} className="yui-time-blocks__time">
-                                  <label className="yui-time-blocks__time-row">
-                                    <input type="checkbox" className="yui-time-blocks__checkbox" checked={checked} onChange={() => toggleChecked(day.id, t.id)} />
-                                    <span className="yui-time-blocks__time-text">
-                                      <span className="yui-time-blocks__time-label">{t.label}</span>
-                                      {t.sublabel ? <span className="yui-time-blocks__time-sublabel">{t.sublabel}</span> : null}
-                                    </span>
-                                  </label>
-                                </li>
-                              )
-                            })}
-                          </ul>
-                        )}
+              <h3 className="yui-time-blocks__day-header">{day.label}</h3>
+              <div className="yui-time-blocks__times">
+                {day.times.map((t) => {
+                  const id = `${day.id}:${t.id}`
+                  const checked = selectedIds.includes(id)
+                  const windowMatch = WINDOWS.find(w => within(t.id, w.range[0], w.range[1]))
+                  const isHighlighted = windowMatch && highlightedBlocks.has(windowMatch.key)
+                  
+                  return (
+                    <label key={id} className={`yui-time-blocks__time-option ${checked ? 'yui-time-blocks__time-option--selected' : ''} ${isHighlighted ? 'yui-time-blocks__time-option--suggested' : ''}`}>
+                      <input 
+                        type="checkbox" 
+                        className="yui-time-blocks__checkbox" 
+                        checked={checked} 
+                        onChange={() => toggleChecked(day.id, t.id)} 
+                      />
+                      <div className="yui-time-blocks__time-content">
+                        <span className="yui-time-blocks__time-label">{t.label}</span>
+                        {t.sublabel && <span className="yui-time-blocks__time-sublabel">{t.sublabel}</span>}
+                        {isHighlighted && <span className="yui-time-blocks__suggested-badge">✨</span>}
                       </div>
-                    )
-                  })}
-                </div>
-              )}
+                    </label>
+                  )
+                })}
+              </div>
             </section>
           ))}
         </div>
