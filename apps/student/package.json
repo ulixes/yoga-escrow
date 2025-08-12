@@ -12,6 +12,7 @@
     "format": "echo 'format with prettier'"
   },
   "dependencies": {
+    "buffer": "^6.0.3",
     "@privy-io/js-sdk-core": "^0.53.3",
     "@privy-io/react-auth": "latest",
     "@yoga/ui": "*",

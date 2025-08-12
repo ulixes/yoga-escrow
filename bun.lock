@@ -18,6 +18,7 @@
         "@privy-io/js-sdk-core": "^0.53.3",
         "@privy-io/react-auth": "latest",
         "@yoga/ui": "*",
+        "buffer": "^6.0.3",
         "ethers": "^5",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
