@@ -362,6 +362,33 @@
 .yui-btn--primary { background: #111; color: #fff; border-color: #111; }
 .yui-btn--ghost { background: #fff; color: #111; border-color: #ddd; }
 .yui-btn--link { background: transparent; color: #111; border: none; text-decoration: underline; text-underline-offset: 3px; padding: 4px 6px; }
+
+/* Navigation header */
+.yui-nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+}
+.yui-nav__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+}
+.yui-nav__brand { display: grid; gap: 2px; }
+.yui-nav__title { font-weight: 800; letter-spacing: 0.2px; }
+.yui-nav__slogan { font-size: 12px; color: #666; }
+.yui-nav__actions { display: flex; gap: 8px; }
+.yui-nav__user { display: flex; gap: 10px; align-items: center; }
+.yui-avatar { width: 32px; height: 32px; border-radius: 50%; background: #111; color: #fff; display: grid; place-items: center; font-weight: 700; }
+.yui-user__meta { display: grid; }
+.yui-user__name { font-weight: 600; }
+.yui-user__sub { font-size: 12px; color: #666; }
 [data-skin='ulyxes'] .yui-journey__persona, [data-skin='ulyxes'] .yui-journey__goal {
   /* Fix clickable appearance with proper button styling */
   border: 2px solid #e0e0e0;

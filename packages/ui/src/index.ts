@@ -65,3 +65,7 @@ export { ClassItem } from './lib/ClassItem'
 export type { ClassItemProps, StudentEscrow, EscrowStatus, TimeSlot, Location } from './lib/ClassItem'
 export { ClassList } from './lib/ClassList'
 export type { ClassListProps } from './lib/ClassList'
+
+// Navigation
+export { NavigationMenu } from './lib/NavigationMenu'
+export type { NavigationMenuProps } from './lib/NavigationMenu'
