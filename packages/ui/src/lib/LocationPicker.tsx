@@ -70,21 +70,18 @@ export function LocationPicker(props: LocationPickerProps) {
 
         <ul className="yui-location-picker__options" role="radiogroup" aria-label={`${country}, ${city} locations`}>
           {options.map((opt) => {
-            const id = `loc-${opt.replace(/\s+/g, '-').toLowerCase()}`
             const checked = selected === opt
             return (
               <li key={opt} className="yui-location-picker__option">
-                <label className="yui-location-picker__row" htmlFor={id}>
-                  <input
-                    id={id}
-                    className="yui-location-picker__radio"
-                    type="radio"
-                    name="location"
-                    checked={checked}
-                    onChange={() => handleSelect(opt)}
-                  />
-                  <span className="yui-location-picker__label">{opt}</span>
-                </label>
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={checked}
+                  className={`yui-location-pill ${checked ? 'is-selected' : ''}`}
+                  onClick={() => handleSelect(opt)}
+                >
+                  <span className="yui-location-pill__label">{opt}</span>
+                </button>
               </li>
             )
           })}

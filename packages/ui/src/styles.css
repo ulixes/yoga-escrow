@@ -189,10 +189,21 @@
 .yui-location-picker__title { font-weight: 600; }
 .yui-location-picker__meta { opacity: 0.8; display: flex; gap: 6px; }
 .yui-location-picker__options { display: grid; gap: 8px; padding: 0; margin: 0; list-style: none; }
-.yui-location-picker__option { border: 1px solid currentColor; border-radius: 12px; padding: 8px; }
-.yui-location-picker__row { display: flex; gap: 8px; align-items: center; }
-.yui-location-picker__radio { width: 16px; height: 16px; }
-.yui-location-picker__label { font-size: 14px; }
+.yui-location-picker__option { padding: 0; }
+.yui-location-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 2px solid #e0e0e0;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.yui-location-pill:hover { border-color: #111; transform: translateY(-1px); }
+.yui-location-pill.is-selected { background: #111; color: #fff; border-color: #111; }
+.yui-location-pill__label { font-weight: 600; }
 .yui-location-picker__actions { display: flex; justify-content: flex-end; }
 
 [data-skin='ulyxes'] .yui-location-picker__option { border: none; box-shadow: 0 1px 0 rgba(0,0,0,0.08); border-radius: 14px; padding: 12px 16px; }

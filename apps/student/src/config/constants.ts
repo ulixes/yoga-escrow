@@ -24,7 +24,7 @@ export const NETWORK = (ENV_NETWORK === 'base' || ENV_NETWORK === 'baseSepolia')
 
 // Contract addresses (allow override)
 const DEFAULT_MAINNET_ADDR = '0xa691f1735FD69AacCcFdf57EBD41a3140228941d'
-const DEFAULT_SEPOLIA_ADDR = '0xc7fefe90aa9f82536dbf6135db5e7280b898f5e6'
+const DEFAULT_SEPOLIA_ADDR = '0x49e0e615583Be1F9457E119BC93e84B85aD63feD'
 export const YOGA_ESCROW_CONTRACT_ADDRESS: `0x${string}` = ENV_ESCROW_ADDRESS
   || (NETWORK === 'base' ? DEFAULT_MAINNET_ADDR : DEFAULT_SEPOLIA_ADDR) as `0x${string}`
 
