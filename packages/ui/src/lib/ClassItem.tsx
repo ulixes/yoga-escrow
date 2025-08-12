@@ -75,7 +75,11 @@ function formatUtcOffset(minutes: number): string {
 }
 
 function formatTimeSlot(slot: TimeSlot): string {
-  const d = new Date(slot.startTime * 1000)
+  // Convert BigInt to number if needed
+  const timestamp = typeof slot.startTime === 'bigint' 
+    ? Number(slot.startTime) 
+    : slot.startTime
+  const d = new Date(timestamp * 1000)
   const datePart = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', weekday: 'short' })
   const timePart = d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })
   const tz = formatUtcOffset(slot.timezoneOffset)
