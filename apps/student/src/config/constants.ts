@@ -9,9 +9,9 @@ const ENV_NETWORK = (import.meta as any).env?.VITE_NETWORK as 'base' | 'baseSepo
 const ENV_ESCROW_ADDRESS = (import.meta as any).env?.VITE_ESCROW_ADDRESS as `0x${string}` | undefined
 
 // Pricing
-export const CLASS_PRICE_USD = 5 // $5 for both testing and production
-export const CLASS_PRICE_ETH = '0.002' // ~$5 in ETH for both environments
-export const CLASS_PRICE_ETH_DISPLAY = '0.002 ETH'
+export const CLASS_PRICE_USD = 15 // $15 USD target price
+export const CLASS_PRICE_ETH = '0.003' // ~$13.50 in ETH at $4500/ETH
+export const CLASS_PRICE_ETH_DISPLAY = '0.003 ETH'
 
 // Legacy USDC values (keeping for balance display compatibility)
 export const CLASS_PRICE_USDC = '5.00' 
@@ -23,8 +23,8 @@ export const NETWORK = (ENV_NETWORK === 'base' || ENV_NETWORK === 'baseSepolia')
   : (IS_PRODUCTION ? 'base' as const : 'baseSepolia' as const)
 
 // Contract addresses (allow override)
-const DEFAULT_MAINNET_ADDR = '0xa691f1735FD69AacCcFdf57EBD41a3140228941d'
-const DEFAULT_SEPOLIA_ADDR = '0x49e0e615583Be1F9457E119BC93e84B85aD63feD'
+const DEFAULT_MAINNET_ADDR = '0x756cf904B2dFFe5008e82DFB34B9B7f081A5cF33' // Production mainnet contract
+const DEFAULT_SEPOLIA_ADDR = '0x49e0e615583Be1F9457E119BC93e84B85aD63feD' // Testnet contract
 export const YOGA_ESCROW_CONTRACT_ADDRESS: `0x${string}` = ENV_ESCROW_ADDRESS
   || (NETWORK === 'base' ? DEFAULT_MAINNET_ADDR : DEFAULT_SEPOLIA_ADDR) as `0x${string}`
 
