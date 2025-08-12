@@ -20,6 +20,7 @@ import { useFundWallet } from './hooks/useFundWallet'
 import { useETHPrice } from './hooks/useETHPrice'
 import { CLASS_PRICE_USD } from './config/constants'
 import { History } from './components/History'
+import { ContractDebugger } from './components/ContractDebugger'
 
 export default function App() {
   const { ready, authenticated, user, requestCode, confirmCode, logout } = useHeadlessEmailAuth()
@@ -206,21 +207,25 @@ export default function App() {
     { id: 'mon', label: 'Monday', times: [
       { id: '06:00', label: '6:00 AM' },
       { id: '09:00', label: '9:00 AM' },
+      { id: '11:00', label: '11:00 AM' },
       { id: '18:00', label: '6:00 PM', sublabel: 'Peak' }
     ]},
     { id: 'tue', label: 'Tuesday', times: [
       { id: '06:00', label: '6:00 AM' },
       { id: '09:00', label: '9:00 AM' },
+      { id: '11:00', label: '11:00 AM' },
       { id: '18:00', label: '6:00 PM', sublabel: 'Peak' }
     ]},
     { id: 'wed', label: 'Wednesday', times: [
       { id: '06:00', label: '6:00 AM' },
       { id: '09:00', label: '9:00 AM' },
+      { id: '11:00', label: '11:00 AM' },
       { id: '18:00', label: '6:00 PM', sublabel: 'Peak' }
     ]},
     { id: 'thu', label: 'Thursday', times: [
       { id: '06:00', label: '6:00 AM' },
       { id: '09:00', label: '9:00 AM' },
+      { id: '11:00', label: '11:00 AM' },
       { id: '18:00', label: '6:00 PM', sublabel: 'Peak' }
     ]},
     { id: 'fri', label: 'Friday', times: [
@@ -272,6 +277,11 @@ export default function App() {
       {showHistory && (
         <div style={{ maxWidth: 800, margin: '24px auto', padding: '0 24px' }}>
           <History studentAddress={walletAddress} />
+          
+          {/* Debug panel - only show in development */}
+          {import.meta.env?.MODE === 'development' && (
+            <ContractDebugger />
+          )}
         </div>
       )}
 

@@ -24,6 +24,8 @@ export type YogaTimeBlocksPickerProps = {
   skin?: string
   className?: string
   hideDoneButton?: boolean
+  restrictDays?: string[]
+  restrictWindows?: ReadonlyArray<readonly [string, string]>
 }
 
 // Windows
@@ -41,6 +43,21 @@ function within(hhmm: string, start: string, end: string): boolean {
   return t >= toMin(start) && t <= toMin(end)
 }
 
+function applyRestrictions(days: YogaDay[], restrictDays?: string[], restrictWindows?: ReadonlyArray<readonly [string, string]>): YogaDay[] {
+  let filtered = days
+  if (restrictDays && restrictDays.length) {
+    const allow = new Set(restrictDays)
+    filtered = filtered.filter((d) => allow.has(d.id))
+  }
+  if (restrictWindows && restrictWindows.length) {
+    filtered = filtered.map((d) => ({
+      ...d,
+      times: d.times.filter((t) => restrictWindows!.some(([s, e]) => within(t.id, s, e))),
+    }))
+  }
+  return filtered
+}
+
 function blockHighlightForPersona(persona?: Persona): Set<string> {
   switch (persona) {
     case 'runner': return new Set(['early', 'evening'])
@@ -51,7 +68,7 @@ function blockHighlightForPersona(persona?: Persona): Set<string> {
 }
 
 export function YogaTimeBlocksPicker(props: YogaTimeBlocksPickerProps) {
-  const { days, selectedIds, onChange, minSelections = 3, onDone, persona, skin = 'ulyxes', className, hideDoneButton = false } = props
+  const { days, selectedIds, onChange, minSelections = 3, onDone, persona, skin = 'ulyxes', className, hideDoneButton = false, restrictDays, restrictWindows } = props
 
   const [openDayId, setOpenDayId] = React.useState<string | null>(null) // null means show all days
   const [openBlocks, setOpenBlocks] = React.useState<Record<string, Set<string>>>(() => ({}))
@@ -83,8 +100,10 @@ export function YogaTimeBlocksPicker(props: YogaTimeBlocksPickerProps) {
     const picked: string[] = []
     const usedDays = new Set<string>()
 
+    // Work on filtered view consistent with UI
+    const filteredDays = applyRestrictions(days, restrictDays, restrictWindows)
     for (const block of pref) {
-      for (const day of days) {
+      for (const day of filteredDays) {
         if (usedDays.has(day.id)) continue
         const timesInBlock = day.times.filter((t) => within(t.id, WINDOWS.find(w => w.key===block)!.range[0], WINDOWS.find(w => w.key===block)!.range[1]))
         if (timesInBlock.length === 0) continue
@@ -124,7 +143,7 @@ export function YogaTimeBlocksPicker(props: YogaTimeBlocksPickerProps) {
         </div>
 
         <div className="yui-time-blocks__grid">
-          {days.map((day) => (
+          {applyRestrictions(days, restrictDays, restrictWindows).map((day) => (
             <section key={day.id} className="yui-time-blocks__day">
               <h3 className="yui-time-blocks__day-header">{day.label}</h3>
               <div className="yui-time-blocks__times">
@@ -135,19 +154,16 @@ export function YogaTimeBlocksPicker(props: YogaTimeBlocksPickerProps) {
                   const isHighlighted = windowMatch && highlightedBlocks.has(windowMatch.key)
                   
                   return (
-                    <label key={id} className={`yui-time-blocks__time-option ${checked ? 'yui-time-blocks__time-option--selected' : ''} ${isHighlighted ? 'yui-time-blocks__time-option--suggested' : ''}`}>
-                      <input 
-                        type="checkbox" 
-                        className="yui-time-blocks__checkbox" 
-                        checked={checked} 
-                        onChange={() => toggleChecked(day.id, t.id)} 
-                      />
-                      <div className="yui-time-blocks__time-content">
-                        <span className="yui-time-blocks__time-label">{t.label}</span>
-                        {t.sublabel && <span className="yui-time-blocks__time-sublabel">{t.sublabel}</span>}
-                        {isHighlighted && <span className="yui-time-blocks__suggested-badge">✨</span>}
-                      </div>
-                    </label>
+                    <button
+                      key={id}
+                      type="button"
+                      className={`yui-time-pill ${checked ? 'is-selected' : ''}`}
+                      aria-pressed={checked}
+                      onClick={() => toggleChecked(day.id, t.id)}
+                    >
+                      <span className="yui-time-pill__label">{t.label}</span>
+                      {t.sublabel && <span className="yui-time-pill__sublabel">{t.sublabel}</span>}
+                    </button>
                   )
                 })}
               </div>

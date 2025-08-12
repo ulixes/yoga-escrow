@@ -222,6 +222,8 @@ export function FullJourney(props: FullJourneyProps) {
               persona={personaToInternal[persona]}
               skin={skin}
               hideDoneButton={true}
+              restrictDays={['mon','tue','wed','thu']}
+              restrictWindows={[['09:00','11:00'], ['18:00','20:00']]}
             />
           </section>
         )}

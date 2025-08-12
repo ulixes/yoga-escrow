@@ -211,17 +211,26 @@
 .yui-time-blocks__day { display: grid; gap: 8px; }
 .yui-time-blocks__day-header { margin: 0; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; font-size: 16px; }
 .yui-time-blocks__times { display: grid; gap: 6px; }
-.yui-time-blocks__time-option { display: flex; gap: 8px; align-items: center; padding: 6px 8px; border-radius: 6px; cursor: pointer; transition: background-color 0.1s ease; }
-.yui-time-blocks__time-option:hover { background: rgba(0,0,0,0.04); }
-.yui-time-blocks__time-option--selected { background: rgba(0,0,0,0.06); }
-.yui-time-blocks__time-option--suggested { background: rgba(0,0,0,0.02); }
-.yui-time-blocks__time-content { display: grid; gap: 2px; }
+.yui-time-pill { 
+  display: inline-grid; 
+  grid-auto-flow: row; 
+  align-items: center; 
+  justify-items: start; 
+  gap: 2px; 
+  padding: 10px 14px; 
+  border-radius: 12px; 
+  border: 2px solid #e0e0e0; 
+  background: #fff; 
+  cursor: pointer; 
+  transition: all 0.15s ease; 
+  text-align: left; 
+}
+.yui-time-pill:hover { border-color: #111; transform: translateY(-1px); }
+.yui-time-pill.is-selected { background: #111; color: #fff; border-color: #111; }
+.yui-time-pill__label { font-weight: 600; }
+.yui-time-pill__sublabel { opacity: 0.85; font-size: 12px; }
 .yui-time-blocks__suggested-badge { font-size: 10px; }
 .yui-time-blocks__time-row { display: flex; gap: 8px; align-items: center; }
-.yui-time-blocks__checkbox { width: 16px; height: 16px; }
-.yui-time-blocks__time-text { display: grid; }
-.yui-time-blocks__time-label { font-size: 14px; }
-.yui-time-blocks__time-sublabel { font-size: 12px; opacity: 0.75; }
 
 [data-skin='ulyxes'] .yui-time-blocks__day { border: none; box-shadow: 0 1px 0 rgba(0,0,0,0.08); padding: 8px 0; }
 [data-skin='ulyxes'] .yui-time-blocks__block { border: none; box-shadow: 0 1px 0 rgba(0,0,0,0.06); }

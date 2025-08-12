@@ -3,6 +3,7 @@ import type { FullJourneyResult } from '@yoga/ui'
 import { hasSufficientBalance, calculateShortfall } from '../utils/walletUtils'
 import { useYogaEscrow, type ContractBookingPayload, type GasEstimate } from './useYogaEscrow'
 import { CLASS_PRICE_USD, CLASS_PRICE_ETH, CLASS_PRICE_ETH_DISPLAY } from '../config/constants'
+import { validateContractPayload, simulateContractCall } from '../utils/contractDebugger'
 
 // Contract enums matching Solidity
 export enum YogaType {
@@ -188,11 +189,18 @@ export function useBookingFlow(userEmail?: string, userWalletAddress?: string, e
     ]
 
     // Teacher handles (placeholder for now, will be removed)
+    // Ensure no empty strings - contract will revert on empty handles
     const teacherHandles: [string, string, string] = [
       '@yogateacher1',
       '@yogateacher2', 
       '@yogateacher3'
-    ]
+    ].filter(handle => handle && handle.trim().length > 0) as [string, string, string]
+
+    // Validate we have exactly 3 non-empty handles
+    if (teacherHandles.length !== 3) {
+      console.error('Invalid teacher handles:', teacherHandles)
+      throw new Error('Must have exactly 3 non-empty teacher handles')
+    }
 
     return {
       teacherHandles,
@@ -413,7 +421,34 @@ export function useBookingFlow(userEmail?: string, userWalletAddress?: string, e
 
       console.log('Final contract payload for transaction:', contractPayload)
 
-      console.log('Creating escrow with contract payload:', contractPayload)
+      // Validate payload before sending transaction
+      const validation = validateContractPayload(contractPayload)
+      console.log('Payload validation result:', validation)
+
+      if (!validation.isValid) {
+        const errorMessage = `Invalid contract parameters: ${validation.errors.join(', ')}`
+        console.error(errorMessage)
+        setState(prev => ({ ...prev, loading: false, error: errorMessage }))
+        return
+      }
+
+      if (validation.warnings.length > 0) {
+        console.warn('Payload validation warnings:', validation.warnings)
+      }
+
+      // Simulate the contract call before sending real transaction
+      console.log('Simulating contract call...')
+      const simulation = await simulateContractCall(contractPayload, userWalletAddress as `0x${string}`)
+      console.log('Contract simulation result:', simulation)
+
+      if (!simulation.success) {
+        const errorMessage = `Contract simulation failed: ${simulation.error}`
+        console.error(errorMessage)
+        setState(prev => ({ ...prev, loading: false, error: errorMessage }))
+        return
+      }
+
+      console.log('Creating escrow with validated payload:', contractPayload)
 
       // Call the smart contract
       const tx = await createEscrow(contractPayload)
