@@ -16,7 +16,7 @@ export function useHeadlessEmailAuth() {
 
   const confirmCode = useCallback(async (email: string, code: string) => {
     try {
-      await loginWithCode({ code })
+      await loginWithCode({ email, code })
     } catch (error) {
       console.error('Failed to verify code:', error)
       throw error
