@@ -97,6 +97,9 @@ export const Demo: StoryObj<typeof NavigationMenu> = {
             { id: 'book', label: 'Book a class', onClick: () => {} },
             { id: 'history', label: 'My bookings', onClick: () => {} },
           ]}
+          theme="hot"
+          connected={!loggedOut}
+          connectionLabel={!loggedOut ? 'Connected (Privy)' : 'Disconnected'}
           onLogout={() => setLoggedOut(true)}
         />
 

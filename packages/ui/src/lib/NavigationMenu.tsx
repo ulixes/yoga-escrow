@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 export interface NavItem {
   id: string
@@ -18,18 +18,26 @@ export interface NavigationMenuProps {
   items?: NavItem[]
   onLogout?: () => void
   skin?: 'ulyxes' | 'default'
+  theme?: 'hot' | 'default'
+  connected?: boolean
+  connectionLabel?: string
 }
 
-export function NavigationMenu({ title = 'Ulyxes', slogan, user, items = [], onLogout, skin = 'ulyxes' }: NavigationMenuProps) {
+export function NavigationMenu({ title = 'Ulyxes', slogan, user, items = [], onLogout, skin = 'ulyxes', theme = 'hot', connected, connectionLabel }: NavigationMenuProps) {
+  const [open, setOpen] = useState(false)
   return (
-    <header className="yui-nav" data-skin={skin}>
+    <header className={`yui-nav ${theme === 'hot' ? 'is-hot' : ''}`} data-skin={skin}>
       <div className="yui-nav__inner">
+        <button className="yui-nav__toggle" aria-label="Menu" onClick={() => setOpen(v => !v)}>
+          <span className="yui-burger" />
+        </button>
+
         <div className="yui-nav__brand">
           <div className="yui-nav__title">{title}</div>
           {slogan && <div className="yui-nav__slogan">{slogan}</div>}
         </div>
 
-        <nav className="yui-nav__actions" aria-label="Primary">
+        <nav className={`yui-nav__actions ${open ? 'is-open' : ''}`} aria-label="Primary">
           {items.map(item => (
             <button key={item.id} className="yui-btn yui-btn--ghost" onClick={item.onClick}>{item.label}</button>
           ))}
@@ -49,6 +57,9 @@ export function NavigationMenu({ title = 'Ulyxes', slogan, user, items = [], onL
               <div className="yui-user__sub">{user.email || user.address}</div>
             )}
           </div>
+          <span className={`yui-conn ${connected ?? !!user ? 'is-on' : 'is-off'}`}>
+            {connectionLabel || ((connected ?? !!user) ? 'Connected' : 'Disconnected')}
+          </span>
           {onLogout && (
             <button className="yui-btn yui-btn--link" onClick={onLogout}>Logout</button>
           )}
