@@ -67,5 +67,9 @@ export { ClassList } from './lib/ClassList'
 export type { ClassListProps } from './lib/ClassList'
 
 // Navigation
-export { NavigationMenu } from './lib/NavigationMenu'
-export type { NavigationMenuProps } from './lib/NavigationMenu'
+export { NavBar } from './lib/NavBar'
+export type { NavBarProps } from './lib/NavBar'
+
+// MyBookings wrapper
+export { MyBookings } from './lib/MyBookings'
+export type { MyBookingsProps, MyBookingsFilter } from './lib/MyBookings'
