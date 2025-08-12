@@ -61,6 +61,9 @@ export interface ClassItemProps {
   onViewDetails?: (escrowId: bigint) => void
   skin?: 'ulyxes' | 'default'
   showActions?: boolean
+  fiatCurrency?: string
+  ethToFiatRate?: number
+  formatFiat?: (fiatAmount: number, currency: string) => string
 }
 
 function formatUtcOffset(minutes: number): string {
@@ -99,7 +102,7 @@ function StatusBadge({ status }: { status: EscrowStatus }) {
   return <span className={`yui-badge yui-badge--${status.toLowerCase()}`}>{status}</span>
 }
 
-export function ClassItem({ escrow, onAssign, onCancel, onRelease, onDispute, onAutoRelease, onViewDetails, skin = 'ulyxes', showActions = true }: ClassItemProps) {
+export function ClassItem({ escrow, onAssign, onCancel, onRelease, onDispute, onAutoRelease, onViewDetails, skin = 'ulyxes', showActions = true, fiatCurrency = 'USD', ethToFiatRate, formatFiat }: ClassItemProps) {
   const title = useMemo(() => {
     if (escrow.status === 'Assigned' && escrow.selected.yogaIndex !== undefined) {
       const idx = escrow.selected.yogaIndex
@@ -145,6 +148,23 @@ export function ClassItem({ escrow, onAssign, onCancel, onRelease, onDispute, on
           <div className="yui-class-item__title">{title}</div>
           <div className="yui-class-item__sub">
             <span className="yui-class-item__amount">{escrow.amountEth} ETH</span>
+            {typeof ethToFiatRate === 'number' && !Number.isNaN(ethToFiatRate) ? (
+              <>
+                <span className="yui-dot-sep" />
+                <span className="yui-class-item__fiat">
+                  {(() => {
+                    const eth = Number.parseFloat(escrow.amountEth)
+                    const fiat = eth * ethToFiatRate
+                    if (formatFiat) return formatFiat(fiat, fiatCurrency)
+                    try {
+                      return new Intl.NumberFormat(undefined, { style: 'currency', currency: fiatCurrency }).format(fiat)
+                    } catch {
+                      return `${fiatCurrency} ${fiat.toFixed(2)}`
+                    }
+                  })()}
+                </span>
+              </>
+            ) : null}
             {teacherLine && <span className="yui-dot-sep" />}
             {teacherLine && <span>{teacherLine}</span>}
           </div>

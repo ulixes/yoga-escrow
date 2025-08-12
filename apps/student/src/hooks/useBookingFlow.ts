@@ -311,18 +311,41 @@ export function useBookingFlow(userEmail?: string, userWalletAddress?: string, e
 
     try {
       // Convert booking payload to contract format for gas estimation
+      // Validate and prepare contract payload
       const contractPayload: ContractBookingPayload = {
         teacherHandles: state.bookingPayload.teacherHandles,
-        yogaTypes: state.bookingPayload.yogaTypes.map(type => Number(type)) as [number, number, number],
-        timeSlots: state.bookingPayload.timeSlots.map(slot => ({
-          startTime: BigInt(slot.startTime),
-          durationMinutes: Number(slot.durationMinutes) || 60,
-          timezoneOffset: Number(slot.timezoneOffset) || 0
+        yogaTypes: state.bookingPayload.yogaTypes.map(type => {
+          const numericType = typeof type === 'number' ? type : Number(type)
+          console.log('Converting yoga type:', type, '->', numericType)
+          return numericType
+        }) as [number, number, number],
+        timeSlots: state.bookingPayload.timeSlots.map(slot => {
+          const timeSlot = {
+            startTime: BigInt(Math.floor(slot.startTime)),
+            durationMinutes: Number(slot.durationMinutes) || 60,
+            timezoneOffset: Number(slot.timezoneOffset) || 0
+          }
+          console.log('Converting time slot:', slot, '->', timeSlot)
+          return timeSlot
+        }) as any,
+        locations: state.bookingPayload.locations.map(loc => ({
+          country: loc.country || 'Unknown',
+          city: loc.city || 'Unknown', 
+          specificLocation: loc.specificLocation || 'Unknown'
         })) as any,
-        locations: state.bookingPayload.locations,
-        description: state.bookingPayload.description,
+        description: state.bookingPayload.description || 'Yoga class booking',
         amount: state.bookingPayload.priceETH
       }
+
+      // Validate all required fields
+      console.log('Contract payload validation:', {
+        teacherHandles: contractPayload.teacherHandles,
+        yogaTypes: contractPayload.yogaTypes,
+        timeSlots: contractPayload.timeSlots,
+        locations: contractPayload.locations,
+        description: contractPayload.description,
+        amount: contractPayload.amount
+      })
 
       console.log('Estimating gas for booking...')
       const gasEstimate = await estimateGas(contractPayload, userWalletAddress)
@@ -360,23 +383,35 @@ export function useBookingFlow(userEmail?: string, userWalletAddress?: string, e
       // Convert booking payload to contract format
       const contractPayload: ContractBookingPayload = {
         teacherHandles: state.bookingPayload.teacherHandles,
-        yogaTypes: state.bookingPayload.yogaTypes.map(type => Number(type)) as [number, number, number],
+        yogaTypes: state.bookingPayload.yogaTypes.map(type => {
+          const numericType = typeof type === 'number' ? type : Number(type)
+          console.log('Converting yoga type:', type, '->', numericType)
+          return numericType
+        }) as [number, number, number],
         timeSlots: state.bookingPayload.timeSlots.map(slot => {
           // Ensure we have valid numbers before converting to BigInt
           const startTime = Number(slot.startTime)
           if (isNaN(startTime)) {
             throw new Error('Invalid start time in time slot')
           }
-          return {
-            startTime: BigInt(startTime),
+          const timeSlot = {
+            startTime: BigInt(Math.floor(startTime)),
             durationMinutes: Number(slot.durationMinutes) || 60,
             timezoneOffset: Number(slot.timezoneOffset) || 0
           }
+          console.log('Converting time slot for transaction:', slot, '->', timeSlot)
+          return timeSlot
         }) as any,
-        locations: state.bookingPayload.locations,
-        description: state.bookingPayload.description,
+        locations: state.bookingPayload.locations.map(loc => ({
+          country: loc.country || 'Unknown',
+          city: loc.city || 'Unknown', 
+          specificLocation: loc.specificLocation || 'Unknown'
+        })) as any,
+        description: state.bookingPayload.description || 'Yoga class booking',
         amount: state.bookingPayload.priceETH // Use ETH amount from payload
       }
+
+      console.log('Final contract payload for transaction:', contractPayload)
 
       console.log('Creating escrow with contract payload:', contractPayload)
 

@@ -357,6 +357,14 @@
 
 .yui-dot-sep::before { content: '·'; margin: 0 4px; color: #aaa; }
 
+/* MyBookings wrapper */
+.yui-bookings { display: grid; gap: 12px; }
+.yui-bookings__header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.yui-bookings__title { font-weight: 700; letter-spacing: 0.2px; }
+.yui-bookings__filters { display: flex; gap: 6px; flex-wrap: wrap; }
+.yui-tab { font: inherit; padding: 6px 12px; border-radius: 999px; border: 1px solid #ddd; background: #fff; cursor: pointer; }
+.yui-tab[data-active='true'] { border-color: #111; background: #111; color: #fff; }
+
 /* Buttons used inside list items */
 .yui-btn { font: inherit; cursor: pointer; border-radius: 10px; padding: 8px 12px; border: 1px solid transparent; }
 .yui-btn--primary { background: #111; color: #fff; border-color: #111; }
@@ -364,52 +372,33 @@
 .yui-btn--link { background: transparent; color: #111; border: none; text-decoration: underline; text-underline-offset: 3px; padding: 4px 6px; }
 
 /* Navigation header */
-.yui-nav {
+.yui-avatar { width: 32px; height: 32px; border-radius: 50%; background: #111; color: #fff; display: grid; place-items: center; font-weight: 700; }
+[data-skin='ulyxes'] .yui-nav { 
   position: sticky;
   top: 0;
-  z-index: 20;
-  background: #fff;
-  border-bottom: 1px solid #eee;
+  z-index: 50;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.9), rgba(255,255,255,0.75));
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
 }
-.yui-nav__inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 16px;
-}
-.yui-nav.is-hot {
-  /* Hot yoga gradient with airy space */
-  background: linear-gradient(135deg, #fff4f0 0%, #fff 35%, #fff 100%);
-  backdrop-filter: saturate(1.1);
-}
-.yui-nav__toggle { display: inline-flex; width: 40px; height: 40px; align-items: center; justify-content: center; border-radius: 10px; border: 1px solid #eee; background: #fff; }
-.yui-burger { width: 18px; height: 2px; background: #111; position: relative; }
-.yui-burger::before, .yui-burger::after { content: ''; position: absolute; left: 0; right: 0; height: 2px; background: #111; }
-.yui-burger::before { top: -6px; }
-.yui-burger::after { top: 6px; }
-.yui-nav__brand { display: grid; gap: 2px; }
-.yui-nav__title { font-weight: 800; letter-spacing: 0.2px; }
-.yui-nav__slogan { font-size: 12px; color: #666; }
-.yui-nav__actions { display: flex; gap: 8px; }
-.yui-conn { font-size: 12px; padding: 4px 8px; border-radius: 999px; border: 1px solid #eee; }
-.yui-conn.is-on { background: #e8fff1; color: #0f6a3c; border-color: #bdf0d1; }
-.yui-conn.is-off { background: #fff0f0; color: #7a1c1c; border-color: #ffd0d0; }
-.yui-nav__user { display: flex; gap: 10px; align-items: center; }
-.yui-avatar { width: 32px; height: 32px; border-radius: 50%; background: #111; color: #fff; display: grid; place-items: center; font-weight: 700; }
-.yui-user__meta { display: grid; }
-.yui-user__name { font-weight: 600; }
-.yui-user__sub { font-size: 12px; color: #666; }
+.yui-nav { display: block; }
+.yui-nav__row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; }
+.yui-nav__brand { display: flex; align-items: center; gap: 10px; min-height: 40px; }
+.yui-nav__brand-text { display: grid; gap: 2px; }
+.yui-nav__brand-title { font-weight: 700; letter-spacing: 0.2px; }
+.yui-nav__brand-slogan { font-size: 12px; opacity: 0.7; }
 
-/* Mobile-friendly layout: collapsible actions and spacious padding */
-@media (max-width: 720px) {
-  .yui-nav__inner { grid-template-columns: auto 1fr auto; gap: 8px; padding: 12px 12px; }
-  .yui-nav__actions { display: none; position: absolute; top: 56px; left: 12px; right: 12px; background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 10px; flex-direction: column; gap: 6px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
-  .yui-nav__actions.is-open { display: flex; }
-  .yui-nav__slogan { display: none; }
-}
+.yui-nav__right { position: relative; display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.yui-nav__link { font: inherit; background: transparent; border: none; color: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; padding: 6px 8px; border-radius: 8px; }
+.yui-nav__burger { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; border: 1px solid rgba(0,0,0,0.15); background: #fff; color: #111; cursor: pointer; }
+[data-skin='ulyxes'] .yui-nav__burger { box-shadow: 0 4px 14px rgba(0,0,0,0.08); transition: transform 0.15s ease, background 0.2s ease; }
+[data-skin='ulyxes'] .yui-nav__burger:hover { transform: translateY(-1px); background: #f7f7f7; }
+
+.yui-nav__menu { position: absolute; top: calc(100% + 8px); right: 0; width: 200px; background: #fff; border: 1px solid rgba(0,0,0,0.1); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); padding: 6px; display: grid; gap: 4px; }
+.yui-nav__menu-item { font: inherit; text-align: left; background: transparent; border: none; padding: 10px 12px; border-radius: 10px; cursor: pointer; }
+.yui-nav__menu-item:hover { background: rgba(0,0,0,0.04); }
+.yui-nav__menu-item--danger { color: #b00020; }
 [data-skin='ulyxes'] .yui-journey__persona, [data-skin='ulyxes'] .yui-journey__goal {
   /* Fix clickable appearance with proper button styling */
   border: 2px solid #e0e0e0;
@@ -434,11 +423,23 @@
 [data-skin='ulyxes'] .yui-journey__input:focus { outline: none; border-bottom-color: #111; }
 
 /* Journey start screen */
-.yui-journey__start { display: grid; gap: 12px; place-items: start; min-height: 40vh; padding: 24px 0; }
+.yui-journey__start { display: grid; gap: 12px; place-items: center; padding: 36px 0 18px; text-align: center; }
 .yui-journey__start-title { margin: 0; font-weight: 700; letter-spacing: 0.2px; }
-.yui-journey__start-subtitle { margin: 0; opacity: 0.75; }
-.yui-journey__cta { font: inherit; }
-[data-skin='ulyxes'] .yui-journey__cta { text-decoration: underline; text-underline-offset: 3px; border: none; background: transparent; padding: 0; }
+.yui-journey__start-subtitle { margin: 0; opacity: 0.8; }
+.yui-journey__start-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 4px; }
+.yui-journey__cta { font: inherit; margin-top: 4px; min-width: 200px; }
+[data-skin='ulyxes'] .yui-journey__cta {
+  border: 2px solid #111;
+  background: #111;
+  color: #fff;
+  border-radius: 999px;
+  padding: 12px 18px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+[data-skin='ulyxes'] .yui-journey__cta:hover { background: #222; transform: translateY(-1px); box-shadow: 0 8px 22px rgba(0,0,0,0.14); }
 
 /* Improved Persona Selector */
 .yui-persona-selector { display: grid; gap: 20px; max-width: 600px; }

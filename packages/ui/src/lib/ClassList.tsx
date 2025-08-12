@@ -2,7 +2,7 @@ import React from 'react'
 import type { ClassItemProps, StudentEscrow } from './ClassItem'
 import { ClassItem } from './ClassItem'
 
-export interface ClassListProps extends Pick<ClassItemProps, 'onAssign' | 'onCancel' | 'onRelease' | 'onDispute' | 'onAutoRelease' | 'onViewDetails' | 'skin' | 'showActions'> {
+export interface ClassListProps extends Pick<ClassItemProps, 'onAssign' | 'onCancel' | 'onRelease' | 'onDispute' | 'onAutoRelease' | 'onViewDetails' | 'skin' | 'showActions' | 'fiatCurrency' | 'ethToFiatRate' | 'formatFiat'> {
   items: StudentEscrow[]
   emptyState?: React.ReactNode
 }

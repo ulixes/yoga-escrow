@@ -25,6 +25,8 @@ export type FullJourneyProps = {
   className?: string
   onSubmit?: (result: FullJourneyResult) => void
   locationProps?: Pick<LocationPickerProps, 'country' | 'city' | 'options'>
+  startSecondaryLabel?: string
+  onStartSecondary?: () => void
 }
 
 type Step = 1 | 2 | 3 | 4 | 5 | 6
@@ -40,6 +42,8 @@ export function FullJourney(props: FullJourneyProps) {
     className,
     onSubmit,
     locationProps,
+    startSecondaryLabel = 'View your bookings',
+    onStartSecondary,
   } = props
 
   const [step, setStep] = React.useState<Step>(1)
@@ -63,9 +67,14 @@ export function FullJourney(props: FullJourneyProps) {
   // Step 5 - details
   const [studentEmail, setStudentEmail] = React.useState<string>(defaultStudentEmail || '')
   React.useEffect(() => {
+    console.log('[JOURNEY DEBUG] FullJourney received defaultStudentEmail:', defaultStudentEmail)
+    console.log('[JOURNEY DEBUG] Current studentEmail state:', studentEmail)
     // Prefill when provided; do not overwrite if user already typed something different
     if (defaultStudentEmail && (studentEmail === '' || studentEmail === undefined)) {
+      console.log('[JOURNEY DEBUG] Setting email to:', defaultStudentEmail)
       setStudentEmail(defaultStudentEmail)
+    } else {
+      console.log('[JOURNEY DEBUG] Not setting email - defaultStudentEmail:', defaultStudentEmail, 'studentEmail:', studentEmail)
     }
   }, [defaultStudentEmail])
 
@@ -127,10 +136,12 @@ export function FullJourney(props: FullJourneyProps) {
       {!started ? (
         <main className="yui-journey__start" aria-label="Start booking">
           <h1 className="yui-journey__start-title">Book a yoga class</h1>
-          <p className="yui-journey__start-subtitle">Anywhere. Anytime.</p>
-          <button type="button" className="yui-btn yui-journey__cta" onClick={() => setStarted(true)}>
-            Start booking
-          </button>
+          <p className="yui-journey__start-subtitle">Find your class — anywhere, anytime.</p>
+          <div className="yui-journey__start-actions">
+            <button type="button" className="yui-btn yui-journey__cta" onClick={() => setStarted(true)}>
+              Start a new booking
+            </button>
+          </div>
         </main>
       ) : (
         <>
@@ -217,6 +228,7 @@ export function FullJourney(props: FullJourneyProps) {
 
         {step === 5 && (
           <section className="yui-journey__step" aria-label="Review & Details">
+            {console.log('[JOURNEY DEBUG] Rendering step 5 with studentEmail:', studentEmail)}
             <div className="yui-journey__review">
               <h3>Review your choices</h3>
               <ul className="yui-journey__summary">
@@ -230,7 +242,15 @@ export function FullJourney(props: FullJourneyProps) {
             <div className="yui-journey__details">
               <label className="yui-journey__field">
                 <span>Email</span>
-                <input className="yui-journey__input" type="email" value={studentEmail} onChange={(e) => setStudentEmail(e.target.value)} />
+                <input 
+                  className="yui-journey__input" 
+                  type="email" 
+                  value={studentEmail} 
+                  onChange={(e) => {
+                    console.log('[JOURNEY DEBUG] Email input changed to:', e.target.value)
+                    setStudentEmail(e.target.value)
+                  }} 
+                />
               </label>
             </div>
           </section>

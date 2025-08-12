@@ -172,12 +172,12 @@ export function useYogaEscrow(ethUsdPrice: number = 3000) {
 
     } catch (error) {
       console.error('Gas estimation failed:', error)
-      // Return fallback values if estimation fails
+      // Return higher fallback values for complex contract calls
       return {
-        gasLimit: BigInt(100000), // Fallback gas limit
+        gasLimit: BigInt(500000), // Higher fallback for complex escrow creation
         gasPrice: BigInt(1000000000), // 1 gwei fallback
-        gasFeeETH: '0.0001',
-        gasFeeUSD: 0.25
+        gasFeeETH: '0.0005',
+        gasFeeUSD: 1.5
       }
     }
   }, [publicClient])
@@ -206,14 +206,30 @@ export function useYogaEscrow(ethUsdPrice: number = 3000) {
         ]
       })
 
-      // Send transaction (EIP-1193 style: hex-encoded value)
+      // Send transaction with explicit gas settings
       const wei = parseEther(payload.amount)
       const valueHex = `0x${wei.toString(16)}`
+
+      // Get gas estimate for this specific call
+      let gasLimit = BigInt(500000) // Default high gas limit
+      try {
+        gasLimit = await publicClient.estimateGas({
+          account: '0x0000000000000000000000000000000000000000' as `0x${string}`, // Dummy account for estimation
+          to: YOGA_ESCROW_CONTRACT_ADDRESS as `0x${string}`,
+          data,
+          value: wei
+        })
+        // Add 20% buffer to gas estimate
+        gasLimit = gasLimit + (gasLimit * BigInt(20) / BigInt(100))
+      } catch (gasError) {
+        console.warn('Gas estimation failed, using fallback:', gasError)
+      }
 
       const tx = await sendTransaction({
         to: YOGA_ESCROW_CONTRACT_ADDRESS as `0x${string}`,
         data,
         value: valueHex,
+        gas: `0x${gasLimit.toString(16)}`, // Explicit gas limit
         chainId: CHAIN_ID
       })
 
