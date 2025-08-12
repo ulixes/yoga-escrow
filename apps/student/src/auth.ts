@@ -4,6 +4,10 @@ import { usePrivy, useLoginWithEmail } from '@privy-io/react-auth'
 export function useHeadlessEmailAuth() {
   const { ready, authenticated, user, getAccessToken, logout } = usePrivy()
   const { sendCode, loginWithCode } = useLoginWithEmail()
+  
+  console.log('[AUTH DEBUG] ready:', ready)
+  console.log('[AUTH DEBUG] authenticated:', authenticated)
+  console.log('[AUTH DEBUG] user in auth hook:', user)
 
   const requestCode = useCallback(async (email: string) => {
     try {
@@ -16,12 +20,15 @@ export function useHeadlessEmailAuth() {
 
   const confirmCode = useCallback(async (email: string, code: string) => {
     try {
-      await loginWithCode({ email, code })
+      console.log('[AUTH DEBUG] Attempting login with:', { email, code })
+      const result = await loginWithCode({ email, code })
+      console.log('[AUTH DEBUG] Login result:', result)
+      console.log('[AUTH DEBUG] User after login:', user)
     } catch (error) {
-      console.error('Failed to verify code:', error)
+      console.error('[AUTH DEBUG] Failed to verify code:', error)
       throw error
     }
-  }, [loginWithCode])
+  }, [loginWithCode, user])
 
   return {
     ready,

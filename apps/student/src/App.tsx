@@ -8,7 +8,8 @@ import {
   InsufficientFunds,
   PaymentConfirmation,
   TransactionConfirmation,
-  TransactionError
+  TransactionError,
+  NavBar
 } from '@yoga/ui'
 import type { FullJourneyResult, YogaTypeItem, YogaDay, PaymentSummary } from '@yoga/ui'
 import '@yoga/ui/styles.css'
@@ -22,6 +23,7 @@ import { History } from './components/History'
 
 export default function App() {
   const { ready, authenticated, user, requestCode, confirmCode, logout } = useHeadlessEmailAuth()
+  const [showHistory, setShowHistory] = React.useState(false)
   
   const { 
     ethBalance,
@@ -49,13 +51,25 @@ export default function App() {
   // Resilient email extraction for prefill (covers older sessions)
   const studentEmail = React.useMemo(() => {
     const u: any = user
-    return (
-      u?.email?.address ||
-      u?.emails?.[0]?.address ||
-      (u?.linkedAccounts || []).find((a: any) => a?.type === 'email')?.address ||
-      ''
-    )
+    console.log('[EMAIL DEBUG] Full user object:', JSON.stringify(u, null, 2))
+    console.log('[EMAIL DEBUG] user.email:', u?.email)
+    console.log('[EMAIL DEBUG] user.emails:', u?.emails)
+    console.log('[EMAIL DEBUG] user.linkedAccounts:', u?.linkedAccounts)
+    
+    const emailFromAddress = u?.email?.address
+    const emailFromEmails = u?.emails?.[0]?.address
+    const emailFromLinkedAccounts = (u?.linkedAccounts || []).find((a: any) => a?.email)?.email
+    
+    console.log('[EMAIL DEBUG] emailFromAddress:', emailFromAddress)
+    console.log('[EMAIL DEBUG] emailFromEmails:', emailFromEmails)
+    console.log('[EMAIL DEBUG] emailFromLinkedAccounts:', emailFromLinkedAccounts)
+    
+    const finalEmail = emailFromAddress || emailFromEmails || emailFromLinkedAccounts || ''
+    console.log('[EMAIL DEBUG] Final extracted email:', finalEmail)
+    
+    return finalEmail
   }, [user])
+
 
   const { 
     step,
@@ -246,32 +260,23 @@ export default function App() {
       minHeight: '100vh',
       background: '#fafafa'
     }}>
-      <div style={{ 
-        padding: '12px 24px',
-        background: 'white',
-        borderBottom: '1px solid #e0e0e0',
-        marginBottom: 24
-      }}>
-        <div style={{ 
-          maxWidth: 1200, 
-          margin: '0 auto',
-          display: 'flex',
-          justifyContent: 'flex-start',
-          alignItems: 'center'
-        }}>
-          <Brand
-            title="Ulyxes"
-            slogan="Yoga everywhere.. anytime.."
-            orientation="horizontal"
-            size="sm"
-            logoVariant="wave"
-            skin="ulyxes"
-          />
+      <NavBar
+        skin="ulyxes"
+        onOpenBookings={() => setShowHistory(!showHistory)}
+        onLogout={logout}
+        bookingsLabel={showHistory ? "Back to Booking" : "My bookings"}
+        logoutLabel="Log out"
+      />
+
+      {/* History View */}
+      {showHistory && (
+        <div style={{ maxWidth: 800, margin: '24px auto', padding: '0 24px' }}>
+          <History studentAddress={walletAddress} />
         </div>
-      </div>
+      )}
 
       {/* Journey Step */}
-      {step === 'journey' && (
+      {step === 'journey' && !showHistory && (
         <div style={{ maxWidth: 800, margin: '0 auto' }}>
           <FullJourney
             yogaTypes={yogaTypes}
@@ -291,7 +296,7 @@ export default function App() {
       )}
 
       {/* Payment Step */}
-      {step === 'payment' && journeyResult && bookingPayload && paymentState && (
+      {step === 'payment' && !showHistory && journeyResult && bookingPayload && paymentState && (
         <div style={{ maxWidth: 600, margin: '0 auto', padding: 24 }}>
           <h2 style={{ marginBottom: 24 }}>Payment</h2>
           
@@ -328,7 +333,7 @@ export default function App() {
       )}
 
       {/* Confirmation Step */}
-      {step === 'confirmation' && transactionHash && (
+      {step === 'confirmation' && !showHistory && transactionHash && (
         <div style={{ maxWidth: 600, margin: '0 auto', padding: 24 }}>
           <TransactionConfirmation
             transactionHash={transactionHash}
@@ -343,7 +348,7 @@ export default function App() {
       )}
       
       {/* Error State */}
-      {error && step === 'payment' && (
+      {error && step === 'payment' && !showHistory && (
         <div style={{ maxWidth: 600, margin: '0 auto', padding: 24 }}>
           <TransactionError
             error={error}
@@ -355,13 +360,6 @@ export default function App() {
             onCancel={() => goToStep('journey')}
             skin="ulyxes"
           />
-        </div>
-      )}
-
-      {/* Booking History */}
-      {walletAddress && (
-        <div style={{ padding: '24px 0' }}>
-          <History studentAddress={walletAddress as `0x${string}`} />
         </div>
       )}
     </div>

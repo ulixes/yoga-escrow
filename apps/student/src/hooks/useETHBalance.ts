@@ -46,7 +46,10 @@ export function useETHBalance() {
         transport: http()
       })
 
-      console.log('Fetching ETH balance for:', privyWallet.address)
+      console.log('[BALANCE DEBUG] Fetching ETH balance for:', privyWallet.address)
+      console.log('[BALANCE DEBUG] Network:', NETWORK)
+      console.log('[BALANCE DEBUG] Chain:', NETWORK === 'base' ? 'base mainnet' : 'base sepolia')
+      console.log('[BALANCE DEBUG] RPC URL:', publicClient.transport.url || 'default')
 
       // Read ETH balance
       const balance = await publicClient.getBalance({
@@ -56,10 +59,16 @@ export function useETHBalance() {
       const ethBalance = balance.toString()
       const ethBalanceFormatted = parseFloat(formatEther(balance)).toFixed(6)
 
-      console.log('ETH balance fetched successfully:', {
-        raw: ethBalance,
-        formatted: ethBalanceFormatted
-      })
+      console.log('[BALANCE DEBUG] Raw balance (wei):', ethBalance)
+      console.log('[BALANCE DEBUG] Formatted balance (ETH):', ethBalanceFormatted)
+      console.log('[BALANCE DEBUG] Balance in hex:', `0x${balance.toString(16)}`)
+      
+      // Check if balance is actually 0 or there's a conversion issue
+      if (balance === 0n) {
+        console.log('[BALANCE DEBUG] ⚠️ Balance is actually 0 - wallet has no funds on this network')
+      } else {
+        console.log('[BALANCE DEBUG] ✅ Wallet has funds:', ethBalanceFormatted, 'ETH')
+      }
 
       setBalance({
         ethBalance,
