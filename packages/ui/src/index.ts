@@ -59,3 +59,9 @@ export type { ImprovedYogaTypeSelectorProps, YogaTypeOption } from './lib/Improv
 
 export { WorkingSelectionDemo } from './lib/WorkingSelectionDemo'
 export type { WorkingSelectionDemoProps } from './lib/WorkingSelectionDemo'
+
+// Booking history components
+export { ClassItem } from './lib/ClassItem'
+export type { ClassItemProps, StudentEscrow, EscrowStatus, TimeSlot, Location } from './lib/ClassItem'
+export { ClassList } from './lib/ClassList'
+export type { ClassListProps } from './lib/ClassList'

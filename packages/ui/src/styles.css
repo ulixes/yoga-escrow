@@ -310,6 +310,58 @@
 }
 
 /* Keep persona/goal buttons as tactile cards */
+
+/* Booking history list */
+.yui-class-list {
+  display: grid;
+  gap: 12px;
+}
+.yui-class-list__item {
+  background: #fff;
+  border: 1px solid #eaeaea;
+  border-radius: 12px;
+}
+
+.yui-class-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  padding: 14px;
+}
+.yui-class-item__left { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start; }
+.yui-class-item__status { padding-top: 2px; }
+.yui-class-item__meta { display: grid; gap: 6px; }
+.yui-class-item__title { font-weight: 700; letter-spacing: 0.2px; }
+.yui-class-item__sub { color: #444; font-size: 14px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.yui-class-item__details { color: #555; font-size: 13px; }
+.yui-class-item__amount { font-weight: 600; }
+.yui-class-item__expires { color: #666; font-size: 12px; }
+.yui-class-item__expires.is-expired { color: #b00020; font-weight: 600; }
+
+.yui-class-item__actions { display: flex; gap: 8px; align-items: center; }
+
+.yui-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  font-size: 12px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+.yui-badge--created { background: #f5f7ff; color: #223; border-color: #c8d1ff; }
+.yui-badge--assigned { background: #fff8e6; color: #5a4500; border-color: #ffe2a1; }
+.yui-badge--completed { background: #e8fff1; color: #0f6a3c; border-color: #bdf0d1; }
+.yui-badge--cancelled { background: #fff0f0; color: #7a1c1c; border-color: #ffd0d0; }
+.yui-badge--disputed { background: #fff3e8; color: #8a3a00; border-color: #ffd9b8; }
+
+.yui-dot-sep::before { content: '·'; margin: 0 4px; color: #aaa; }
+
+/* Buttons used inside list items */
+.yui-btn { font: inherit; cursor: pointer; border-radius: 10px; padding: 8px 12px; border: 1px solid transparent; }
+.yui-btn--primary { background: #111; color: #fff; border-color: #111; }
+.yui-btn--ghost { background: #fff; color: #111; border-color: #ddd; }
+.yui-btn--link { background: transparent; color: #111; border: none; text-decoration: underline; text-underline-offset: 3px; padding: 4px 6px; }
 [data-skin='ulyxes'] .yui-journey__persona, [data-skin='ulyxes'] .yui-journey__goal {
   /* Fix clickable appearance with proper button styling */
   border: 2px solid #e0e0e0;
