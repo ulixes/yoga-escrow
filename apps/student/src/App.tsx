@@ -46,6 +46,17 @@ export default function App() {
     ethToUSD
   } = useETHPrice()
   
+  // Resilient email extraction for prefill (covers older sessions)
+  const studentEmail = React.useMemo(() => {
+    const u: any = user
+    return (
+      u?.email?.address ||
+      u?.emails?.[0]?.address ||
+      (u?.linkedAccounts || []).find((a: any) => a?.type === 'email')?.address ||
+      ''
+    )
+  }, [user])
+
   const { 
     step,
     journeyResult,
@@ -62,7 +73,7 @@ export default function App() {
     transactionHash,
     escrowId,
     goToStep
-  } = useBookingFlow(user?.email?.address, walletAddress, ethPrice)
+  } = useBookingFlow(studentEmail, walletAddress, ethPrice)
 
   // Update payment state when balance changes
   React.useEffect(() => {
@@ -267,7 +278,7 @@ export default function App() {
             yogaTypePersonas={['runner', 'traveler', 'dancer']}
             days={days}
             defaultPersona="Traveler"
-            defaultStudentEmail={user?.email?.address}
+            defaultStudentEmail={studentEmail}
             locationProps={{
               country: 'Georgia',
               city: 'Tbilisi',
