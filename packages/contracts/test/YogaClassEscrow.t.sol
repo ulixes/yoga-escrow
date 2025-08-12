@@ -375,4 +375,110 @@ contract YogaClassEscrowTest is Test {
         vm.expectRevert(YogaClassEscrow.InvalidLocationIndex.selector);
         escrow.assignPayee(escrowId, teacher1, HANDLE_1, 0, 0, 3); // Index 3 is invalid
     }
+
+    function test_GetEscrowsByPayer() public {
+        // Create multiple escrows with different payers
+        uint256 escrow1 = createSampleEscrow(); // payer
+        
+        vm.prank(teacher1);
+        uint256 escrow2 = escrow.createEscrow{value: ESCROW_AMOUNT}(
+            [HANDLE_1, HANDLE_2, HANDLE_3],
+            [YogaClassEscrow.YogaType.Vinyasa, YogaClassEscrow.YogaType.Hatha, YogaClassEscrow.YogaType.Yin],
+            getDefaultTimeSlots(),
+            getDefaultLocations(),
+            "Teacher's escrow"
+        );
+
+        vm.prank(payer);
+        uint256 escrow3 = escrow.createEscrow{value: ESCROW_AMOUNT}(
+            [HANDLE_1, HANDLE_2, HANDLE_3],
+            [YogaClassEscrow.YogaType.Yin, YogaClassEscrow.YogaType.Vinyasa, YogaClassEscrow.YogaType.Hatha],
+            getDefaultTimeSlots(),
+            getDefaultLocations(),
+            "Payer's second escrow"
+        );
+
+        // Get escrows for payer
+        uint256[] memory payerEscrows = escrow.getEscrowsByPayer(payer);
+        assertEq(payerEscrows.length, 2);
+        assertEq(payerEscrows[0], escrow1);
+        assertEq(payerEscrows[1], escrow3);
+
+        // Get escrows for teacher1
+        uint256[] memory teacherEscrows = escrow.getEscrowsByPayer(teacher1);
+        assertEq(teacherEscrows.length, 1);
+        assertEq(teacherEscrows[0], escrow2);
+    }
+
+    function test_GetEscrowsByPayee() public {
+        uint256 escrow1 = createSampleEscrow();
+        uint256 escrow2 = createSampleEscrow();
+
+        // Assign teacher1 to first escrow
+        vm.prank(payer);
+        escrow.assignPayee(escrow1, teacher1, HANDLE_1, 0, 0, 0);
+
+        // Assign teacher2 to second escrow
+        vm.prank(payer);
+        escrow.assignPayee(escrow2, teacher2, HANDLE_2, 1, 1, 1);
+
+        // Get escrows for teacher1
+        uint256[] memory teacher1Escrows = escrow.getEscrowsByPayee(teacher1);
+        assertEq(teacher1Escrows.length, 1);
+        assertEq(teacher1Escrows[0], escrow1);
+
+        // Get escrows for teacher2
+        uint256[] memory teacher2Escrows = escrow.getEscrowsByPayee(teacher2);
+        assertEq(teacher2Escrows.length, 1);
+        assertEq(teacher2Escrows[0], escrow2);
+
+        // Teacher3 should have no escrows
+        uint256[] memory teacher3Escrows = escrow.getEscrowsByPayee(teacher3);
+        assertEq(teacher3Escrows.length, 0);
+    }
+
+    function test_GetMultipleEscrows() public {
+        uint256 escrow1 = createSampleEscrow();
+        uint256 escrow2 = createSampleEscrow();
+
+        uint256[] memory escrowIds = new uint256[](2);
+        escrowIds[0] = escrow1;
+        escrowIds[1] = escrow2;
+
+        YogaClassEscrow.Escrow[] memory escrows = escrow.getMultipleEscrows(escrowIds);
+        assertEq(escrows.length, 2);
+        assertEq(escrows[0].payer, payer);
+        assertEq(escrows[1].payer, payer);
+        assertEq(escrows[0].amount, ESCROW_AMOUNT);
+        assertEq(escrows[1].amount, ESCROW_AMOUNT);
+    }
+
+    // Helper function for tests
+    function getDefaultTimeSlots() internal view returns (YogaClassEscrow.TimeSlot[3] memory) {
+        YogaClassEscrow.TimeSlot[3] memory timeSlots;
+        timeSlots[0] = YogaClassEscrow.TimeSlot({
+            startTime: uint64(block.timestamp + 2 days),
+            durationMinutes: 60,
+            timezoneOffset: -300
+        });
+        timeSlots[1] = YogaClassEscrow.TimeSlot({
+            startTime: uint64(block.timestamp + 3 days),
+            durationMinutes: 90,
+            timezoneOffset: -300
+        });
+        timeSlots[2] = YogaClassEscrow.TimeSlot({
+            startTime: uint64(block.timestamp + 4 days),
+            durationMinutes: 75,
+            timezoneOffset: -300
+        });
+        return timeSlots;
+    }
+
+    function getDefaultLocations() internal pure returns (YogaClassEscrow.Location[3] memory) {
+        YogaClassEscrow.Location[3] memory locations;
+        locations[0] = YogaClassEscrow.Location({country: "Georgia", city: "Tbilisi", specificLocation: "Vake Park"});
+        locations[1] = YogaClassEscrow.Location({country: "Georgia", city: "Tbilisi", specificLocation: "Mtatsminda Park"});
+        locations[2] = YogaClassEscrow.Location({country: "Georgia", city: "Tbilisi", specificLocation: "Lisi Lake"});
+        return locations;
+    }
 }

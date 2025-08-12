@@ -433,4 +433,75 @@ contract YogaClassEscrow is ReentrancyGuard {
         if (yogaType == YogaType.Power) return "Power";
         return "Unknown";
     }
+
+    /**
+     * @notice Get all escrow IDs for a specific payer (student)
+     * @param payer The address of the payer to get escrows for
+     * @return Array of escrow IDs belonging to the payer
+     */
+    function getEscrowsByPayer(address payer) external view returns (uint256[] memory) {
+        uint256 count = 0;
+        
+        // First pass: count matching escrows
+        for (uint256 i = 0; i < nextEscrowId; i++) {
+            if (escrows[i].payer == payer) {
+                count++;
+            }
+        }
+        
+        // Second pass: collect IDs
+        uint256[] memory result = new uint256[](count);
+        uint256 index = 0;
+        for (uint256 i = 0; i < nextEscrowId; i++) {
+            if (escrows[i].payer == payer) {
+                result[index] = i;
+                index++;
+            }
+        }
+        
+        return result;
+    }
+
+    /**
+     * @notice Get all escrow IDs for a specific payee (teacher)
+     * @param payee The address of the payee to get escrows for
+     * @return Array of escrow IDs assigned to the payee
+     */
+    function getEscrowsByPayee(address payee) external view returns (uint256[] memory) {
+        uint256 count = 0;
+        
+        // First pass: count matching escrows
+        for (uint256 i = 0; i < nextEscrowId; i++) {
+            if (escrows[i].payee == payee) {
+                count++;
+            }
+        }
+        
+        // Second pass: collect IDs
+        uint256[] memory result = new uint256[](count);
+        uint256 index = 0;
+        for (uint256 i = 0; i < nextEscrowId; i++) {
+            if (escrows[i].payee == payee) {
+                result[index] = i;
+                index++;
+            }
+        }
+        
+        return result;
+    }
+
+    /**
+     * @notice Get full escrow details for multiple escrow IDs
+     * @param escrowIds Array of escrow IDs to fetch
+     * @return Array of escrow structs
+     */
+    function getMultipleEscrows(uint256[] calldata escrowIds) external view returns (Escrow[] memory) {
+        Escrow[] memory result = new Escrow[](escrowIds.length);
+        
+        for (uint256 i = 0; i < escrowIds.length; i++) {
+            result[i] = escrows[escrowIds[i]];
+        }
+        
+        return result;
+    }
 }

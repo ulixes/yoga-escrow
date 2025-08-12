@@ -4,24 +4,24 @@ import { base, baseSepolia } from 'viem/chains'
 import { NETWORK, YOGA_ESCROW_CONTRACT_ADDRESS } from '../config/constants'
 import { adaptEscrow } from '../adapters/escrowAdapter'
 
+// Efficient ABI with the new wallet-specific functions
 const ABI = [
   {
-    type: 'event',
-    name: 'EscrowCreated',
-    inputs: [
-      { indexed: false, name: 'escrowId', type: 'uint256' },
-      { indexed: false, name: 'payer', type: 'address' },
-      { indexed: false, name: 'amount', type: 'uint256' },
-    ],
+    type: 'function',
+    name: 'getEscrowsByPayer',
+    stateMutability: 'view',
+    inputs: [{ name: 'payer', type: 'address' }],
+    outputs: [{ name: '', type: 'uint256[]' }],
   },
   {
     type: 'function',
-    name: 'getEscrow',
+    name: 'getMultipleEscrows',
     stateMutability: 'view',
-    inputs: [{ name: 'escrowId', type: 'uint256' }],
+    inputs: [{ name: 'escrowIds', type: 'uint256[]' }],
     outputs: [
       {
-        type: 'tuple',
+        name: '',
+        type: 'tuple[]',
         components: [
           { name: 'payer', type: 'address' },
           { name: 'payee', type: 'address' },
@@ -79,26 +79,31 @@ export function useEscrowHistory(studentAddress?: Address) {
         setLoading(true); setError(null)
         const nowSec = Math.floor(Date.now() / 1000)
 
-        const logs = await client.getLogs({
+        // Get all escrow IDs for this payer using the new efficient function
+        const escrowIds = await client.readContract({
           address: YOGA_ESCROW_CONTRACT_ADDRESS,
-          abi: ABI as any,
-          eventName: 'EscrowCreated',
-          fromBlock: 'earliest',
-          toBlock: 'latest',
-          args: { payer: studentAddress },
-        } as any)
+          abi: ABI,
+          functionName: 'getEscrowsByPayer',
+          args: [studentAddress],
+        }) as bigint[]
 
-        const ids = (logs as any[]).map((l) => (l as any).args.escrowId as bigint)
+        if (escrowIds.length === 0) {
+          if (mounted) setItems([])
+          return
+        }
 
-        const results = await Promise.all(ids.map(async (id) => {
-          const raw = await client.readContract({
-            address: YOGA_ESCROW_CONTRACT_ADDRESS,
-            abi: ABI,
-            functionName: 'getEscrow',
-            args: [id],
-          })
-          return adaptEscrow(raw as any, id, nowSec)
-        }))
+        // Get full escrow details for all IDs in one call
+        const escrowsData = await client.readContract({
+          address: YOGA_ESCROW_CONTRACT_ADDRESS,
+          abi: ABI,
+          functionName: 'getMultipleEscrows',
+          args: [escrowIds],
+        }) as any[]
+
+        // Adapt the escrow data to our format
+        const results = escrowsData.map((raw, index) => 
+          adaptEscrow(raw, escrowIds[index], nowSec)
+        )
 
         if (mounted) setItems(results.sort((a,b) => b.createdAt - a.createdAt))
       } catch (e: any) {
