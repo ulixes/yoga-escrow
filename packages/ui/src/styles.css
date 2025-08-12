@@ -28,10 +28,13 @@
 .yui-yoga-picker__persona-btn { font: inherit; padding: 6px 10px; border: 1px solid currentColor; background: transparent; border-radius: 999px; cursor: pointer; }
 .yui-yoga-picker__persona-btn[data-active='true'] { background: currentColor; color: #fff; }
 .yui-yoga-picker__search-input { font: inherit; padding: 8px 10px; }
-.yui-yoga-picker__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
-.yui-yoga-picker__card { display: grid; gap: 8px; border: 1px solid currentColor; border-radius: 10px; padding: 10px; }
-.yui-yoga-picker__card[data-selected='true'] { outline: 2px solid currentColor; outline-offset: 2px; }
-.yui-yoga-picker__card[data-picking='true'] { opacity: 0.6; }
+.yui-yoga-picker__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+.yui-yoga-picker__card { display: none; }
+.yui-yoga-pill { display: grid; gap: 4px; padding: 12px 14px; border-radius: 12px; border: 2px solid #e0e0e0; background: #fff; cursor: pointer; transition: all 0.15s ease; text-align: left; }
+.yui-yoga-pill:hover { border-color: #111; transform: translateY(-1px); }
+.yui-yoga-pill.is-selected { background: #111; color: #fff; border-color: #111; }
+.yui-yoga-pill__title { font-weight: 600; }
+.yui-yoga-pill__tagline { opacity: 0.8; font-size: 13px; }
 .yui-yoga-picker__benefits { display: grid; gap: 8px; }
 .yui-yoga-picker__benefits-group { display: grid; gap: 4px; }
 .yui-yoga-picker__benefits-list { margin: 0; padding-left: 18px; }

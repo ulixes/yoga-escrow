@@ -188,7 +188,9 @@ export function ClassItem({ escrow, onAssign, onCancel, onRelease, onDispute, on
         <div className="yui-class-item__actions">
           {escrow.status === 'Created' && (
             <>
-              <button className="yui-btn yui-btn--primary" onClick={() => onAssign?.(escrow.id)}>Assign teacher</button>
+              {onAssign && (
+                <button className="yui-btn yui-btn--primary" onClick={() => onAssign(escrow.id)}>Assign teacher</button>
+              )}
               <button className="yui-btn yui-btn--ghost" onClick={() => onCancel?.(escrow.id)}>Cancel</button>
             </>
           )}

@@ -6,7 +6,7 @@ import { useETHPrice } from '../hooks/useETHPrice'
 
 export function History({ studentAddress }: { studentAddress?: `0x${string}` }) {
   const { items, loading, error } = useEscrowHistory(studentAddress)
-  const { assignPayee, releasePayment, cancelEscrow, raiseDispute, autoRelease } = useYogaEscrow()
+  const { releasePayment, cancelEscrow, raiseDispute, autoRelease } = useYogaEscrow()
   const { ethPrice } = useETHPrice()
 
   return (
@@ -21,23 +21,7 @@ export function History({ studentAddress }: { studentAddress?: `0x${string}` }) 
           fiatCurrency="USD"
           ethToFiatRate={ethPrice}
           emptyState={<div className="yui-empty">No bookings yet. Start by creating your first yoga class booking!</div>}
-          onAssign={async (id, teacherAddress, teacherHandle, yogaIndex, timeIndex, locationIndex) => {
-            try {
-              console.log('Assigning teacher:', { id, teacherAddress, teacherHandle, yogaIndex, timeIndex, locationIndex })
-              await assignPayee({
-                escrowId: id,
-                teacherAddress,
-                teacherHandle,
-                yogaIndex,
-                timeIndex,
-                locationIndex
-              })
-              console.log('Teacher assigned successfully')
-            } catch (error) {
-              console.error('Failed to assign teacher:', error)
-              alert('Failed to assign teacher. Please try again.')
-            }
-          }}
+          // Teacher assignment removed - students cannot assign teachers
           onCancel={async (id) => {
             try {
               console.log('Cancelling escrow:', id)
