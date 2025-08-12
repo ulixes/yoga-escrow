@@ -18,6 +18,7 @@ import { useETHBalance } from './hooks/useETHBalance'
 import { useFundWallet } from './hooks/useFundWallet'
 import { useETHPrice } from './hooks/useETHPrice'
 import { CLASS_PRICE_USD } from './config/constants'
+import { History } from './components/History'
 
 export default function App() {
   const { ready, authenticated, user, requestCode, confirmCode, logout } = useHeadlessEmailAuth()
@@ -343,6 +344,13 @@ export default function App() {
             onCancel={() => goToStep('journey')}
             skin="ulyxes"
           />
+        </div>
+      )}
+
+      {/* Booking History */}
+      {walletAddress && (
+        <div style={{ padding: '24px 0' }}>
+          <History studentAddress={walletAddress as `0x${string}`} />
         </div>
       )}
     </div>

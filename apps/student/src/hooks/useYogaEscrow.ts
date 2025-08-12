@@ -247,6 +247,58 @@ export function useYogaEscrow(ethUsdPrice: number = 3000) {
     }
   }, [sendTransaction])
 
+  // ---- History/Actions wiring ----
+  const ESCROW_WRITE_ABI = [
+    { name: 'assignPayee', type: 'function', stateMutability: 'nonpayable', inputs: [
+      { name: 'escrowId', type: 'uint256' },
+      { name: 'teacherAddress', type: 'address' },
+      { name: 'teacherHandle', type: 'string' },
+      { name: 'yogaIndex', type: 'uint8' },
+      { name: 'timeIndex', type: 'uint8' },
+      { name: 'locationIndex', type: 'uint8' },
+    ], outputs: [] },
+    { name: 'releasePayment', type: 'function', stateMutability: 'nonpayable', inputs: [{ name: 'escrowId', type: 'uint256' }], outputs: [] },
+    { name: 'cancelEscrow', type: 'function', stateMutability: 'nonpayable', inputs: [{ name: 'escrowId', type: 'uint256' }], outputs: [] },
+    { name: 'raiseDispute', type: 'function', stateMutability: 'nonpayable', inputs: [{ name: 'escrowId', type: 'uint256' }], outputs: [] },
+    { name: 'autoRelease', type: 'function', stateMutability: 'nonpayable', inputs: [{ name: 'escrowId', type: 'uint256' }], outputs: [] },
+  ] as const
+
+  const assignPayee = useCallback(async (args: {
+    escrowId: bigint,
+    teacherAddress: `0x${string}`,
+    teacherHandle: string,
+    yogaIndex: 0|1|2,
+    timeIndex: 0|1|2,
+    locationIndex: 0|1|2,
+  }) => {
+    const data = encodeFunctionData({
+      abi: ESCROW_WRITE_ABI,
+      functionName: 'assignPayee',
+      args: [args.escrowId, args.teacherAddress, args.teacherHandle, args.yogaIndex, args.timeIndex, args.locationIndex],
+    })
+    return sendTransaction({ to: YOGA_ESCROW_CONTRACT_ADDRESS as `0x${string}`, data, chainId: CHAIN_ID })
+  }, [sendTransaction])
+
+  const releasePayment = useCallback(async (escrowId: bigint) => {
+    const data = encodeFunctionData({ abi: ESCROW_WRITE_ABI, functionName: 'releasePayment', args: [escrowId] })
+    return sendTransaction({ to: YOGA_ESCROW_CONTRACT_ADDRESS as `0x${string}`, data, chainId: CHAIN_ID })
+  }, [sendTransaction])
+
+  const cancelEscrow = useCallback(async (escrowId: bigint) => {
+    const data = encodeFunctionData({ abi: ESCROW_WRITE_ABI, functionName: 'cancelEscrow', args: [escrowId] })
+    return sendTransaction({ to: YOGA_ESCROW_CONTRACT_ADDRESS as `0x${string}`, data, chainId: CHAIN_ID })
+  }, [sendTransaction])
+
+  const raiseDispute = useCallback(async (escrowId: bigint) => {
+    const data = encodeFunctionData({ abi: ESCROW_WRITE_ABI, functionName: 'raiseDispute', args: [escrowId] })
+    return sendTransaction({ to: YOGA_ESCROW_CONTRACT_ADDRESS as `0x${string}`, data, chainId: CHAIN_ID })
+  }, [sendTransaction])
+
+  const autoRelease = useCallback(async (escrowId: bigint) => {
+    const data = encodeFunctionData({ abi: ESCROW_WRITE_ABI, functionName: 'autoRelease', args: [escrowId] })
+    return sendTransaction({ to: YOGA_ESCROW_CONTRACT_ADDRESS as `0x${string}`, data, chainId: CHAIN_ID })
+  }, [sendTransaction])
+
   const resetContractState = useCallback(() => {
     setContractState({
       isLoading: false,
@@ -260,6 +312,11 @@ export function useYogaEscrow(ethUsdPrice: number = 3000) {
     createEscrow,
     estimateGas,
     contractState,
-    resetContractState
+    resetContractState,
+    assignPayee,
+    releasePayment,
+    cancelEscrow,
+    raiseDispute,
+    autoRelease,
   }
 }
