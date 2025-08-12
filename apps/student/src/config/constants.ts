@@ -34,5 +34,4 @@ export const BASE_SEPOLIA_CHAIN_ID = 84532
 export const CHAIN_ID = NETWORK === 'base' ? BASE_MAINNET_CHAIN_ID : BASE_SEPOLIA_CHAIN_ID
 
 // Time
-export const DEFAULT_EXPIRATION_DAYS = 7 // Escrow expires after 7 days
 export const DEFAULT_CLASS_DURATION_MINUTES = 60 // 1 hour classes

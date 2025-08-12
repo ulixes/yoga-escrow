@@ -1,13 +1,65 @@
 import { useEffect, useState, useMemo } from 'react'
-import { createPublicClient, http, parseAbi, type Address } from 'viem'
+import { createPublicClient, http, type Address } from 'viem'
 import { base, baseSepolia } from 'viem/chains'
 import { NETWORK, YOGA_ESCROW_CONTRACT_ADDRESS } from '../config/constants'
 import { adaptEscrow } from '../adapters/escrowAdapter'
 
-const ABI = parseAbi([
-  'event EscrowCreated(uint256 escrowId, address payer, uint256 amount, uint64 expiresAt)',
-  'function getEscrow(uint256) view returns (tuple(address payer,address payee,uint256 amount,uint8 status,uint64 createdAt,uint64 expiresAt,string description,string[3] teacherHandles,uint8[3] yogaTypes,tuple(uint64 startTime,uint32 durationMinutes,int16 timezoneOffset)[3] timeSlots,tuple(string country,string city,string specificLocation)[3] locations,uint8 selectedPayeeIndex,uint8 selectedYogaIndex,uint8 selectedTimeIndex,uint8 selectedLocationIndex,string selectedHandle))',
-])
+const ABI = [
+  {
+    type: 'event',
+    name: 'EscrowCreated',
+    inputs: [
+      { indexed: false, name: 'escrowId', type: 'uint256' },
+      { indexed: false, name: 'payer', type: 'address' },
+      { indexed: false, name: 'amount', type: 'uint256' },
+    ],
+  },
+  {
+    type: 'function',
+    name: 'getEscrow',
+    stateMutability: 'view',
+    inputs: [{ name: 'escrowId', type: 'uint256' }],
+    outputs: [
+      {
+        type: 'tuple',
+        components: [
+          { name: 'payer', type: 'address' },
+          { name: 'payee', type: 'address' },
+          { name: 'amount', type: 'uint256' },
+          { name: 'status', type: 'uint8' },
+          { name: 'createdAt', type: 'uint64' },
+          { name: 'expiresAt', type: 'uint64' },
+          { name: 'description', type: 'string' },
+          { name: 'teacherHandles', type: 'string[3]' },
+          { name: 'yogaTypes', type: 'uint8[3]' },
+          {
+            name: 'timeSlots',
+            type: 'tuple[3]',
+            components: [
+              { name: 'startTime', type: 'uint64' },
+              { name: 'durationMinutes', type: 'uint32' },
+              { name: 'timezoneOffset', type: 'int16' },
+            ],
+          },
+          {
+            name: 'locations',
+            type: 'tuple[3]',
+            components: [
+              { name: 'country', type: 'string' },
+              { name: 'city', type: 'string' },
+              { name: 'specificLocation', type: 'string' },
+            ],
+          },
+          { name: 'selectedPayeeIndex', type: 'uint8' },
+          { name: 'selectedYogaIndex', type: 'uint8' },
+          { name: 'selectedTimeIndex', type: 'uint8' },
+          { name: 'selectedLocationIndex', type: 'uint8' },
+          { name: 'selectedHandle', type: 'string' },
+        ],
+      },
+    ],
+  },
+] as const
 
 export function useEscrowHistory(studentAddress?: Address) {
   const [loading, setLoading] = useState(false)

@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo } from 'react'
 import type { FullJourneyResult } from '@yoga/ui'
 import { hasSufficientBalance, calculateShortfall } from '../utils/walletUtils'
 import { useYogaEscrow, type ContractBookingPayload, type GasEstimate } from './useYogaEscrow'
-import { CLASS_PRICE_USD, CLASS_PRICE_ETH, CLASS_PRICE_ETH_DISPLAY, DEFAULT_EXPIRATION_DAYS } from '../config/constants'
+import { CLASS_PRICE_USD, CLASS_PRICE_ETH, CLASS_PRICE_ETH_DISPLAY } from '../config/constants'
 
 // Contract enums matching Solidity
 export enum YogaType {
@@ -42,7 +42,6 @@ export interface BookingPayload {
   yogaTypes: [YogaType, YogaType, YogaType]
   timeSlots: [TimeSlot, TimeSlot, TimeSlot]
   locations: [Location, Location, Location]
-  expirationTime: number // Unix timestamp
   description: string
   priceUSD: number // Price in USD for display
   priceETH: string // Price in ETH for contract
@@ -195,15 +194,11 @@ export function useBookingFlow(userEmail?: string, userWalletAddress?: string, e
       '@yogateacher3'
     ]
 
-    // Set expiration using global constant
-    const expirationTime = Math.floor(Date.now() / 1000) + (DEFAULT_EXPIRATION_DAYS * 24 * 60 * 60)
-
     return {
       teacherHandles,
       yogaTypes,
       timeSlots: timeSlots as [TimeSlot, TimeSlot, TimeSlot],
       locations,
-      expirationTime,
       description: `Yoga class booking - ${result.persona} seeking ${result.goal}`,
       priceUSD: CLASS_PRICE_USD,
       priceETH: CLASS_PRICE_ETH
@@ -325,7 +320,6 @@ export function useBookingFlow(userEmail?: string, userWalletAddress?: string, e
           timezoneOffset: Number(slot.timezoneOffset) || 0
         })) as any,
         locations: state.bookingPayload.locations,
-        expirationTime: BigInt(state.bookingPayload.expirationTime),
         description: state.bookingPayload.description,
         amount: state.bookingPayload.priceETH
       }
@@ -380,7 +374,6 @@ export function useBookingFlow(userEmail?: string, userWalletAddress?: string, e
           }
         }) as any,
         locations: state.bookingPayload.locations,
-        expirationTime: BigInt(state.bookingPayload.expirationTime),
         description: state.bookingPayload.description,
         amount: state.bookingPayload.priceETH // Use ETH amount from payload
       }

@@ -30,7 +30,6 @@ const ESCROW_ABI = [
         "name": "locations",
         "type": "tuple[3]"
       },
-      {"internalType": "uint64", "name": "expirationTime", "type": "uint64"},
       {"internalType": "string", "name": "description", "type": "string"}
     ],
     "name": "createEscrow",
@@ -89,7 +88,6 @@ export interface ContractBookingPayload {
       specificLocation: string
     }
   ]
-  expirationTime: bigint
   description: string
   amount: string // ETH amount as string like "0.01"
 }
@@ -136,7 +134,6 @@ export function useYogaEscrow(ethUsdPrice: number = 3000) {
           payload.yogaTypes,
           payload.timeSlots,
           payload.locations,
-          payload.expirationTime,
           payload.description
         ]
       })
@@ -205,7 +202,6 @@ export function useYogaEscrow(ethUsdPrice: number = 3000) {
           payload.yogaTypes,
           payload.timeSlots,
           payload.locations,
-          payload.expirationTime,
           payload.description
         ]
       })
