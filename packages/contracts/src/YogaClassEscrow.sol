@@ -70,11 +70,12 @@ contract YogaClassEscrow is ReentrancyGuard {
 
     uint8 private constant NOT_SELECTED = 255;
     uint8 private constant OPTIONS_COUNT = 3;
+    uint32 private constant GRACE_PERIOD_HOURS = 48; // Hours after class ends before auto-release
 
     mapping(uint256 => Escrow) public escrows;
     uint256 public nextEscrowId;
 
-    event EscrowCreated(uint256 indexed escrowId, address indexed payer, uint256 amount, uint64 expiresAt);
+    event EscrowCreated(uint256 indexed escrowId, address indexed payer, uint256 amount);
 
     event EscrowAssigned(
         uint256 indexed escrowId,
@@ -98,7 +99,6 @@ contract YogaClassEscrow is ReentrancyGuard {
     error EscrowNotExpired();
     error NoFundsToRelease();
     error ZeroAmount();
-    error InvalidExpiration();
     error InvalidPayeeIndex();
     error InvalidYogaIndex();
     error InvalidTimeIndex();
@@ -132,12 +132,11 @@ contract YogaClassEscrow is ReentrancyGuard {
 
     /**
      * @notice Creates a new escrow with ETH deposit and choice options
-     * @dev Funds are held until released or expired. Payer specifies 3 options for each category
+     * @dev Funds are held until released. Auto-expiration calculated when teacher assigned. Payer specifies 3 options for each category
      * @param teacherHandles Array of exactly 3 unique teacher handles (e.g., "@yogamaster", "@zenteacher")
      * @param yogaTypes Array of exactly 3 yoga type preferences
      * @param timeSlots Array of exactly 3 possible time slots
      * @param locations Array of exactly 3 possible locations for the class
-     * @param expirationTime Unix timestamp when funds can be auto-released
      * @param description Optional description of the service
      * @return escrowId Unique identifier for the created escrow
      */
@@ -146,11 +145,9 @@ contract YogaClassEscrow is ReentrancyGuard {
         YogaType[3] calldata yogaTypes,
         TimeSlot[3] calldata timeSlots,
         Location[3] calldata locations,
-        uint64 expirationTime,
         string calldata description
     ) external payable nonReentrant returns (uint256 escrowId) {
         if (msg.value == 0) revert ZeroAmount();
-        if (expirationTime <= block.timestamp) revert InvalidExpiration();
 
         // Validate handles - no empty strings and no duplicates
         for (uint8 i = 0; i < OPTIONS_COUNT; i++) {
@@ -180,7 +177,7 @@ contract YogaClassEscrow is ReentrancyGuard {
         escrow.amount = msg.value;
         escrow.status = EscrowStatus.Created;
         escrow.createdAt = uint64(block.timestamp);
-        escrow.expiresAt = expirationTime;
+        escrow.expiresAt = 0; // Will be set when teacher assigned
         escrow.description = description;
         escrow.selectedPayeeIndex = NOT_SELECTED;
         escrow.selectedYogaIndex = NOT_SELECTED;
@@ -195,7 +192,7 @@ contract YogaClassEscrow is ReentrancyGuard {
             escrow.locations[i] = locations[i];
         }
 
-        emit EscrowCreated(escrowId, msg.sender, msg.value, expirationTime);
+        emit EscrowCreated(escrowId, msg.sender, msg.value);
     }
 
     /**
@@ -235,6 +232,11 @@ contract YogaClassEscrow is ReentrancyGuard {
 
         if (payeeIndex == NOT_SELECTED) revert HandleMismatch();
 
+        // Calculate automatic expiration: class end time + grace period
+        TimeSlot memory selectedSlot = escrow.timeSlots[timeIndex];
+        uint64 classEndTime = selectedSlot.startTime + (uint64(selectedSlot.durationMinutes) * 60);
+        uint64 gracePeriodSeconds = uint64(GRACE_PERIOD_HOURS) * 3600;
+
         // Assign the selections
         escrow.payee = teacherAddress;
         escrow.selectedPayeeIndex = payeeIndex;
@@ -242,6 +244,7 @@ contract YogaClassEscrow is ReentrancyGuard {
         escrow.selectedTimeIndex = timeIndex;
         escrow.selectedLocationIndex = locationIndex;
         escrow.selectedHandle = teacherHandle;
+        escrow.expiresAt = classEndTime + gracePeriodSeconds;
         escrow.status = EscrowStatus.Assigned;
 
         emit EscrowAssigned(escrowId, teacherAddress, payeeIndex, yogaIndex, timeIndex, locationIndex);

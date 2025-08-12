@@ -57,11 +57,9 @@ contract YogaClassEscrowTest is Test {
             YogaClassEscrow.Location({country: "Georgia", city: "Tbilisi", specificLocation: "Mtatsminda Park"});
         locations[2] = YogaClassEscrow.Location({country: "Georgia", city: "Tbilisi", specificLocation: "Lisi Lake"});
 
-        uint64 futureTime = uint64(block.timestamp + 7 days);
-
         vm.prank(payer);
         return escrow.createEscrow{value: ESCROW_AMOUNT}(
-            teacherHandles, yogaTypes, timeSlots, locations, futureTime, "Yoga class payment"
+            teacherHandles, yogaTypes, timeSlots, locations, "Yoga class payment"
         );
     }
 
@@ -110,6 +108,12 @@ contract YogaClassEscrowTest is Test {
         assertEq(escrowData.selectedHandle, HANDLE_2);
         assertEq(uint8(escrowData.status), uint8(YogaClassEscrow.EscrowStatus.Assigned));
 
+        // Check that expiration was calculated correctly
+        // timeSlot[2] starts at block.timestamp + 4 days, duration 75 minutes
+        uint64 expectedClassEnd = uint64(block.timestamp + 4 days) + (75 * 60);
+        uint64 expectedExpiration = expectedClassEnd + (48 * 3600); // 48 hours grace period
+        assertEq(escrowData.expiresAt, expectedExpiration);
+
         (uint8 payeeIndex, uint8 yogaIndex, uint8 timeIndex, uint8 locationIndex) = escrow.getSelectedOptions(escrowId);
         assertEq(payeeIndex, 1); // HANDLE_2 is at index 1
         assertEq(yogaIndex, 0);
@@ -156,9 +160,11 @@ contract YogaClassEscrowTest is Test {
         vm.prank(payer);
         escrow.assignPayee(escrowId, teacher3, HANDLE_3, 2, 1, 2); // Select teacher3 with @vinyasapro, Yin, timeSlot[1], location[2]
 
-        // Fast forward past expiration
-        uint64 futureTime = uint64(block.timestamp + 7 days);
-        vm.warp(futureTime + 1);
+        // Fast forward past class end time + 48 hour grace period
+        // timeSlot[1] starts at block.timestamp + 3 days, duration 90 minutes
+        uint64 classEndTime = uint64(block.timestamp + 3 days) + (90 * 60);
+        uint64 autoReleaseTime = classEndTime + (48 * 3600); // 48 hours after class ends
+        vm.warp(autoReleaseTime + 1);
 
         uint256 teacher3BalanceBefore = teacher3.balance;
 
@@ -222,9 +228,7 @@ contract YogaClassEscrowTest is Test {
 
         vm.prank(payer);
         vm.expectRevert(YogaClassEscrow.ZeroAmount.selector);
-        escrow.createEscrow{value: 0}(
-            teacherHandles, yogaTypes, timeSlots, locations, uint64(block.timestamp + 7 days), "Test"
-        );
+        escrow.createEscrow{value: 0}(teacherHandles, yogaTypes, timeSlots, locations, "Test");
     }
 
     function test_RevertCreateEscrowWithDuplicateHandles() public {
@@ -239,9 +243,7 @@ contract YogaClassEscrowTest is Test {
 
         vm.prank(payer);
         vm.expectRevert(YogaClassEscrow.DuplicateHandle.selector);
-        escrow.createEscrow{value: ESCROW_AMOUNT}(
-            teacherHandles, yogaTypes, timeSlots, locations, uint64(block.timestamp + 7 days), "Test"
-        );
+        escrow.createEscrow{value: ESCROW_AMOUNT}(teacherHandles, yogaTypes, timeSlots, locations, "Test");
     }
 
     function test_RevertCreateEscrowWithEmptyHandle() public {
@@ -256,9 +258,7 @@ contract YogaClassEscrowTest is Test {
 
         vm.prank(payer);
         vm.expectRevert(YogaClassEscrow.EmptyHandle.selector);
-        escrow.createEscrow{value: ESCROW_AMOUNT}(
-            teacherHandles, yogaTypes, timeSlots, locations, uint64(block.timestamp + 7 days), "Test"
-        );
+        escrow.createEscrow{value: ESCROW_AMOUNT}(teacherHandles, yogaTypes, timeSlots, locations, "Test");
     }
 
     function test_RevertAssignPayeeHandleMismatch() public {
@@ -365,9 +365,7 @@ contract YogaClassEscrowTest is Test {
 
         vm.prank(payer);
         vm.expectRevert(YogaClassEscrow.EmptyLocation.selector);
-        escrow.createEscrow{value: ESCROW_AMOUNT}(
-            teacherHandles, yogaTypes, timeSlots, locations, uint64(block.timestamp + 7 days), "Test"
-        );
+        escrow.createEscrow{value: ESCROW_AMOUNT}(teacherHandles, yogaTypes, timeSlots, locations, "Test");
     }
 
     function test_RevertAssignPayeeInvalidLocationIndex() public {
