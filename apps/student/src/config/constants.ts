@@ -1,7 +1,12 @@
 // Global configuration constants
 
-// Environment detection
-const IS_PRODUCTION = process.env.NODE_ENV === 'production'
+// Environment detection (Vite): prefer import.meta.env over process.env
+const IS_PRODUCTION = import.meta.env?.PROD === true
+const MODE = import.meta.env?.MODE || (IS_PRODUCTION ? 'production' : 'development')
+
+// Optional overrides via Vite env
+const ENV_NETWORK = (import.meta as any).env?.VITE_NETWORK as 'base' | 'baseSepolia' | undefined
+const ENV_ESCROW_ADDRESS = (import.meta as any).env?.VITE_ESCROW_ADDRESS as `0x${string}` | undefined
 
 // Pricing
 export const CLASS_PRICE_USD = 5 // $5 for both testing and production
@@ -12,18 +17,21 @@ export const CLASS_PRICE_ETH_DISPLAY = '0.002 ETH'
 export const CLASS_PRICE_USDC = '5.00' 
 export const CLASS_PRICE_USDC_RAW = '5000000' // 5 USDC with 6 decimals
 
-// Contract addresses
-export const YOGA_ESCROW_CONTRACT_ADDRESS = IS_PRODUCTION 
-  ? '0xa691f1735FD69AacCcFdf57EBD41a3140228941d' // Base mainnet
-  : '0x3F99B8Bd87e24Fd9728EE20A9184D285d74090Ec' // Base Sepolia testnet
+// Network selection
+export const NETWORK = (ENV_NETWORK === 'base' || ENV_NETWORK === 'baseSepolia')
+  ? ENV_NETWORK
+  : (IS_PRODUCTION ? 'base' as const : 'baseSepolia' as const)
+
+// Contract addresses (allow override)
+const DEFAULT_MAINNET_ADDR = '0xa691f1735FD69AacCcFdf57EBD41a3140228941d'
+const DEFAULT_SEPOLIA_ADDR = '0x3F99B8Bd87e24Fd9728EE20A9184D285d74090Ec'
+export const YOGA_ESCROW_CONTRACT_ADDRESS: `0x${string}` = ENV_ESCROW_ADDRESS
+  || (NETWORK === 'base' ? DEFAULT_MAINNET_ADDR : DEFAULT_SEPOLIA_ADDR) as `0x${string}`
 
 // Chain IDs  
 export const BASE_MAINNET_CHAIN_ID = 8453
 export const BASE_SEPOLIA_CHAIN_ID = 84532
-export const CHAIN_ID = IS_PRODUCTION ? BASE_MAINNET_CHAIN_ID : BASE_SEPOLIA_CHAIN_ID
-
-// Network
-export const NETWORK = IS_PRODUCTION ? 'base' as const : 'baseSepolia' as const
+export const CHAIN_ID = NETWORK === 'base' ? BASE_MAINNET_CHAIN_ID : BASE_SEPOLIA_CHAIN_ID
 
 // Time
 export const DEFAULT_EXPIRATION_DAYS = 7 // Escrow expires after 7 days
