@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo } from 'react'
 import type { FullJourneyResult } from '@yoga/ui'
 import { hasSufficientBalance, calculateShortfall } from '../utils/walletUtils'
 import { useYogaEscrow, type ContractBookingPayload, type GasEstimate } from './useYogaEscrow'
-import { CLASS_PRICE_USD, CLASS_PRICE_ETH, CLASS_PRICE_ETH_DISPLAY } from '../config/constants'
+import { CLASS_PRICE_USD, CLASS_PRICE_ETH, CLASS_PRICE_ETH_DISPLAY, YOGA_ESCROW_CONTRACT_ADDRESS } from '../config/constants'
 import { validateContractPayload, simulateContractCall } from '../utils/contractDebugger'
 
 // Contract enums matching Solidity
@@ -437,7 +437,7 @@ export function useBookingFlow(userEmail?: string, userWalletAddress?: string, e
       }
 
       // Simulate the contract call before sending real transaction
-      console.log('Simulating contract call...')
+      console.log('Simulating contract call with address:', YOGA_ESCROW_CONTRACT_ADDRESS)
       const simulation = await simulateContractCall(contractPayload, userWalletAddress as `0x${string}`)
       console.log('Contract simulation result:', simulation)
 
