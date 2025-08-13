@@ -230,7 +230,6 @@ export function FullJourney(props: FullJourneyProps) {
 
         {step === 5 && (
           <section className="yui-journey__step" aria-label="Review & Details">
-            {console.log('[JOURNEY DEBUG] Rendering step 5 with studentEmail:', studentEmail)}
             <div className="yui-journey__review">
               <h3>Review your choices</h3>
               <ul className="yui-journey__summary">

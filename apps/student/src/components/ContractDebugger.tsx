@@ -30,7 +30,7 @@ Errors: ${validation.errors.length > 0 ? validation.errors.join(', ') : 'None'}
 Warnings: ${validation.warnings.length > 0 ? validation.warnings.join(', ') : 'None'}`)
       
       } else if (testType === 'simulate') {
-        const simulation = await simulateContractCall(payload, walletAddress)
+        const simulation = await simulateContractCall(payload, walletAddress as `0x${string}`)
         setResult(`🧪 Simulation Result:
 Success: ${simulation.success}
 ${simulation.error ? `Error: ${simulation.error}` : ''}

@@ -276,7 +276,7 @@ export default function App() {
       {/* History View */}
       {showHistory && (
         <div style={{ maxWidth: 800, margin: '24px auto', padding: '0 24px' }}>
-          <History studentAddress={walletAddress} />
+          <History studentAddress={walletAddress as `0x${string}` | undefined} />
           
           {/* Debug panel - only show in development */}
           {import.meta.env?.MODE === 'development' && (

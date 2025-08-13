@@ -21,7 +21,7 @@ export function useHeadlessEmailAuth() {
   const confirmCode = useCallback(async (email: string, code: string) => {
     try {
       console.log('[AUTH DEBUG] Attempting login with:', { email, code })
-      const result = await loginWithCode({ email, code })
+      const result = await loginWithCode({ code })
       console.log('[AUTH DEBUG] Login result:', result)
       console.log('[AUTH DEBUG] User after login:', user)
     } catch (error) {

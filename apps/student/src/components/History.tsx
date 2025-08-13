@@ -7,7 +7,7 @@ import { useETHPrice } from '../hooks/useETHPrice'
 export function History({ studentAddress }: { studentAddress?: `0x${string}` }) {
   const { items, loading, error } = useEscrowHistory(studentAddress)
   const { releasePayment, cancelEscrow, raiseDispute, autoRelease } = useYogaEscrow()
-  const { ethPrice } = useETHPrice()
+  const { usdPrice: ethPrice } = useETHPrice()
 
   return (
     <div style={{ maxWidth: 800, margin: '0 auto', padding: 16 }}>

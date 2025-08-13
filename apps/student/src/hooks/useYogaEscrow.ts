@@ -206,30 +206,14 @@ export function useYogaEscrow(ethUsdPrice: number = 3000) {
         ]
       })
 
-      // Send transaction with explicit gas settings
+      // Send transaction and let the wallet/provider determine gas settings
       const wei = parseEther(payload.amount)
       const valueHex = `0x${wei.toString(16)}`
-
-      // Get gas estimate for this specific call
-      let gasLimit = BigInt(500000) // Default high gas limit
-      try {
-        gasLimit = await publicClient.estimateGas({
-          account: '0x0000000000000000000000000000000000000000' as `0x${string}`, // Dummy account for estimation
-          to: YOGA_ESCROW_CONTRACT_ADDRESS as `0x${string}`,
-          data,
-          value: wei
-        })
-        // Add 20% buffer to gas estimate
-        gasLimit = gasLimit + (gasLimit * BigInt(20) / BigInt(100))
-      } catch (gasError) {
-        console.warn('Gas estimation failed, using fallback:', gasError)
-      }
 
       const tx = await sendTransaction({
         to: YOGA_ESCROW_CONTRACT_ADDRESS as `0x${string}`,
         data,
         value: valueHex,
-        gas: `0x${gasLimit.toString(16)}`, // Explicit gas limit
         chainId: CHAIN_ID
       })
 
