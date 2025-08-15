@@ -73,3 +73,9 @@ export type { NavBarProps } from './lib/NavBar'
 // MyBookings wrapper
 export { MyBookings } from './lib/MyBookings'
 export type { MyBookingsProps, MyBookingsFilter } from './lib/MyBookings'
+
+// Hot Teacher Cards and Discovery
+export { HotTeacherCard } from './lib/HotTeacherCard'
+export type { HotTeacherCardProps, HotTeacherProfile } from './lib/HotTeacherCard'
+export { TeacherDiscovery } from './lib/TeacherDiscovery'
+export type { TeacherDiscoveryProps } from './lib/TeacherDiscovery'

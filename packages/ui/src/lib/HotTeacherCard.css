@@ -1,0 +1,351 @@
+/* Hot Teacher Card Styles */
+.hot-teacher-card {
+  position: relative;
+  background: #fff;
+  border-radius: 20px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.hot-teacher-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.hot-teacher-card.selected {
+  box-shadow: 0 0 0 3px #000;
+}
+
+/* Visual Section */
+.hot-teacher-card__visual {
+  position: relative;
+}
+
+.hot-teacher-card__hero {
+  position: relative;
+  width: 100%;
+  height: 320px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.hot-teacher-card__hero img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.hot-teacher-card__hero img.loaded {
+  opacity: 1;
+}
+
+.hot-teacher-card__overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px;
+  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+}
+
+.hot-teacher-card__handle {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hot-teacher-card__handle .verified {
+  background: #1DA1F2;
+  color: white;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+}
+
+/* Grid Images */
+.hot-teacher-card__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  height: 120px;
+  margin-top: 2px;
+}
+
+.hot-teacher-card__grid-item {
+  position: relative;
+  overflow: hidden;
+  background: #f0f0f0;
+}
+
+.hot-teacher-card__grid-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.hot-teacher-card__grid-item:hover img {
+  transform: scale(1.1);
+}
+
+/* Content Section */
+.hot-teacher-card__content {
+  padding: 20px;
+}
+
+.hot-teacher-card__header {
+  margin-bottom: 12px;
+}
+
+.hot-teacher-card__name {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 4px 0;
+  color: #111;
+}
+
+.hot-teacher-card__vibe {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+  font-style: italic;
+}
+
+/* Stats */
+.hot-teacher-card__stats {
+  display: flex;
+  gap: 16px;
+  margin: 16px 0;
+  padding: 12px 0;
+  border-top: 1px solid #f0f0f0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.hot-teacher-card__stats .stat {
+  font-size: 13px;
+  color: #666;
+}
+
+.hot-teacher-card__stats .stat strong {
+  color: #111;
+  font-weight: 600;
+}
+
+/* Tags */
+.hot-teacher-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 16px 0;
+}
+
+.hot-teacher-card__tags .tag {
+  padding: 4px 10px;
+  background: #f8f8f8;
+  border-radius: 20px;
+  font-size: 12px;
+  color: #444;
+  font-weight: 500;
+}
+
+/* CTA Button */
+.hot-teacher-card__cta {
+  width: 100%;
+  padding: 14px;
+  background: #111;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.hot-teacher-card__cta:hover {
+  background: #222;
+  transform: translateY(-1px);
+}
+
+.hot-teacher-card__cta.selected {
+  background: #fff;
+  color: #111;
+  border: 2px solid #111;
+}
+
+/* Compact Mode */
+.hot-teacher-card.compact .hot-teacher-card__hero {
+  height: 240px;
+}
+
+.hot-teacher-card.compact .hot-teacher-card__content {
+  padding: 16px;
+}
+
+.hot-teacher-card.compact .hot-teacher-card__name {
+  font-size: 18px;
+}
+
+/* Teacher Discovery Container */
+.teacher-discovery {
+  min-height: 100vh;
+  background: #fafafa;
+  padding: 40px 20px;
+}
+
+.teacher-discovery__header {
+  max-width: 1200px;
+  margin: 0 auto 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.teacher-discovery__title-section h1 {
+  font-size: 48px;
+  font-weight: 800;
+  margin: 0 0 8px 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.teacher-discovery__title-section p {
+  font-size: 18px;
+  color: #666;
+  margin: 0;
+}
+
+/* View Toggle */
+.view-toggle {
+  display: flex;
+  background: #fff;
+  border-radius: 10px;
+  padding: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.view-toggle button {
+  padding: 8px 16px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.view-toggle button.active {
+  background: #111;
+  color: #fff;
+}
+
+/* Content Layouts */
+.teacher-discovery__content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  gap: 24px;
+}
+
+.teacher-discovery__content--stack {
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+}
+
+.teacher-discovery__content--grid {
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+/* Selection Bar */
+.teacher-discovery__selection-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-top: 1px solid #e0e0e0;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+  z-index: 100;
+}
+
+.selection-info {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.selection-info .count {
+  font-size: 14px;
+  font-weight: 600;
+  color: #666;
+}
+
+.selected-handles {
+  display: flex;
+  gap: 8px;
+}
+
+.handle-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #f0f0f0;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.handle-chip button {
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  padding: 0;
+  margin-left: 4px;
+}
+
+.handle-chip button:hover {
+  color: #111;
+}
+
+.submit-btn {
+  padding: 12px 32px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+.submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
