@@ -441,14 +441,14 @@ contract YogaClassEscrow is ReentrancyGuard {
      */
     function getEscrowsByPayer(address payer) external view returns (uint256[] memory) {
         uint256 count = 0;
-        
+
         // First pass: count matching escrows
         for (uint256 i = 0; i < nextEscrowId; i++) {
             if (escrows[i].payer == payer) {
                 count++;
             }
         }
-        
+
         // Second pass: collect IDs
         uint256[] memory result = new uint256[](count);
         uint256 index = 0;
@@ -458,7 +458,7 @@ contract YogaClassEscrow is ReentrancyGuard {
                 index++;
             }
         }
-        
+
         return result;
     }
 
@@ -469,14 +469,14 @@ contract YogaClassEscrow is ReentrancyGuard {
      */
     function getEscrowsByPayee(address payee) external view returns (uint256[] memory) {
         uint256 count = 0;
-        
+
         // First pass: count matching escrows
         for (uint256 i = 0; i < nextEscrowId; i++) {
             if (escrows[i].payee == payee) {
                 count++;
             }
         }
-        
+
         // Second pass: collect IDs
         uint256[] memory result = new uint256[](count);
         uint256 index = 0;
@@ -486,7 +486,7 @@ contract YogaClassEscrow is ReentrancyGuard {
                 index++;
             }
         }
-        
+
         return result;
     }
 
@@ -497,11 +497,11 @@ contract YogaClassEscrow is ReentrancyGuard {
      */
     function getMultipleEscrows(uint256[] calldata escrowIds) external view returns (Escrow[] memory) {
         Escrow[] memory result = new Escrow[](escrowIds.length);
-        
+
         for (uint256 i = 0; i < escrowIds.length; i++) {
             result[i] = escrows[escrowIds[i]];
         }
-        
+
         return result;
     }
 }
