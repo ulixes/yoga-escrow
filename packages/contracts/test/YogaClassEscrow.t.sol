@@ -379,7 +379,7 @@ contract YogaClassEscrowTest is Test {
     function test_GetEscrowsByPayer() public {
         // Create multiple escrows with different payers
         uint256 escrow1 = createSampleEscrow(); // payer
-        
+
         vm.prank(teacher1);
         uint256 escrow2 = escrow.createEscrow{value: ESCROW_AMOUNT}(
             [HANDLE_1, HANDLE_2, HANDLE_3],
@@ -477,7 +477,8 @@ contract YogaClassEscrowTest is Test {
     function getDefaultLocations() internal pure returns (YogaClassEscrow.Location[3] memory) {
         YogaClassEscrow.Location[3] memory locations;
         locations[0] = YogaClassEscrow.Location({country: "Georgia", city: "Tbilisi", specificLocation: "Vake Park"});
-        locations[1] = YogaClassEscrow.Location({country: "Georgia", city: "Tbilisi", specificLocation: "Mtatsminda Park"});
+        locations[1] =
+            YogaClassEscrow.Location({country: "Georgia", city: "Tbilisi", specificLocation: "Mtatsminda Park"});
         locations[2] = YogaClassEscrow.Location({country: "Georgia", city: "Tbilisi", specificLocation: "Lisi Lake"});
         return locations;
     }
