@@ -275,6 +275,116 @@
 .yui-journey__details { display: grid; gap: 10px; }
 .yui-journey__field { display: grid; gap: 4px; }
 .yui-journey__input { font: inherit; padding: 8px 0; border: none; border-bottom: 1px solid rgba(0,0,0,0.25); background: transparent; }
+.yui-journey__final-review { display: grid; gap: 24px; }
+
+/* Matching Section - Minimal Yoga Theme */
+.yui-journey__matching-section { 
+  padding: 28px 20px; 
+  background: rgba(0,0,0,0.01);
+  border-radius: 12px; 
+  border: 1px solid rgba(0,0,0,0.06);
+}
+.yui-journey__matching-header { text-align: center; margin-bottom: 28px; }
+.yui-journey__matching-title { margin: 0; font-weight: 600; font-size: 16px; letter-spacing: 0.3px; }
+.yui-journey__matching-subtitle { margin: 6px 0 0 0; opacity: 0.5; font-size: 13px; font-weight: 400; }
+
+.yui-journey__matching-grid { 
+  display: grid; 
+  grid-template-columns: 1fr auto 1fr; 
+  gap: 16px; 
+  align-items: center;
+}
+
+.yui-journey__matching-teachers,
+.yui-journey__matching-times { 
+  text-align: center;
+  padding: 20px 16px;
+  background: transparent;
+  border: 1px solid rgba(0,0,0,0.12);
+  border-radius: 10px;
+}
+
+.yui-journey__matching-count { 
+  font-size: 28px; 
+  font-weight: 600; 
+  line-height: 1;
+  color: #111;
+  letter-spacing: -0.5px;
+}
+.yui-journey__matching-label { 
+  font-size: 11px; 
+  text-transform: uppercase; 
+  letter-spacing: 1.2px; 
+  opacity: 0.4; 
+  margin: 6px 0 14px 0;
+  font-weight: 500;
+}
+
+.yui-journey__matching-names,
+.yui-journey__matching-slots { 
+  display: flex; 
+  flex-wrap: wrap; 
+  gap: 8px; 
+  justify-content: center;
+}
+
+.yui-journey__teacher-chip,
+.yui-journey__time-chip { 
+  padding: 7px 14px; 
+  background: transparent; 
+  border: 1px solid rgba(0,0,0,0.15);
+  border-radius: 999px; 
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.2px;
+}
+
+.yui-journey__matching-connector { 
+  display: grid; 
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 50%;
+  font-size: 16px;
+  font-weight: 400;
+  opacity: 0.6;
+}
+
+/* Session Details - Minimal Grid */
+.yui-journey__details-section { 
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(0,0,0,0.06);
+}
+
+.yui-journey__detail-grid { 
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+}
+
+.yui-journey__detail-item { 
+  display: grid;
+  gap: 4px;
+}
+
+.yui-journey__detail-label { 
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.4;
+  font-weight: 500;
+}
+
+.yui-journey__detail-value { 
+  font-size: 14px;
+  font-weight: 400;
+  color: #111;
+}
+
+.yui-journey__payment-section { display: grid; gap: 16px; }
 .yui-journey__footer {
   /* Mobile-friendly sticky action bar with safe-area support */
   position: sticky;
@@ -463,6 +573,95 @@
   transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;
 }
 [data-skin='ulyxes'] .yui-journey__cta:hover { background: #222; transform: translateY(-1px); box-shadow: 0 8px 22px rgba(0,0,0,0.14); }
+
+/* Journey Pricing Styles */
+.yui-journey__pricing { display: grid; gap: 20px; max-width: 600px; margin: 0 auto; }
+.yui-journey__pricing-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.yui-journey__pricing-card {
+  background: #fff;
+  border: 2px solid #f0f0f0;
+  border-radius: 20px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: grid;
+  gap: 12px;
+}
+.yui-journey__pricing-card:hover {
+  border-color: #111;
+  transform: translateY(-2px);
+}
+.yui-journey__pricing-card.selected {
+  border-color: #111;
+  background: #111;
+  color: #fff;
+}
+.yui-journey__pricing-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.yui-journey__pricing-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+.yui-journey__price {
+  font-size: 24px;
+  font-weight: 700;
+}
+.yui-journey__pricing-desc {
+  margin: 0;
+  opacity: 0.8;
+  font-size: 14px;
+}
+.yui-journey__pricing-features {
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+  opacity: 0.9;
+}
+.yui-journey__amount-section {
+  display: grid;
+  gap: 12px;
+  padding: 20px;
+  background: #f0f0f0;
+  border-radius: 12px;
+}
+.yui-journey__amount-label {
+  font-weight: 600;
+  color: #111;
+}
+.yui-journey__amount-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  border-radius: 8px;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+}
+.yui-journey__amount-input:focus-within {
+  border-color: #111;
+}
+.yui-journey__currency {
+  font-weight: 600;
+  color: #666;
+}
+.yui-journey__amount-field {
+  border: none;
+  outline: none;
+  font: inherit;
+  font-size: 18px;
+  font-weight: 600;
+  flex: 1;
+  background: transparent;
+}
+.yui-journey__amount-note {
+  margin: 0;
+  font-size: 13px;
+  color: #666;
+}
 
 /* Improved Persona Selector */
 .yui-persona-selector { display: grid; gap: 20px; max-width: 600px; }
