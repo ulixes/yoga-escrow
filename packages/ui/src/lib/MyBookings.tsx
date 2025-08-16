@@ -2,7 +2,7 @@ import React from 'react'
 import { ClassList } from './ClassList'
 import type { ClassItemProps, StudentEscrow, EscrowStatus } from './ClassItem'
 
-export type MyBookingsFilter = 'all' | 'active' | 'created' | 'assigned' | 'completed' | 'cancelled' | 'disputed'
+export type MyBookingsFilter = 'all' | 'active' | 'created' | 'assigned' | 'completed' | 'cancelled' | 'disputed' | 'history'
 
 export interface MyBookingsProps extends Pick<ClassItemProps, 'onAssign' | 'onCancel' | 'onRelease' | 'onDispute' | 'onAutoRelease' | 'onViewDetails' | 'fiatCurrency' | 'ethToFiatRate' | 'formatFiat'> {
   items: StudentEscrow[]
@@ -15,7 +15,23 @@ export interface MyBookingsProps extends Pick<ClassItemProps, 'onAssign' | 'onCa
 function applyFilter(items: StudentEscrow[], filter: MyBookingsFilter): StudentEscrow[] {
   if (filter === 'all') return items
   if (filter === 'active') return items.filter((i) => i.status === 'Created' || i.status === 'Assigned')
-  const mapping: Record<Exclude<MyBookingsFilter, 'all' | 'active'>, EscrowStatus> = {
+  if (filter === 'history') {
+    // Class History: Completed and Cancelled classes, sorted by classTime descending
+    return items
+      .filter((i) => i.status === 'Completed' || i.status === 'Cancelled')
+      .sort((a, b) => {
+        // Sort by the selected time slot if available, otherwise use createdAt
+        const getTime = (escrow: StudentEscrow) => {
+          if (escrow.selected.timeIndex !== undefined) {
+            const timeSlot = escrow.timeSlots[escrow.selected.timeIndex]
+            return typeof timeSlot.startTime === 'bigint' ? Number(timeSlot.startTime) : timeSlot.startTime
+          }
+          return escrow.createdAt
+        }
+        return getTime(b) - getTime(a) // Descending order (newest first)
+      })
+  }
+  const mapping: Record<Exclude<MyBookingsFilter, 'all' | 'active' | 'history'>, EscrowStatus> = {
     created: 'Created',
     assigned: 'Assigned',
     completed: 'Completed',
@@ -37,11 +53,13 @@ export const MyBookings: React.FC<MyBookingsProps> = ({
   const filtered = React.useMemo(() => applyFilter(items ?? [], filter), [items, filter])
 
   const totalActive = React.useMemo(() => items?.filter((i) => i.status === 'Created' || i.status === 'Assigned').length ?? 0, [items])
+  const totalHistory = React.useMemo(() => items?.filter((i) => i.status === 'Completed' || i.status === 'Cancelled').length ?? 0, [items])
 
   const classes = ['yui-bookings', className].filter(Boolean).join(' ')
 
   const filters: Array<{ key: MyBookingsFilter; label: string; count?: number }> = [
     { key: 'active', label: 'Active', count: totalActive },
+    { key: 'history', label: 'Class History', count: totalHistory },
     { key: 'created', label: 'Created' },
     { key: 'assigned', label: 'Assigned' },
     { key: 'completed', label: 'Completed' },

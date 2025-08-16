@@ -8,12 +8,12 @@ export type TeacherDiscoveryProps = {
 }
 
 export const TeacherDiscovery: React.FC<TeacherDiscoveryProps> = ({
-  teachers,
+  teachers = [],
   maxSelection = 3,
   onSubmitSelection
 }) => {
   const [selectedTeachers, setSelectedTeachers] = React.useState<Set<string>>(new Set())
-  const [viewMode, setViewMode] = React.useState<'grid' | 'stack'>('stack')
+  // Always use stack view (no grid mode)
   
   const handleToggleTeacher = (teacherId: string) => {
     setSelectedTeachers(prev => {
@@ -33,38 +33,26 @@ export const TeacherDiscovery: React.FC<TeacherDiscoveryProps> = ({
     <div className="teacher-discovery">
       <header className="teacher-discovery__header">
         <div className="teacher-discovery__title-section">
-          <h1>Find Your Flow</h1>
-          <p>Select up to {maxSelection} instructors for your personalized yoga journey</p>
+          <h1>Book a Yoga Class</h1>
+          <p>Choose up to {maxSelection} instructors to request sessions from</p>
         </div>
         
-        <div className="teacher-discovery__controls">
-          <div className="view-toggle">
-            <button 
-              className={viewMode === 'stack' ? 'active' : ''}
-              onClick={() => setViewMode('stack')}
-            >
-              Stack
-            </button>
-            <button 
-              className={viewMode === 'grid' ? 'active' : ''}
-              onClick={() => setViewMode('grid')}
-            >
-              Grid
-            </button>
-          </div>
-        </div>
       </header>
       
-      <div className={`teacher-discovery__content teacher-discovery__content--${viewMode}`}>
-        {teachers.map(teacher => (
+      <div className="teacher-discovery__content teacher-discovery__content--stack">
+        {teachers?.length > 0 ? teachers.map(teacher => (
           <HotTeacherCard
             key={teacher.id}
             teacher={teacher}
             isSelected={selectedTeachers.has(teacher.id)}
             onSelect={() => handleToggleTeacher(teacher.id)}
-            compact={viewMode === 'grid'}
+            compact={false}
           />
-        ))}
+        )) : (
+          <div className="teacher-discovery__empty">
+            <p>No teachers available</p>
+          </div>
+        )}
       </div>
       
       {selectedTeachers.size > 0 && (

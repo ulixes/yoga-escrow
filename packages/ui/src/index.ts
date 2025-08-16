@@ -79,3 +79,26 @@ export { HotTeacherCard } from './lib/HotTeacherCard'
 export type { HotTeacherCardProps, HotTeacherProfile } from './lib/HotTeacherCard'
 export { TeacherDiscovery } from './lib/TeacherDiscovery'
 export type { TeacherDiscoveryProps } from './lib/TeacherDiscovery'
+
+// Student Booking Tracking Components
+export { BookingRequestCard } from './lib/BookingRequestCard'
+export type { BookingRequestCardProps, Escrow, ClassStatus } from './lib/BookingRequestCard'
+export { BookingsList } from './lib/BookingsList'
+export type { BookingsListProps, BookingFilter, BookingSortOption } from './lib/BookingsList'
+export { BookingDetailView } from './lib/BookingDetailView'
+export type { BookingDetailViewProps } from './lib/BookingDetailView'
+
+// Teacher Components
+export { TeacherClassCard } from './lib/TeacherClassCard'
+export type { TeacherClassCardProps, TeacherClassRequest } from './lib/TeacherClassCard'
+export { TeacherClassesList } from './lib/TeacherClassesList'
+export type { TeacherClassesListProps, TeacherFilter, TeacherSortOption } from './lib/TeacherClassesList'
+export { OpportunityDetailsModal } from './lib/OpportunityDetailsModal'
+export type { OpportunityDetailsModalProps } from './lib/OpportunityDetailsModal'
+export { UpcomingClassCard } from './lib/UpcomingClassCard'
+export type { UpcomingClassCardProps } from './lib/UpcomingClassCard'
+export { TeacherOnboarding } from './lib/TeacherOnboarding'
+export type { TeacherOnboardingProps } from './lib/TeacherOnboarding'
+
+// Core Types
+export type { Escrow, ClassOpportunity, GroupedOpportunity, AcceptedClass, TeacherDashboardData } from './lib/types'

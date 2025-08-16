@@ -28,7 +28,7 @@
   width: 100%;
   height: 320px;
   overflow: hidden;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #f0f0f0;
 }
 
 .hot-teacher-card__hero img {
@@ -216,9 +216,7 @@
   font-size: 48px;
   font-weight: 800;
   margin: 0 0 8px 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #111;
 }
 
 .teacher-discovery__title-section p {
@@ -330,7 +328,7 @@
 
 .submit-btn {
   padding: 12px 32px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #111;
   color: #fff;
   border: none;
   border-radius: 10px;
@@ -341,8 +339,7 @@
 }
 
 .submit-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+  background: #222;
 }
 
 .submit-btn:disabled {

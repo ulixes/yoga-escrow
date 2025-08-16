@@ -16,6 +16,10 @@ export type FullJourneyResult = {
   location: { country: string; city: string; specificLocation: string }
   timeIds: string[] // dayId:HH:mm
   student: { email: string; wallet?: string }
+  pricing: {
+    sessionType: '1on1' | 'group'
+    customAmount: number
+  }
 }
 
 export type FullJourneyProps = {
@@ -41,7 +45,7 @@ export type FullJourneyProps = {
   onAuthRequired?: () => void
 }
 
-type Step = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
+type Step = 1 | 2 | 3 | 4 | 5 | 6
 
 export function FullJourney(props: FullJourneyProps) {
   const {
@@ -75,14 +79,7 @@ export function FullJourney(props: FullJourneyProps) {
   // Step 2 - Teacher Selection (confirmation)
   // Already handled in selectedTeacherIds
 
-  // Step 3 - Persona + Goal
-  const [persona, setPersona] = React.useState<JourneyPersona>(defaultPersona)
-  const [goal, setGoal] = React.useState<JourneyGoal>('None')
-
-  // Step 4 - Yoga Type
-  const [selectedYogaTypeId, setSelectedYogaTypeId] = React.useState<string>('')
-
-  // Step 5 - Location
+  // Step 3 - Location
   const [location, setLocation] = React.useState<{ country: string; city: string; specificLocation: string } | null>(
     null,
   )
@@ -102,11 +99,16 @@ export function FullJourney(props: FullJourneyProps) {
     }
   }, [isAuthenticated, userEmail, userWallet, defaultStudentEmail])
 
-  // Step 7 - Pricing
+  // Step 5 - Pricing
   const [sessionType, setSessionType] = React.useState<'1on1' | 'group'>('1on1')
   const [customAmount, setCustomAmount] = React.useState<number>(50)
   
-  // Step 8 - Success
+  // Step 6 - Success
+  
+  // Default values for removed steps
+  const persona: JourneyPersona = 'Traveler'
+  const goal: JourneyGoal = 'None'
+  const selectedYogaTypeId = ''
   React.useEffect(() => {
     console.log('[JOURNEY DEBUG] FullJourney received defaultStudentEmail:', defaultStudentEmail)
     console.log('[JOURNEY DEBUG] Current studentEmail state:', studentEmail)
@@ -119,7 +121,7 @@ export function FullJourney(props: FullJourneyProps) {
     }
   }, [defaultStudentEmail])
 
-  const totalSteps: Step = 8
+  const totalSteps: Step = 6
 
   const canNext = React.useMemo(() => {
     switch (step) {
@@ -128,14 +130,10 @@ export function FullJourney(props: FullJourneyProps) {
       case 2:
         return selectedTeacherIds.length > 0
       case 3:
-        return Boolean(persona)
+        return Boolean(location) // Location step
       case 4:
-        return Boolean(selectedYogaTypeId)
+        return selectedTimes.length >= 3 // Time slots step
       case 5:
-        return Boolean(location)
-      case 6:
-        return selectedTimes.length >= 3
-      case 7:
         return customAmount > 0 // Pricing step - must have valid amount
       default:
         return true
@@ -145,19 +143,19 @@ export function FullJourney(props: FullJourneyProps) {
   const handleNext = () => {
     if (step === totalSteps) return
     
-    // Skip step 2 (teacher confirmation) - go directly from 1 to 3
+    // Skip step 2 (teacher confirmation) - go directly from 1 to 3 (Location)
     if (step === 1) {
       setStep(3)
       return
     }
     
     // Handle authentication requirement before pricing if not authenticated
-    if (step === 6 && !isAuthenticated && onAuthRequired) {
+    if (step === 4 && !isAuthenticated && onAuthRequired) {
       onAuthRequired()
       return
     }
     
-    // Step 7 is now just pricing selection - no payment logic here
+    // Step 5 is now just pricing selection - no payment logic here
     setStep((s) => ((s + 1) as Step))
   }
 
@@ -173,7 +171,7 @@ export function FullJourney(props: FullJourneyProps) {
 
   const handleTeacherSelection = (selectedIds: string[]) => {
     setSelectedTeacherIds(selectedIds)
-    setStep(3) // Skip step 2, go directly to step 3
+    setStep(3) // Skip step 2, go directly to step 3 (Location)
   }
 
   const handleWalletConnect = (walletAddress: string) => {
@@ -235,25 +233,20 @@ export function FullJourney(props: FullJourneyProps) {
     return `${targetDate.toLocaleDateString('en-US', options)} at ${formatTime()}`
   }
 
-  // Get selected yoga type name
+  // Get default yoga type name
   const getYogaTypeName = () => {
-    const yogaType = yogaTypes.find(yt => yt.id === selectedYogaTypeId)
-    return yogaType?.name || 'Not selected'
+    return 'Yoga Session' // Generic since no specific type selected
   }
 
-  // Get selected teacher names
+  // Get selected teacher handles
   const getTeacherNames = () => {
     return teachers
       .filter(t => selectedTeacherIds.includes(t.id))
-      .map(t => t.name)
+      .map(t => `@${t.handle}`)
       .join(', ') || 'No teachers selected'
   }
 
-  // Sync YogaTypePicker's persona filter with journey persona, but allow user to change it in step 2
-  const [ytFilterPersona, setYtFilterPersona] = React.useState<string | null>(personaToInternal[persona])
-  React.useEffect(() => {
-    setYtFilterPersona(personaToInternal[persona])
-  }, [persona])
+  // Removed YogaTypePicker related code
 
   return (
     <div data-skin={skin} className={['yui-journey', className].filter(Boolean).join(' ')}>
@@ -290,51 +283,6 @@ export function FullJourney(props: FullJourneyProps) {
         {/* Step 2 removed - we skip directly from teacher selection to persona */}
 
         {step === 3 && (
-          <section className="yui-journey__step yui-journey__welcome" aria-label="Persona & Goal">
-            <div className="yui-journey__hero">
-              <h2 className="yui-journey__title">Start Your Journey</h2>
-              <p className="yui-journey__subtitle">Pick a persona and an optional goal</p>
-            </div>
-            <div className="yui-journey__cards">
-              {(['Dancer', 'Runner', 'Traveler'] as JourneyPersona[]).map((p) => (
-                <button
-                  key={p}
-                  type="button"
-                  className="yui-btn yui-journey__persona"
-                  data-active={persona === p}
-                  onClick={() => setPersona(p)}
-                >
-                  {p}
-                </button>
-              ))}
-            </div>
-            <div className="yui-journey__goals">
-              {(['None', 'Flexibility', 'Recovery', 'Strength', 'Calm'] as JourneyGoal[]).map((g) => (
-                <button key={g} type="button" className="yui-journey__goal" data-active={goal === g} onClick={() => setGoal(g)}>
-                  {g}
-                </button>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {step === 4 && (
-          <section className="yui-journey__step" aria-label="Choose Yoga Type">
-            <YogaTypePicker
-              items={yogaTypes}
-              personas={yogaTypePersonas}
-              filterPersona={ytFilterPersona}
-              onFilterPersona={(p) => setYtFilterPersona(p)}
-              selectedIds={selectedYogaTypeId ? [selectedYogaTypeId] : []}
-              selectionMode="single"
-              onSelect={(id) => setSelectedYogaTypeId(id)}
-              onDeselect={(id) => setSelectedYogaTypeId('')}
-              skin={skin}
-            />
-          </section>
-        )}
-
-        {step === 5 && (
           <section className="yui-journey__step" aria-label="Choose Location">
             <LocationPicker
               {...locationProps}
@@ -347,7 +295,7 @@ export function FullJourney(props: FullJourneyProps) {
           </section>
         )}
 
-        {step === 6 && (
+        {step === 4 && (
           <section className="yui-journey__step" aria-label="Choose Times">
             <YogaTimeBlocksPicker
               days={days}
@@ -362,7 +310,7 @@ export function FullJourney(props: FullJourneyProps) {
           </section>
         )}
 
-        {step === 7 && (
+        {step === 5 && (
           <section className="yui-journey__step" aria-label="Pricing">
             <div className="yui-journey__pricing">
               <div className="yui-journey__hero">
@@ -433,7 +381,7 @@ export function FullJourney(props: FullJourneyProps) {
           </section>
         )}
 
-        {step === 8 && (
+        {step === 6 && (
           <section className="yui-journey__step" aria-label="Payment Review">
             <div className="yui-journey__final-review">
               <div className="yui-journey__hero">
@@ -456,7 +404,7 @@ export function FullJourney(props: FullJourneyProps) {
                       {teachers
                         .filter(t => selectedTeacherIds.includes(t.id))
                         .map(t => (
-                          <div key={t.id} className="yui-journey__teacher-chip">{t.name}</div>
+                          <div key={t.id} className="yui-journey__teacher-chip">@{t.handle}</div>
                         ))}
                     </div>
                   </div>
@@ -470,14 +418,44 @@ export function FullJourney(props: FullJourneyProps) {
                     <div className="yui-journey__matching-label">Time Slot{selectedTimes.length > 1 ? 's' : ''}</div>
                     <div className="yui-journey__matching-slots">
                       {selectedTimes.map((time, idx) => {
+                        // Calculate the actual future date with 24hr skip
                         const [dayStr, timeStr] = time.split(':')
-                        const [hours] = timeStr.split(':')
+                        const dayMap: Record<string, number> = {
+                          'mon': 1, 'tue': 2, 'wed': 3, 'thu': 4, 'fri': 5, 'sat': 6, 'sun': 0
+                        }
+                        
+                        const targetDay = dayMap[dayStr.toLowerCase()]
+                        const now = new Date()
+                        const currentDay = now.getDay()
+                        const [hours, minutes = '00'] = timeStr.split(':')
                         const hour = parseInt(hours)
+                        const minute = parseInt(minutes)
+                        
+                        // Calculate days until target - always skip at least 24 hours
+                        let daysUntil = targetDay - currentDay
+                        
+                        // If target is today or tomorrow within 24hrs, move to next week
+                        if (daysUntil <= 1) {
+                          daysUntil += 7
+                        } else if (daysUntil < 0) {
+                          daysUntil += 7
+                        }
+                        
+                        const targetDate = new Date(now)
+                        targetDate.setDate(now.getDate() + daysUntil)
+                        
+                        // Format for chip display
+                        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                        const month = monthNames[targetDate.getMonth()]
+                        const day = targetDate.getDate()
+                        
                         const period = hour >= 12 ? 'PM' : 'AM'
                         const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour
+                        
                         return (
                           <div key={idx} className="yui-journey__time-chip">
-                            {dayStr.toUpperCase()} {displayHour}{period}
+                            {month} {day}, {displayHour}{period}
                           </div>
                         )
                       })}
@@ -486,61 +464,29 @@ export function FullJourney(props: FullJourneyProps) {
                 </div>
               </div>
               
-              {/* Session Details */}
+              {/* Payment & Session Details */}
               <div className="yui-journey__details-section">
-                <div className="yui-journey__detail-grid">
-                  <div className="yui-journey__detail-item">
-                    <span className="yui-journey__detail-label">Style</span>
-                    <span className="yui-journey__detail-value">{getYogaTypeName()}</span>
+                {/* Payment Offer - Prominent Display */}
+                <div className="yui-journey__offer-display">
+                  <div className="yui-journey__offer-amount">${customAmount}</div>
+                  <div className="yui-journey__offer-label">Your Offer</div>
+                  <div className="yui-journey__offer-type">
+                    {sessionType === '1on1' ? 'Private 1:1 Session' : 'Group Class'}
                   </div>
-                  <div className="yui-journey__detail-item">
-                    <span className="yui-journey__detail-label">Location</span>
-                    <span className="yui-journey__detail-value">
-                      {location ? `${location.specificLocation}, ${location.city}` : 'Not selected'}
-                    </span>
+                  <div className="yui-journey__offer-note">
+                    Your payment is protected. Teachers get paid only after you confirm class completion.
                   </div>
-                  <div className="yui-journey__detail-item">
-                    <span className="yui-journey__detail-label">Session</span>
-                    <span className="yui-journey__detail-value">
-                      {sessionType === '1on1' ? 'Private 1:1' : 'Group Class'}
-                    </span>
-                  </div>
-                  {goal !== 'None' && (
-                    <div className="yui-journey__detail-item">
-                      <span className="yui-journey__detail-label">Goal</span>
-                      <span className="yui-journey__detail-value">{goal}</span>
-                    </div>
-                  )}
+                </div>
+                
+                {/* Session Location */}
+                <div className="yui-journey__session-location">
+                  <span className="yui-journey__location-label">Location</span>
+                  <span className="yui-journey__location-text">
+                    {location ? `${location.specificLocation}, ${location.city}` : 'Not selected'}
+                  </span>
                 </div>
               </div>
               
-              {paymentSummary && (
-                <div className="yui-journey__payment-section">
-                  <h3 className="yui-journey__review-title">Payment Summary</h3>
-                  <PaymentConfirmation
-                    summary={{
-                      ...paymentSummary,
-                      defaultSessionType: sessionType,
-                      defaultOfferAmount: customAmount
-                    }}
-                    onConfirm={() => {
-                      const result = {
-                        selectedTeacherIds,
-                        persona,
-                        goal,
-                        yogaTypeId: selectedYogaTypeId,
-                        location: location!,
-                        timeIds: selectedTimes,
-                        student: { email: studentEmail.trim(), wallet },
-                      }
-                      onPayment?.(result)
-                      onSubmit?.(result)
-                    }}
-                    onCancel={() => setStep(7)}
-                    skin={skin}
-                  />
-                </div>
-              )}
             </div>
           </section>
         )}
@@ -548,8 +494,29 @@ export function FullJourney(props: FullJourneyProps) {
 
           <footer className="yui-journey__footer">
             <button type="button" className="yui-btn yui-journey__back" onClick={handleBack} disabled={step === 1}>Back</button>
-            <button type="button" className="yui-btn yui-journey__next" onClick={handleNext} disabled={!canNext}>
-              {step === 7 ? 'Review Payment' : step === 8 ? 'Complete Payment' : 'Next'}
+            <button type="button" className="yui-btn yui-journey__next" onClick={() => {
+              if (step === 6) {
+                // Complete Payment clicked - trigger payment flow
+                const result = {
+                  selectedTeacherIds,
+                  persona,
+                  goal,
+                  yogaTypeId: selectedYogaTypeId,
+                  location: location!,
+                  timeIds: selectedTimes,
+                  student: { email: studentEmail.trim(), wallet },
+                  pricing: {
+                    sessionType,
+                    customAmount
+                  }
+                }
+                onPayment?.(result)
+                onSubmit?.(result)
+              } else {
+                handleNext()
+              }
+            }} disabled={!canNext}>
+              {step === 5 ? 'Review Payment' : step === 6 ? 'Complete Payment' : 'Next'}
             </button>
           </footer>
         </>

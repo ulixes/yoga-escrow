@@ -115,6 +115,8 @@ export function ClassItem({ escrow, onAssign, onCancel, onRelease, onDispute, on
     return escrow.description?.trim() || 'Yoga class'
   }, [escrow])
 
+  const isCancelled = escrow.status === 'Cancelled'
+
   const teacherLine = useMemo(() => {
     if (escrow.status === 'Assigned' || escrow.status === 'Completed' || escrow.status === 'Disputed') {
       const handle = escrow.selected.handle || escrow.teacherHandles[escrow.selected.payeeIndex ?? 0]
@@ -145,11 +147,13 @@ export function ClassItem({ escrow, onAssign, onCancel, onRelease, onDispute, on
   const rootDataSkin = skin
 
   return (
-    <div className="yui-class-item" data-skin={rootDataSkin}>
+    <div className={`yui-class-item ${isCancelled ? 'yui-class-item--cancelled' : ''}`} data-skin={rootDataSkin}>
       <div className="yui-class-item__left">
         <div className="yui-class-item__status"><StatusBadge status={escrow.status} /></div>
         <div className="yui-class-item__meta">
-          <div className="yui-class-item__title">{title}</div>
+          <div className={`yui-class-item__title ${isCancelled ? 'yui-class-item__title--cancelled' : ''}`}>
+            {title}
+          </div>
           <div className="yui-class-item__sub">
             <span className="yui-class-item__amount">{escrow.amountEth} ETH</span>
             {typeof ethToFiatRate === 'number' && !Number.isNaN(ethToFiatRate) ? (
@@ -173,13 +177,25 @@ export function ClassItem({ escrow, onAssign, onCancel, onRelease, onDispute, on
             {teacherLine && <span>{teacherLine}</span>}
           </div>
           <div className="yui-class-item__details">
-            <span className="yui-class-item__time">{timeLine}</span>
+            <span className={`yui-class-item__time ${isCancelled ? 'yui-class-item__time--cancelled' : ''}`}>
+              {timeLine}
+            </span>
           </div>
           <div className="yui-class-item__details">
             <span className="yui-class-item__location">{locationLine}</span>
           </div>
           {(escrow.status === 'Assigned' || escrow.status === 'Created') && (
             <div className={`yui-class-item__expires ${escrow.isExpired ? 'is-expired' : ''}`}>{expiresLine}</div>
+          )}
+          {isCancelled && (
+            <div className="yui-class-item__cancelled-info">
+              <div className="yui-class-item__cancelled-status">
+                <span className="yui-class-item__cancelled-label">Cancelled by Student</span>
+              </div>
+              <div className="yui-class-item__cancelled-outcome">
+                Full refund of {escrow.amountEth} ETH was returned to the student.
+              </div>
+            </div>
           )}
         </div>
       </div>

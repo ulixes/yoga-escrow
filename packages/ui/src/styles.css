@@ -12,6 +12,1207 @@
 /* Button baseline, still unstyled */
 .yui-btn { font: inherit; cursor: pointer; }
 
+/* Student Booking Tracking Components */
+
+/* BookingRequestCard */
+.booking-request-card {
+  display: grid;
+  gap: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 16px;
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.booking-request-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.booking-status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.booking-status-badge--orange {
+  background: #fef3e2;
+  color: #d97706;
+}
+
+.booking-status-badge--green {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.booking-status-badge--blue {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.booking-status-badge--gray {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.booking-request-card__amount {
+  font-weight: 600;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.booking-request-card__fiat {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: 2px;
+}
+
+.booking-request-card__content {
+  display: grid;
+  gap: 12px;
+}
+
+.booking-request-card__title {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.booking-request-card__location {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.booking-request-card__label {
+  font-weight: 500;
+  margin-right: 8px;
+}
+
+.booking-request-card__teacher-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.booking-request-card__teacher-chip {
+  background: #f3f4f6;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  color: #374151;
+}
+
+.booking-request-card__time-list {
+  display: grid;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.booking-request-card__time-option {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.booking-request-card__elapsed {
+  font-size: 12px;
+  color: #9ca3af;
+  font-style: italic;
+}
+
+.booking-request-card__confirmed-teacher,
+.booking-request-card__confirmed-time {
+  display: flex;
+  align-items: center;
+}
+
+.booking-request-card__teacher-name {
+  font-weight: 600;
+  color: #16a34a;
+}
+
+.booking-request-card__countdown {
+  font-weight: 500;
+  color: #2563eb;
+  font-size: 14px;
+}
+
+.booking-request-card__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.booking-request-card__action {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid;
+  transition: all 0.15s ease;
+}
+
+.booking-request-card__action--cancel {
+  border-color: #ef4444;
+  color: #ef4444;
+  background: transparent;
+}
+
+.booking-request-card__action--cancel:hover {
+  background: #ef4444;
+  color: white;
+}
+
+.booking-request-card__action--release {
+  border-color: #16a34a;
+  color: #16a34a;
+  background: transparent;
+}
+
+.booking-request-card__action--release:hover {
+  background: #16a34a;
+  color: white;
+}
+
+
+.booking-request-card__action--details {
+  border-color: #6b7280;
+  color: #6b7280;
+  background: transparent;
+}
+
+.booking-request-card__action--details:hover {
+  background: #6b7280;
+  color: white;
+}
+
+/* BookingsList */
+.bookings-list {
+  display: grid;
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.bookings-list__header {
+  display: grid;
+  gap: 16px;
+}
+
+.bookings-list__title {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.bookings-list__controls {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.bookings-list__search-input {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  min-width: 240px;
+}
+
+.bookings-list__sort {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bookings-list__sort-label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.bookings-list__sort-select {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.bookings-list__filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.bookings-list__filter {
+  padding: 8px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 20px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.15s ease;
+}
+
+.bookings-list__filter:hover {
+  border-color: #6b7280;
+}
+
+.bookings-list__filter--active {
+  background: #111;
+  color: white;
+  border-color: #111;
+}
+
+.bookings-list__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 16px;
+}
+
+.bookings-list__empty {
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.bookings-list__empty-state,
+.bookings-list__no-results {
+  display: grid;
+  gap: 16px;
+  justify-items: center;
+}
+
+.bookings-list__empty-title,
+.bookings-list__no-results-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.bookings-list__empty-text,
+.bookings-list__no-results-text {
+  color: #6b7280;
+  margin: 0;
+  max-width: 300px;
+}
+
+.bookings-list__create-button {
+  padding: 12px 24px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.bookings-list__create-button:hover {
+  background: #1d4ed8;
+}
+
+/* BookingDetailView */
+.booking-detail-view {
+  display: grid;
+  gap: 24px;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.booking-detail-view__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.booking-detail-view__header-content {
+  display: grid;
+  gap: 8px;
+}
+
+.booking-detail-view__title {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.booking-detail-view__close {
+  padding: 8px;
+  background: transparent;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+  width: 40px;
+  height: 40px;
+}
+
+.booking-detail-view__close:hover {
+  background: #f3f4f6;
+}
+
+.booking-detail-view__content {
+  display: grid;
+  gap: 24px;
+}
+
+.booking-detail-view__section {
+  display: grid;
+  gap: 12px;
+}
+
+.booking-detail-view__section-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 8px;
+}
+
+.booking-detail-view__payment {
+  display: grid;
+  gap: 12px;
+}
+
+.booking-detail-view__amount {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.booking-detail-view__amount-eth {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.booking-detail-view__amount-fiat {
+  color: #6b7280;
+  font-size: 16px;
+}
+
+.booking-detail-view__tx-link {
+  color: #2563eb;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.booking-detail-view__tx-link:hover {
+  text-decoration: underline;
+}
+
+.booking-detail-view__details {
+  display: grid;
+  gap: 8px;
+}
+
+.booking-detail-view__detail-row {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.booking-detail-view__detail-label {
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.booking-detail-view__teacher-options,
+.booking-detail-view__time-options {
+  display: grid;
+  gap: 8px;
+}
+
+.booking-detail-view__teacher-option,
+.booking-detail-view__time-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+.booking-detail-view__teacher-option--selected,
+.booking-detail-view__time-option--selected {
+  background: #dcfce7;
+  border-color: #16a34a;
+}
+
+.booking-detail-view__teacher-option--not-selected,
+.booking-detail-view__time-option--not-selected {
+  opacity: 0.5;
+  text-decoration: line-through;
+}
+
+.booking-detail-view__teacher-badge,
+.booking-detail-view__time-badge {
+  background: #16a34a;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.booking-detail-view__timeline {
+  display: grid;
+  gap: 16px;
+}
+
+.booking-detail-view__timeline-item {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.booking-detail-view__timeline-marker {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #2563eb;
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+.booking-detail-view__timeline-content {
+  display: grid;
+  gap: 4px;
+}
+
+.booking-detail-view__timeline-title {
+  font-weight: 600;
+}
+
+.booking-detail-view__timeline-time {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.booking-detail-view__timeline-description {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.booking-detail-view__actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.booking-detail-view__action {
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid;
+  transition: all 0.15s ease;
+}
+
+.booking-detail-view__action--cancel {
+  border-color: #ef4444;
+  color: #ef4444;
+  background: transparent;
+}
+
+.booking-detail-view__action--cancel:hover {
+  background: #ef4444;
+  color: white;
+}
+
+.booking-detail-view__action--release {
+  border-color: #16a34a;
+  color: #16a34a;
+  background: transparent;
+}
+
+.booking-detail-view__action--release:hover {
+  background: #16a34a;
+  color: white;
+}
+
+
+.booking-detail-status-badge {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.booking-detail-status-badge--orange {
+  background: #fef3e2;
+  color: #d97706;
+}
+
+.booking-detail-status-badge--green {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.booking-detail-status-badge--blue {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.booking-detail-status-badge--gray {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+/* Teacher Components */
+
+/* TeacherClassCard */
+.teacher-class-card {
+  display: grid;
+  gap: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 16px;
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.teacher-class-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.teacher-class-card__header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.teacher-class-card__status {
+  background: #000;
+  color: white;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.teacher-class-card__title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  color: #111;
+}
+
+.teacher-class-card__elapsed {
+  font-size: 12px;
+  color: #9ca3af;
+  font-style: italic;
+  white-space: nowrap;
+}
+
+.teacher-class-card__details {
+  display: grid;
+  gap: 12px;
+}
+
+.teacher-class-card__detail-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.teacher-class-card__detail-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.teacher-class-card__detail-label {
+  font-weight: 500;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.teacher-class-card__detail-value {
+  font-weight: 600;
+  color: #111;
+}
+
+.teacher-class-card__amount {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.teacher-class-card__amount-eth {
+  font-weight: 600;
+  color: #111;
+}
+
+.teacher-class-card__amount-fiat {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.teacher-class-card__location,
+.teacher-class-card__time {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.teacher-class-card__actions {
+  display: flex;
+  gap: 12px;
+  padding-top: 8px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.teacher-class-card__action {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid;
+  transition: all 0.15s ease;
+}
+
+.teacher-class-card__action--accept {
+  border-color: #000;
+  color: #000;
+  background: transparent;
+}
+
+.teacher-class-card__action--accept:hover {
+  background: #000;
+  color: white;
+}
+
+.teacher-class-card__action--ignore {
+  border-color: #000;
+  color: #000;
+  background: transparent;
+}
+
+.teacher-class-card__action--ignore:hover {
+  background: #000;
+  color: white;
+}
+
+/* TeacherClassesList */
+.teacher-classes-list {
+  display: grid;
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.teacher-classes-list__header {
+  display: grid;
+  gap: 16px;
+}
+
+.teacher-classes-list__title-section {
+  display: grid;
+  gap: 8px;
+}
+
+.teacher-classes-list__title {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+  color: #111;
+}
+
+.teacher-classes-list__summary {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.teacher-classes-list__count {
+  font-weight: 500;
+}
+
+.teacher-classes-list__total {
+  font-weight: 600;
+  color: #111;
+}
+
+.teacher-classes-list__total-fiat {
+  font-size: 12px;
+  color: #6b7280;
+  margin-left: 4px;
+}
+
+.teacher-classes-list__controls {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.teacher-classes-list__search-input {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  min-width: 280px;
+}
+
+.teacher-classes-list__sort {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.teacher-classes-list__sort-label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.teacher-classes-list__sort-select {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.teacher-classes-list__filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.teacher-classes-list__filter {
+  padding: 8px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 20px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.15s ease;
+}
+
+.teacher-classes-list__filter:hover {
+  border-color: #6b7280;
+}
+
+.teacher-classes-list__filter--active {
+  background: #111;
+  color: white;
+  border-color: #111;
+}
+
+.teacher-classes-list__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 16px;
+}
+
+.teacher-classes-list__empty {
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.teacher-classes-list__empty-state,
+.teacher-classes-list__no-results {
+  display: grid;
+  gap: 16px;
+  justify-items: center;
+}
+
+.teacher-classes-list__empty-title,
+.teacher-classes-list__no-results-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.teacher-classes-list__empty-text,
+.teacher-classes-list__no-results-text {
+  color: #6b7280;
+  margin: 0;
+  max-width: 300px;
+}
+
+.teacher-classes-list__smart-view {
+  display: grid;
+  gap: 32px;
+}
+
+.teacher-classes-list__section {
+  display: grid;
+  gap: 16px;
+}
+
+.teacher-classes-list__section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #000;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.teacher-classes-list__group-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.teacher-classes-list__individual-grid {
+  display: grid;
+  gap: 12px;
+}
+
+/* GroupClassCard */
+.group-class-card {
+  display: grid;
+  gap: 16px;
+  border: 2px solid #000;
+  border-radius: 0;
+  padding: 20px;
+  background: #fff;
+  position: relative;
+}
+
+.group-class-card__priority {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: -8px;
+}
+
+.group-class-card__fire {
+  font-size: 16px;
+}
+
+.group-class-card__label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #000;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.group-class-card__header {
+  margin-bottom: 8px;
+}
+
+.group-class-card__title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #000;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.group-class-card__details {
+  display: grid;
+  gap: 12px;
+}
+
+.group-class-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.group-class-card__students {
+  color: #000;
+}
+
+.group-class-card__separator {
+  color: #ccc;
+}
+
+.group-class-card__amount {
+  color: #000;
+}
+
+.group-class-card__fiat {
+  color: #666;
+  font-weight: 400;
+}
+
+.group-class-card__location {
+  display: flex;
+  gap: 8px;
+}
+
+.group-class-card__detail-label {
+  font-weight: 500;
+  color: #666;
+}
+
+.group-class-card__detail-value {
+  font-weight: 600;
+  color: #000;
+}
+
+.group-class-card__actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.group-class-card__action {
+  flex: 1;
+  padding: 12px 16px;
+  border: 1px solid #000;
+  background: transparent;
+  color: #000;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.group-class-card__action--accept {
+  background: #000;
+  color: white;
+}
+
+.group-class-card__action--accept:hover {
+  opacity: 0.8;
+}
+
+.group-class-card__action--details:hover {
+  background: #000;
+  color: white;
+}
+
+/* IndividualRequestCard */
+.individual-request-card {
+  display: grid;
+  gap: 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 0;
+  padding: 16px;
+  background: #fff;
+}
+
+.individual-request-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.individual-request-card__student {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.individual-request-card__name {
+  font-weight: 600;
+  color: #000;
+}
+
+.individual-request-card__separator {
+  color: #ccc;
+}
+
+.individual-request-card__times-label {
+  color: #666;
+  font-size: 14px;
+}
+
+.individual-request-card__amount {
+  font-weight: 600;
+  color: #000;
+}
+
+.individual-request-card__fiat {
+  color: #666;
+  font-weight: 400;
+}
+
+.individual-request-card__elapsed {
+  font-size: 12px;
+  color: #9ca3af;
+  white-space: nowrap;
+}
+
+.individual-request-card__details {
+  display: grid;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.individual-request-card__times,
+.individual-request-card__location {
+  display: flex;
+  gap: 8px;
+}
+
+.individual-request-card__times-label,
+.individual-request-card__location-label {
+  font-weight: 500;
+  color: #666;
+  min-width: 60px;
+}
+
+.individual-request-card__times-list,
+.individual-request-card__location-value {
+  color: #000;
+}
+
+.individual-request-card__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.individual-request-card__action {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #000;
+  background: transparent;
+  color: #000;
+  font-weight: 500;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.individual-request-card__action:hover {
+  background: #000;
+  color: white;
+}
+
+/* TeacherOnboarding */
+.teacher-onboarding {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: 24px;
+  background: #fff;
+}
+
+.teacher-onboarding__content {
+  max-width: 400px;
+  width: 100%;
+}
+
+.teacher-onboarding__header {
+  margin-bottom: 48px;
+}
+
+.teacher-onboarding__title {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0;
+  color: #000;
+  letter-spacing: -0.02em;
+}
+
+.teacher-onboarding__form {
+  display: grid;
+  gap: 24px;
+}
+
+.teacher-onboarding__input-wrapper {
+  display: flex;
+  align-items: baseline;
+  border-bottom: 2px solid #000;
+  padding-bottom: 8px;
+  transition: border-color 0.2s ease;
+}
+
+.teacher-onboarding__input-wrapper:focus-within {
+  border-color: #000;
+}
+
+.teacher-onboarding__input-prefix {
+  font-size: 24px;
+  font-weight: 600;
+  color: #000;
+  margin-right: 4px;
+}
+
+.teacher-onboarding__input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 24px;
+  font-weight: 600;
+  background: transparent;
+  color: #000;
+}
+
+.teacher-onboarding__input::placeholder {
+  color: #ccc;
+  font-weight: 400;
+}
+
+.teacher-onboarding__input--error {
+  color: #dc2626;
+}
+
+.teacher-onboarding__input-wrapper:has(.teacher-onboarding__input--error) {
+  border-color: #dc2626;
+}
+
+.teacher-onboarding__error {
+  color: #dc2626;
+  font-size: 13px;
+  margin: 8px 0 0 0;
+}
+
+.teacher-onboarding__submit {
+  padding: 16px 32px;
+  background: #000;
+  color: white;
+  border: none;
+  border-radius: 0;
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.teacher-onboarding__submit:hover:not(:disabled) {
+  opacity: 0.8;
+}
+
+.teacher-onboarding__submit:disabled {
+  background: #e5e7eb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+
 /* Brand baseline */
 .yui-brand { display: inline-block; }
 .yui-brand__row { display: grid; gap: 6px; justify-items: start; }
@@ -213,18 +1414,87 @@
 [data-skin='ulyxes'] .yui-location-picker__label { text-underline-offset: 3px; }
 
 /* YogaTimeBlocksPicker – grouped blocks per day */
-.yui-time-blocks { display: grid; gap: 14px; }
-.yui-time-blocks__header { display: flex; gap: 10px; align-items: center; justify-content: space-between; }
-.yui-time-blocks__title { font-weight: 600; }
-.yui-time-blocks__progress { display: grid; gap: 6px; width: 160px; }
-.yui-time-blocks__progress-text { text-align: right; font-size: 12px; opacity: 0.8; }
-.yui-time-blocks__progress-bar { height: 4px; background: rgba(0,0,0,0.08); border-radius: 999px; overflow: hidden; }
-.yui-time-blocks__progress-bar > span { display: block; height: 100%; background: #111; }
-.yui-time-blocks__actions { display: flex; gap: 8px; }
-.yui-time-blocks__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
-.yui-time-blocks__day { display: grid; gap: 8px; }
-.yui-time-blocks__day-header { margin: 0; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; font-size: 16px; }
-.yui-time-blocks__times { display: grid; gap: 6px; }
+.yui-time-blocks { display: grid; gap: 32px; }
+
+/* Header - Clean and Breathable */
+.yui-time-blocks__header { 
+  text-align: center;
+  display: grid;
+  gap: 20px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+
+.yui-time-blocks__title { 
+  font-weight: 400; 
+  font-size: 18px;
+  letter-spacing: 0.3px;
+  opacity: 0.8;
+  margin: 0;
+}
+
+.yui-time-blocks__progress { 
+  display: grid; 
+  gap: 8px;
+  max-width: 120px;
+  margin: 0 auto;
+}
+
+.yui-time-blocks__progress-text { 
+  font-size: 13px; 
+  opacity: 0.5;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+.yui-time-blocks__progress-bar { 
+  height: 2px; 
+  background: rgba(0,0,0,0.08); 
+  border-radius: 999px; 
+  overflow: hidden; 
+}
+
+.yui-time-blocks__progress-bar > span { 
+  display: block; 
+  height: 100%; 
+  background: #111;
+  transition: width 0.2s ease;
+}
+
+.yui-time-blocks__actions { 
+  display: flex; 
+  justify-content: center;
+  gap: 12px; 
+}
+
+.yui-time-blocks__grid { 
+  display: grid; 
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+  gap: 28px; 
+}
+
+.yui-time-blocks__day { 
+  display: grid; 
+  gap: 16px; 
+}
+
+.yui-time-blocks__day-header { 
+  margin: 0; 
+  font-weight: 500;
+  font-size: 14px;
+  text-align: center;
+  padding: 12px;
+  background: rgba(0,0,0,0.02);
+  border-radius: 8px;
+  letter-spacing: 0.5px;
+  opacity: 0.7;
+  text-decoration: none;
+}
+
+.yui-time-blocks__times { 
+  display: grid; 
+  gap: 12px; 
+}
 .yui-time-pill { 
   display: inline-grid; 
   grid-auto-flow: row; 
@@ -246,11 +1516,34 @@
 .yui-time-blocks__suggested-badge { font-size: 10px; }
 .yui-time-blocks__time-row { display: flex; gap: 8px; align-items: center; }
 
-[data-skin='ulyxes'] .yui-time-blocks__day { border: none; box-shadow: 0 1px 0 rgba(0,0,0,0.08); padding: 8px 0; }
-[data-skin='ulyxes'] .yui-time-blocks__block { border: none; box-shadow: 0 1px 0 rgba(0,0,0,0.06); }
-[data-skin='ulyxes'] .yui-time-blocks__progress-bar { background: rgba(0,0,0,0.06); }
-[data-skin='ulyxes'] .yui-time-blocks__quick { text-decoration: underline; text-underline-offset: 3px; border: none; background: transparent; padding: 0; }
-[data-skin='ulyxes'] .yui-time-blocks__title { text-decoration: underline; text-underline-offset: 3px; }
+[data-skin='ulyxes'] .yui-time-blocks__day { 
+  border: none; 
+  box-shadow: none; 
+  padding: 0; 
+}
+
+[data-skin='ulyxes'] .yui-time-blocks__day-header {
+  background: rgba(0,0,0,0.01);
+  border: 1px solid rgba(0,0,0,0.06);
+}
+
+[data-skin='ulyxes'] .yui-time-blocks__progress-bar { 
+  background: rgba(0,0,0,0.06); 
+}
+
+[data-skin='ulyxes'] .yui-time-blocks__quick { 
+  border: 1px solid rgba(0,0,0,0.12);
+  background: transparent; 
+  font-weight: 400;
+}
+
+[data-skin='ulyxes'] .yui-time-blocks__quick:hover {
+  background: rgba(0,0,0,0.02);
+}
+
+[data-skin='ulyxes'] .yui-time-blocks__title { 
+  text-decoration: none;
+}
 
 /* FullJourney – orchestrated flow */
 .yui-journey { display: grid; gap: 16px; }
@@ -357,6 +1650,51 @@
   margin-top: 20px;
   padding-top: 20px;
   border-top: 1px solid rgba(0,0,0,0.06);
+  display: grid;
+  gap: 24px;
+}
+
+/* Payment Offer Display */
+.yui-journey__offer-display {
+  text-align: center;
+  padding: 20px;
+  border: 1px solid rgba(0,0,0,0.12);
+  border-radius: 12px;
+  background: rgba(0,0,0,0.01);
+}
+
+.yui-journey__offer-amount {
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 1;
+  color: #111;
+  letter-spacing: -1px;
+}
+
+.yui-journey__offer-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  opacity: 0.4;
+  margin: 6px 0 8px 0;
+  font-weight: 500;
+}
+
+.yui-journey__offer-type {
+  font-size: 14px;
+  font-weight: 400;
+  color: #111;
+  opacity: 0.7;
+}
+
+.yui-journey__offer-note {
+  font-size: 13px;
+  line-height: 1.4;
+  opacity: 0.6;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0,0,0,0.08);
+  font-style: italic;
 }
 
 .yui-journey__detail-grid { 
@@ -379,6 +1717,31 @@
 }
 
 .yui-journey__detail-value { 
+  font-size: 14px;
+  font-weight: 400;
+  color: #111;
+}
+
+/* Session Location - Centered */
+.yui-journey__session-location {
+  text-align: center;
+  padding: 16px 20px;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 8px;
+  background: rgba(0,0,0,0.01);
+}
+
+.yui-journey__location-label {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.4;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.yui-journey__location-text {
   font-size: 14px;
   font-weight: 400;
   color: #111;
@@ -901,3 +2264,589 @@
   .yui-booking-info[data-variant='side'] { grid-template-columns: 1fr 1fr; align-items: start; }
 }
 .yui-booking-info__toggle { width: 100%; text-align: left; background: transparent; border: none; padding: 0; font: inherit; cursor: pointer; }
+
+/* Teacher Opportunity Cards - Simplified */
+.teacher-opportunity-card {
+  border: 2px solid #000;
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.teacher-opportunity-card__header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.teacher-opportunity-card__group-badge {
+  display: inline-block;
+  background: #000;
+  color: #fff;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  align-self: flex-start;
+}
+
+.teacher-opportunity-card__title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #000;
+}
+
+.teacher-opportunity-card__details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.teacher-opportunity-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #555;
+}
+
+.teacher-opportunity-card__separator {
+  opacity: 0.5;
+}
+
+.teacher-opportunity-card__payout {
+  font-weight: 600;
+  color: #000;
+}
+
+.teacher-opportunity-card__fiat {
+  opacity: 0.7;
+  font-weight: 400;
+}
+
+.teacher-opportunity-card__location {
+  display: flex;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.teacher-opportunity-card__detail-label {
+  color: #555;
+  font-weight: 500;
+}
+
+.teacher-opportunity-card__detail-value {
+  color: #000;
+  font-weight: 400;
+}
+
+.teacher-opportunity-card__actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.teacher-opportunity-card__action {
+  padding: 10px 16px;
+  border: 2px solid #000;
+  background: transparent;
+  color: #000;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.teacher-opportunity-card__action:hover {
+  background: #000;
+  color: #fff;
+}
+
+.teacher-opportunity-card__action--accept {
+  background: #000;
+  color: #fff;
+}
+
+.teacher-opportunity-card__action--accept:hover {
+  background: #333;
+}
+
+/* Opportunity Details Modal */
+.opportunity-details-modal__backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.opportunity-details-modal {
+  background: #fff;
+  border: 2px solid #000;
+  border-radius: 8px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.opportunity-details-modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 24px;
+  border-bottom: 2px solid #000;
+}
+
+.opportunity-details-modal__title-section {
+  flex: 1;
+}
+
+.opportunity-details-modal__group-badge {
+  display: inline-block;
+  background: #000;
+  color: #fff;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.opportunity-details-modal__title {
+  margin: 0 0 4px 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #000;
+}
+
+.opportunity-details-modal__subtitle {
+  margin: 0;
+  color: #555;
+  font-size: 14px;
+}
+
+.opportunity-details-modal__close {
+  background: transparent;
+  border: 2px solid #000;
+  border-radius: 4px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #000;
+  margin-left: 16px;
+}
+
+.opportunity-details-modal__close:hover {
+  background: #000;
+  color: #fff;
+}
+
+.opportunity-details-modal__content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.opportunity-details-modal__overview {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background: #f9f9f9;
+}
+
+.opportunity-details-modal__overview-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.opportunity-details-modal__label {
+  font-weight: 500;
+  color: #555;
+}
+
+.opportunity-details-modal__value {
+  font-weight: 600;
+  color: #000;
+}
+
+.opportunity-details-modal__fiat {
+  opacity: 0.7;
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+.opportunity-details-modal__section-title {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #000;
+}
+
+.opportunity-details-modal__student-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.opportunity-details-modal__student-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 16px;
+  background: #fff;
+}
+
+.opportunity-details-modal__student-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.opportunity-details-modal__student-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #000;
+}
+
+.opportunity-details-modal__student-address {
+  font-family: monospace;
+  font-size: 12px;
+  color: #555;
+  background: #f0f0f0;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.opportunity-details-modal__student-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.opportunity-details-modal__student-detail {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+}
+
+.opportunity-details-modal__detail-label {
+  color: #555;
+}
+
+.opportunity-details-modal__detail-value {
+  font-weight: 500;
+  color: #000;
+}
+
+.opportunity-details-modal__detail-fiat {
+  opacity: 0.7;
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+.opportunity-details-modal__student-actions {
+  margin-top: 8px;
+}
+
+.opportunity-details-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px 24px;
+  border-top: 2px solid #000;
+}
+
+.opportunity-details-modal__action {
+  padding: 10px 16px;
+  border: 2px solid #000;
+  background: transparent;
+  color: #000;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.opportunity-details-modal__action:hover {
+  background: #000;
+  color: #fff;
+}
+
+.opportunity-details-modal__action--accept {
+  background: #000;
+  color: #fff;
+}
+
+.opportunity-details-modal__action--accept:hover {
+  background: #333;
+}
+
+.opportunity-details-modal__action--secondary {
+  border-color: #999;
+  color: #999;
+}
+
+.opportunity-details-modal__action--secondary:hover {
+  background: #999;
+  color: #fff;
+}
+
+/* Teacher Dashboard Sections */
+.teacher-classes-list__upcoming-section,
+.teacher-classes-list__opportunities-section {
+  margin-bottom: 32px;
+}
+
+.teacher-classes-list__section-title {
+  margin: 0 0 20px 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #000;
+  border-bottom: 2px solid #000;
+  padding-bottom: 8px;
+}
+
+.teacher-classes-list__upcoming-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 20px;
+}
+
+/* Upcoming Class Cards */
+.upcoming-class-card {
+  border: 2px solid #000;
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.upcoming-class-card--past-due {
+  border-color: #d32f2f;
+  background: #fff5f5;
+}
+
+.upcoming-class-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.upcoming-class-card__title-section {
+  flex: 1;
+}
+
+.upcoming-class-card__title {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #000;
+}
+
+.upcoming-class-card__time-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.upcoming-class-card__datetime {
+  font-size: 14px;
+  color: #555;
+  font-weight: 500;
+}
+
+.upcoming-class-card__countdown {
+  font-size: 12px;
+  color: #007c33;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.upcoming-class-card__countdown--past-due {
+  color: #d32f2f;
+}
+
+.upcoming-class-card__status {
+  flex-shrink: 0;
+}
+
+.upcoming-class-card__status-badge {
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.upcoming-class-card__status-badge--accepted {
+  background: #000;
+  color: #fff;
+}
+
+.upcoming-class-card__status-badge--completed {
+  background: #007c33;
+  color: #fff;
+}
+
+.upcoming-class-card__status-badge--cancelled {
+  background: #d32f2f;
+  color: #fff;
+}
+
+.upcoming-class-card__details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.upcoming-class-card__detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+}
+
+.upcoming-class-card__detail-label {
+  color: #555;
+  font-weight: 500;
+}
+
+.upcoming-class-card__detail-value {
+  color: #000;
+  font-weight: 500;
+  text-align: right;
+}
+
+.upcoming-class-card__payout {
+  font-weight: 600;
+}
+
+.upcoming-class-card__fiat {
+  opacity: 0.7;
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+.upcoming-class-card__escrow-id {
+  font-family: monospace;
+  background: #f0f0f0;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.upcoming-class-card__actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.upcoming-class-card__action {
+  padding: 10px 16px;
+  border: 2px solid #000;
+  background: transparent;
+  color: #000;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex: 1;
+}
+
+.upcoming-class-card__action:hover {
+  background: #000;
+  color: #fff;
+}
+
+.upcoming-class-card__action--cancel {
+  border-color: #d32f2f;
+  color: #d32f2f;
+}
+
+.upcoming-class-card__action--cancel:hover {
+  background: #d32f2f;
+  color: #fff;
+}
+
+/* Cancelled Classes Visual Treatment */
+.yui-class-item--cancelled {
+  border-left: 4px solid #d32f2f;
+  background-color: #fff5f5;
+}
+
+.yui-class-item__title--cancelled {
+  text-decoration: line-through;
+  color: #666;
+}
+
+.yui-class-item__time--cancelled {
+  text-decoration: line-through;
+  color: #666;
+}
+
+.yui-class-item__cancelled-info {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: #ffebee;
+  border: 1px solid #ffcdd2;
+  border-radius: 4px;
+}
+
+.yui-class-item__cancelled-status {
+  margin-bottom: 4px;
+}
+
+.yui-class-item__cancelled-label {
+  color: #d32f2f;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.yui-class-item__cancelled-outcome {
+  font-size: 12px;
+  color: #666;
+  line-height: 1.4;
+}
+
+/* Enhanced Cancelled Badge */
+.yui-badge--cancelled {
+  background-color: #d32f2f;
+  color: #fff;
+  font-weight: 600;
+}

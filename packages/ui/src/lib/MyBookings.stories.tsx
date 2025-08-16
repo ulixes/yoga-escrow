@@ -82,6 +82,72 @@ const demo: StudentEscrow[] = [
     canDispute: false,
     canTriggerAutoRelease: false,
   },
+  {
+    id: 4n,
+    payer: '0xabc0000000000000000000000000000000000000',
+    amountWei: 0n,
+    status: 'Cancelled',
+    createdAt: now - 86400, // 1 day ago
+    expiresAt: now - 3600,
+    description: 'Beginner Hatha Yoga',
+    teacherHandles: ['@lena', '@maya', '@alex'],
+    yogaTypes: ['Hatha','Yin','Vinyasa'],
+    timeSlots: [mkSlot(-12), mkSlot(-6), mkSlot(2)],
+    locations: [mkLoc('Vake Park'), mkLoc('Rustaveli Studio'), mkLoc('Old Town')],
+    selected: { payeeIndex: 0, yogaIndex: 0, timeIndex: 0, locationIndex: 0, handle: '@lena' },
+    amountEth: '0.0025',
+    isExpired: true,
+    timeToExpireMs: -1000 * 60 * 60,
+    canAssign: false,
+    canCancel: false,
+    canRelease: false,
+    canDispute: false,
+    canTriggerAutoRelease: false,
+  },
+  {
+    id: 5n,
+    payer: '0xabc0000000000000000000000000000000000000',
+    amountWei: 0n,
+    status: 'Completed',
+    createdAt: now - 172800, // 2 days ago
+    expiresAt: now - 86400,
+    description: 'Power Yoga Session',
+    teacherHandles: ['@maya', '@alex', '@zoe'],
+    yogaTypes: ['Power','Ashtanga','Vinyasa'],
+    timeSlots: [mkSlot(-36), mkSlot(-30), mkSlot(-24)],
+    locations: [mkLoc('Saburtalo Center'), mkLoc('Lisi Lake'), mkLoc('Gym Central')],
+    selected: { payeeIndex: 1, yogaIndex: 0, timeIndex: 2, locationIndex: 0, handle: '@alex' },
+    amountEth: '0.004',
+    isExpired: true,
+    timeToExpireMs: -1000 * 60 * 60 * 24,
+    canAssign: false,
+    canCancel: false,
+    canRelease: false,
+    canDispute: false,
+    canTriggerAutoRelease: false,
+  },
+  {
+    id: 6n,
+    payer: '0xabc0000000000000000000000000000000000000',
+    amountWei: 0n,
+    status: 'Cancelled',
+    createdAt: now - 259200, // 3 days ago
+    expiresAt: now - 172800,
+    description: 'Vinyasa Flow',
+    teacherHandles: ['@zoe', '@lena', '@maya'],
+    yogaTypes: ['Vinyasa','Yin','Hatha'],
+    timeSlots: [mkSlot(-60), mkSlot(-54), mkSlot(-48)],
+    locations: [mkLoc('Turtle Lake'), mkLoc('Vake Park'), mkLoc('Old Town')],
+    selected: { payeeIndex: 0, yogaIndex: 0, timeIndex: 1, locationIndex: 2, handle: '@zoe' },
+    amountEth: '0.003',
+    isExpired: true,
+    timeToExpireMs: -1000 * 60 * 60 * 48,
+    canAssign: false,
+    canCancel: false,
+    canRelease: false,
+    canDispute: false,
+    canTriggerAutoRelease: false,
+  },
 ]
 
 export const Default: Story = {
@@ -89,6 +155,40 @@ export const Default: Story = {
     <div data-skin="ulyxes" style={{ maxWidth: 760 }}>
       <MyBookings
         items={demo}
+        onAssign={(id) => console.log('assign', id)}
+        onCancel={(id) => console.log('cancel', id)}
+        onRelease={(id) => console.log('release', id)}
+        onDispute={(id) => console.log('dispute', id)}
+        onAutoRelease={(id) => console.log('autoRelease', id)}
+        onViewDetails={(id) => console.log('details', id)}
+      />
+    </div>
+  ),
+}
+
+export const ClassHistory: Story = {
+  render: () => (
+    <div data-skin="ulyxes" style={{ maxWidth: 760 }}>
+      <MyBookings
+        items={demo}
+        initialFilter="history"
+        onAssign={(id) => console.log('assign', id)}
+        onCancel={(id) => console.log('cancel', id)}
+        onRelease={(id) => console.log('release', id)}
+        onDispute={(id) => console.log('dispute', id)}
+        onAutoRelease={(id) => console.log('autoRelease', id)}
+        onViewDetails={(id) => console.log('details', id)}
+      />
+    </div>
+  ),
+}
+
+export const CancelledOnly: Story = {
+  render: () => (
+    <div data-skin="ulyxes" style={{ maxWidth: 760 }}>
+      <MyBookings
+        items={demo}
+        initialFilter="cancelled"
         onAssign={(id) => console.log('assign', id)}
         onCancel={(id) => console.log('cancel', id)}
         onRelease={(id) => console.log('release', id)}
