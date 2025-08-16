@@ -217,6 +217,51 @@ export const OnlyUpcomingClasses: Story = {
     teacherHandle: '@yoga_master',
     ethToFiatRate: 2500,
     fiatCurrency: 'USD',
+    initialTab: 'upcoming',
+  },
+}
+
+export const OpportunitiesTab: Story = {
+  args: {
+    opportunities: createMockOpportunities(),
+    upcomingClasses: createMockUpcomingClasses(),
+    teacherHandle: '@yoga_master',
+    ethToFiatRate: 2500,
+    fiatCurrency: 'USD',
+    initialTab: 'opportunities',
+  },
+}
+
+export const HistoryTab: Story = {
+  args: {
+    opportunities: createMockOpportunities(),
+    upcomingClasses: createMockUpcomingClasses(),
+    classHistory: [
+      {
+        escrowId: 301,
+        studentAddress: '0xStudent201',
+        classTime: Math.floor(Date.now() / 1000) - 86400, // Yesterday
+        location: 'Vake Park, Tbilisi',
+        description: 'Group yoga class booking',
+        payout: '0.002266',
+        acceptedAt: Math.floor(Date.now() / 1000) - 90000,
+        status: 'cancelled' as const
+      },
+      {
+        escrowId: 302,
+        studentAddress: '0xStudent202',
+        classTime: Math.floor(Date.now() / 1000) - 172800, // 2 days ago
+        location: 'Rustaveli Studio',
+        description: 'Power Yoga Session',
+        payout: '0.004',
+        acceptedAt: Math.floor(Date.now() / 1000) - 180000,
+        status: 'completed' as const
+      }
+    ],
+    teacherHandle: '@yoga_master',
+    ethToFiatRate: 2500,
+    fiatCurrency: 'USD',
+    initialTab: 'history',
   },
 }
 

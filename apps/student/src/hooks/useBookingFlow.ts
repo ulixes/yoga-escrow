@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo } from 'react'
 import type { FullJourneyResult } from '@yoga/ui'
 import { hasSufficientBalance, calculateShortfall } from '../utils/walletUtils'
 import { useYogaEscrow, type ContractBookingPayload, type GasEstimate } from './useYogaEscrow'
-import { CLASS_PRICE_USD, CLASS_PRICE_ETH, CLASS_PRICE_ETH_DISPLAY, YOGA_ESCROW_CONTRACT_ADDRESS } from '../config/constants'
+import { YOGA_ESCROW_CONTRACT_ADDRESS } from '../config'
 import { validateContractPayload, simulateContractCall } from '../utils/contractDebugger'
 
 // Contract enums matching Solidity
@@ -38,14 +38,17 @@ export interface Location {
 }
 
 export interface BookingPayload {
-  // For createEscrow function
-  teacherHandles: [string, string, string] // Will be removed in future
-  yogaTypes: [YogaType, YogaType, YogaType]
-  timeSlots: [TimeSlot, TimeSlot, TimeSlot]
-  locations: [Location, Location, Location]
+  // Clean contract payload
+  teacherHandles: string[] // 1-3 teacher handles
+  timeSlots: [number, number, number] // Unix timestamps only
+  location: string // Single location string
   description: string
   priceUSD: number // Price in USD for display
   priceETH: string // Price in ETH for contract
+  student: {
+    email: string
+    wallet: string
+  }
 }
 
 export interface Escrow {
@@ -103,7 +106,7 @@ const yogaTypeMap: Record<string, YogaType> = {
   'power': YogaType.Power
 }
 
-export function useBookingFlow(userEmail?: string, userWalletAddress?: string, ethUsdPrice: number = 3000) {
+export function useBookingFlow(userEmail?: string, userWalletAddress?: string, ethUsdPrice: number = 3000, teachers: any[] = []) {
   const { createEscrow, estimateGas, contractState } = useYogaEscrow(ethUsdPrice)
   
   const [state, setState] = useState<BookingFlowState>({
@@ -118,33 +121,32 @@ export function useBookingFlow(userEmail?: string, userWalletAddress?: string, e
   })
 
   // Convert journey result to contract payload
-  const convertToBookingPayload = useCallback((result: FullJourneyResult): BookingPayload => {
-    // Parse time selections (format: "dayId:HH:mm")
+  const convertToBookingPayload = useCallback((result: FullJourneyResult, teachers: any[]): BookingPayload => {
+    // Debug logging
+    console.log('DEBUG - Selected teacher IDs:', result.selectedTeacherIds)
+    console.log('DEBUG - Available teachers:', teachers.map(t => ({ id: t.id, handle: t.handle })))
+    
+    // Get actual teacher handles from selected IDs - no padding needed!
+    const selectedTeachers = teachers.filter(t => result.selectedTeacherIds.includes(t.id))
+    console.log('DEBUG - Found selected teachers:', selectedTeachers.map(t => ({ id: t.id, handle: t.handle })))
+    
+    const teacherHandles = selectedTeachers.map(t => `@${t.handle}`)
+
+    // Parse time selections to Unix timestamps
     const timeSlots = result.timeIds.slice(0, 3).map(timeId => {
-      // timeId format is "dayId:HH:mm" e.g., "mon:09:00"
       const parts = timeId.split(':')
       if (parts.length !== 3) {
         console.error('Invalid timeId format:', timeId)
-        // Return a default slot
-        return {
-          startTime: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60),
-          durationMinutes: 60,
-          timezoneOffset: 0
-        }
+        return Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60)
       }
       
       const dayId = parts[0]
       const hours = Number(parts[1])
       const minutes = Number(parts[2])
       
-      // Validate parsed numbers
       if (isNaN(hours) || isNaN(minutes)) {
         console.error('Invalid time values:', { hours, minutes, timeId })
-        return {
-          startTime: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60),
-          durationMinutes: 60,
-          timezoneOffset: 0
-        }
+        return Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60)
       }
       
       // Calculate next occurrence of this day/time
@@ -159,69 +161,52 @@ export function useBookingFlow(userEmail?: string, userWalletAddress?: string, e
       targetDate.setDate(now.getDate() + daysUntilTarget)
       targetDate.setHours(hours, minutes, 0, 0)
       
-      return {
-        startTime: Math.floor(targetDate.getTime() / 1000),
-        durationMinutes: 60, // Default 60 min classes
-        timezoneOffset: -targetDate.getTimezoneOffset()
-      }
+      return Math.floor(targetDate.getTime() / 1000)
     })
 
-    // Ensure we have exactly 3 slots
+    // Ensure we have exactly 3 timestamps
     while (timeSlots.length < 3) {
-      timeSlots.push(timeSlots[0]) // Duplicate first slot if needed
+      timeSlots.push(timeSlots[0])
     }
 
-    // Map yoga type
-    const yogaType = yogaTypeMap[result.yogaTypeId] || YogaType.Vinyasa
-    
-    // Create 3 variations of yoga types (main choice + alternatives)
-    const yogaTypes: [YogaType, YogaType, YogaType] = [
-      yogaType,
-      yogaType === YogaType.Vinyasa ? YogaType.Hatha : YogaType.Vinyasa,
-      yogaType === YogaType.Yin ? YogaType.Restorative : YogaType.Yin
-    ]
+    // Single location string
+    const location = `${result.location.specificLocation}, ${result.location.city}`
 
-    // Create 3 location options (selected + alternatives)
-    const locations: [Location, Location, Location] = [
-      result.location,
-      { ...result.location, specificLocation: 'Alternative Studio' },
-      { ...result.location, specificLocation: 'Online Session' }
-    ]
+    // Calculate ETH price from USD amount (rough conversion)
+    const ethPrice = ethUsdPrice || 3000
+    const priceETH = (result.pricing.customAmount / ethPrice).toFixed(6)
 
-    // Teacher handles (placeholder for now, will be removed)
-    // Ensure no empty strings - contract will revert on empty handles
-    const teacherHandles: [string, string, string] = [
-      '@yogateacher1',
-      '@yogateacher2', 
-      '@yogateacher3'
-    ].filter(handle => handle && handle.trim().length > 0) as [string, string, string]
-
-    // Validate we have exactly 3 non-empty handles
-    if (teacherHandles.length !== 3) {
-      console.error('Invalid teacher handles:', teacherHandles)
-      throw new Error('Must have exactly 3 non-empty teacher handles')
-    }
-
-    return {
+    const finalPayload = {
       teacherHandles,
-      yogaTypes,
-      timeSlots: timeSlots as [TimeSlot, TimeSlot, TimeSlot],
-      locations,
-      description: `Yoga class booking - ${result.persona} seeking ${result.goal}`,
-      priceUSD: CLASS_PRICE_USD,
-      priceETH: CLASS_PRICE_ETH
+      timeSlots: timeSlots.slice(0, 3) as [number, number, number],
+      location,
+      description: `${result.pricing.sessionType === '1on1' ? 'Private' : 'Group'} yoga class booking`,
+      priceUSD: result.pricing.customAmount,
+      priceETH,
+      student: {
+        email: result.student.email,
+        wallet: userWalletAddress || result.student.wallet || ''
+      }
     }
-  }, [])
 
-  // Check payment eligibility (now using ETH instead of USDC)
+    console.log('DEBUG - convertToBookingPayload wallet assignment:', {
+      userWalletAddress,
+      resultStudentWallet: result.student.wallet,
+      finalWallet: finalPayload.student.wallet
+    })
+
+    return finalPayload
+  }, [ethUsdPrice, userWalletAddress])
+
+  // Check payment eligibility
   const checkPaymentEligibility = useCallback((ethBalance: string, gasEstimate?: GasEstimate): PaymentState => {
-    const requiredAmountETH = parseFloat(CLASS_PRICE_ETH)
+    const requiredAmountETH = state.bookingPayload ? parseFloat(state.bookingPayload.priceETH) : 0
     const currentBalanceETH = parseFloat(ethBalance)
     
     // Calculate total cost including gas
     const gasFeeETH = gasEstimate ? parseFloat(gasEstimate.gasFeeETH) : 0
     const totalCostETH = requiredAmountETH + gasFeeETH
-    const totalCostUSD = CLASS_PRICE_USD + (gasEstimate?.gasFeeUSD || 0)
+    const totalCostUSD = (state.bookingPayload?.priceUSD || 0) + (gasEstimate?.gasFeeUSD || 0)
     
     const hasSufficient = currentBalanceETH >= totalCostETH
     const shortfall = hasSufficient ? "0.000000" : (totalCostETH - currentBalanceETH).toFixed(6)
@@ -236,7 +221,7 @@ export function useBookingFlow(userEmail?: string, userWalletAddress?: string, e
     })
     
     return {
-      requiredAmount: CLASS_PRICE_ETH, // Use ETH amount for display
+      requiredAmount: state.bookingPayload?.priceETH || '0',
       currency: 'ETH',
       hasSufficientBalance: hasSufficient,
       shortfallAmount: shortfall,
@@ -246,7 +231,7 @@ export function useBookingFlow(userEmail?: string, userWalletAddress?: string, e
       totalCostETH: totalCostETH.toFixed(6),
       totalCostUSD
     }
-  }, [])
+  }, [state.bookingPayload])
 
   // Handle journey completion - now triggers payment check
   const handleJourneyComplete = useCallback((result: FullJourneyResult) => {
@@ -258,11 +243,11 @@ export function useBookingFlow(userEmail?: string, userWalletAddress?: string, e
       }
     }
     
-    const payload = convertToBookingPayload(finalResult)
+    const payload = convertToBookingPayload(finalResult, teachers)
     
     // Initialize payment state (balance will be checked separately)
     const initialPaymentState: PaymentState = {
-      requiredAmount: CLASS_PRICE_ETH,
+      requiredAmount: payload.priceETH,
       currency: 'ETH',
       hasSufficientBalance: false,
       shortfallAmount: "0.000000",
@@ -274,9 +259,11 @@ export function useBookingFlow(userEmail?: string, userWalletAddress?: string, e
       ...prev,
       journeyResult: finalResult,
       bookingPayload: payload,
-      paymentState: initialPaymentState,
-      step: 'payment'
+      paymentState: initialPaymentState
+      // Don't change step - stay on journey to keep UI visible
     }))
+    
+    return payload
   }, [convertToBookingPayload, userEmail])
 
   // Update payment state with balance info and gas estimation
@@ -319,40 +306,23 @@ export function useBookingFlow(userEmail?: string, userWalletAddress?: string, e
 
     try {
       // Convert booking payload to contract format for gas estimation
-      // Validate and prepare contract payload
       const contractPayload: ContractBookingPayload = {
         teacherHandles: state.bookingPayload.teacherHandles,
-        yogaTypes: state.bookingPayload.yogaTypes.map(type => {
-          const numericType = typeof type === 'number' ? type : Number(type)
-          console.log('Converting yoga type:', type, '->', numericType)
-          return numericType
-        }) as [number, number, number],
-        timeSlots: state.bookingPayload.timeSlots.map(slot => {
-          const timeSlot = {
-            startTime: BigInt(Math.floor(slot.startTime)),
-            durationMinutes: Number(slot.durationMinutes) || 60,
-            timezoneOffset: Number(slot.timezoneOffset) || 0
-          }
-          console.log('Converting time slot:', slot, '->', timeSlot)
-          return timeSlot
-        }) as any,
-        locations: state.bookingPayload.locations.map(loc => ({
-          country: loc.country || 'Unknown',
-          city: loc.city || 'Unknown', 
-          specificLocation: loc.specificLocation || 'Unknown'
-        })) as any,
-        description: state.bookingPayload.description || 'Yoga class booking',
-        amount: state.bookingPayload.priceETH
+        timeSlots: state.bookingPayload.timeSlots.map(timestamp => BigInt(timestamp)) as [bigint, bigint, bigint],
+        location: state.bookingPayload.location,
+        description: state.bookingPayload.description,
+        amount: state.bookingPayload.priceETH,
+        student: state.bookingPayload.student
       }
 
       // Validate all required fields
       console.log('Contract payload validation:', {
         teacherHandles: contractPayload.teacherHandles,
-        yogaTypes: contractPayload.yogaTypes,
         timeSlots: contractPayload.timeSlots,
-        locations: contractPayload.locations,
+        location: contractPayload.location,
         description: contractPayload.description,
-        amount: contractPayload.amount
+        amount: contractPayload.amount,
+        student: contractPayload.student
       })
 
       console.log('Estimating gas for booking...')
@@ -378,45 +348,27 @@ export function useBookingFlow(userEmail?: string, userWalletAddress?: string, e
   }, [state.bookingPayload, userWalletAddress, estimateGas, checkPaymentEligibility])
 
   // Confirm payment and create escrow on blockchain
-  const confirmPayment = useCallback(async () => {
-    if (!state.bookingPayload) {
+  const confirmPayment = useCallback(async (payloadOverride?: BookingPayload) => {
+    const payload = payloadOverride || state.bookingPayload
+    if (!payload) {
       throw new Error('No booking payload available')
     }
 
     setState(prev => ({ ...prev, loading: true, error: null }))
     
-    console.log('Booking payload before conversion:', state.bookingPayload)
+    console.log('Booking payload before conversion:', payload)
+    console.log('DEBUG - Student wallet in payload:', payload.student.wallet)
+    console.log('DEBUG - userWalletAddress param:', userWalletAddress)
     
     try {
       // Convert booking payload to contract format
       const contractPayload: ContractBookingPayload = {
-        teacherHandles: state.bookingPayload.teacherHandles,
-        yogaTypes: state.bookingPayload.yogaTypes.map(type => {
-          const numericType = typeof type === 'number' ? type : Number(type)
-          console.log('Converting yoga type:', type, '->', numericType)
-          return numericType
-        }) as [number, number, number],
-        timeSlots: state.bookingPayload.timeSlots.map(slot => {
-          // Ensure we have valid numbers before converting to BigInt
-          const startTime = Number(slot.startTime)
-          if (isNaN(startTime)) {
-            throw new Error('Invalid start time in time slot')
-          }
-          const timeSlot = {
-            startTime: BigInt(Math.floor(startTime)),
-            durationMinutes: Number(slot.durationMinutes) || 60,
-            timezoneOffset: Number(slot.timezoneOffset) || 0
-          }
-          console.log('Converting time slot for transaction:', slot, '->', timeSlot)
-          return timeSlot
-        }) as any,
-        locations: state.bookingPayload.locations.map(loc => ({
-          country: loc.country || 'Unknown',
-          city: loc.city || 'Unknown', 
-          specificLocation: loc.specificLocation || 'Unknown'
-        })) as any,
-        description: state.bookingPayload.description || 'Yoga class booking',
-        amount: state.bookingPayload.priceETH // Use ETH amount from payload
+        teacherHandles: payload.teacherHandles,
+        timeSlots: payload.timeSlots.map(timestamp => BigInt(timestamp)) as [bigint, bigint, bigint],
+        location: payload.location,
+        description: payload.description,
+        amount: payload.priceETH,
+        student: payload.student
       }
 
       console.log('Final contract payload for transaction:', contractPayload)

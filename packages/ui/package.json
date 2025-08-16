@@ -5,13 +5,14 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./styles.css": "./src/styles.css"
+    "./styles.css": "./src/styles.css",
+    "./src/styles.css": "./src/styles.css"
   },
   "types": "./src/index.ts",
   "sideEffects": false,
   "scripts": {
-    "build": "echo 'ui uses source; no build'",
-    "dev": "echo 'ui is a library'",
+    "build": "storybook build",
+    "dev": "storybook dev -p 6006",
     "test": "echo 'no tests yet'",
     "lint": "echo 'no lint configured'",
     "format": "echo 'format with prettier'",

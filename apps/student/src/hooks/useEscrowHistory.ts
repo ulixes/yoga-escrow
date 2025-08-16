@@ -1,16 +1,16 @@
 import { useEffect, useState, useMemo } from 'react'
 import { createPublicClient, http, type Address } from 'viem'
 import { base, baseSepolia } from 'viem/chains'
-import { NETWORK, YOGA_ESCROW_CONTRACT_ADDRESS } from '../config/constants'
+import { NETWORK, YOGA_ESCROW_CONTRACT_ADDRESS } from '../config'
 import { adaptEscrow } from '../adapters/escrowAdapter'
 
-// Efficient ABI with the new wallet-specific functions
+// Updated ABI for new YogaClassEscrow contract
 const ABI = [
   {
     type: 'function',
-    name: 'getEscrowsByPayer',
+    name: 'getEscrowsByStudent',
     stateMutability: 'view',
-    inputs: [{ name: 'payer', type: 'address' }],
+    inputs: [{ name: 'student', type: 'address' }],
     outputs: [{ name: '', type: 'uint256[]' }],
   },
   {
@@ -23,41 +23,29 @@ const ABI = [
         name: '',
         type: 'tuple[]',
         components: [
-          { name: 'payer', type: 'address' },
-          { name: 'payee', type: 'address' },
+          { name: 'student', type: 'address' },
+          { name: 'teacher', type: 'address' },
           { name: 'amount', type: 'uint256' },
           { name: 'status', type: 'uint8' },
           { name: 'createdAt', type: 'uint64' },
-          { name: 'expiresAt', type: 'uint64' },
+          { name: 'classTime', type: 'uint64' },
           { name: 'description', type: 'string' },
-          { name: 'teacherHandles', type: 'string[3]' },
-          { name: 'yogaTypes', type: 'uint8[3]' },
-          {
-            name: 'timeSlots',
-            type: 'tuple[3]',
-            components: [
-              { name: 'startTime', type: 'uint64' },
-              { name: 'durationMinutes', type: 'uint32' },
-              { name: 'timezoneOffset', type: 'int16' },
-            ],
-          },
-          {
-            name: 'locations',
-            type: 'tuple[3]',
-            components: [
-              { name: 'country', type: 'string' },
-              { name: 'city', type: 'string' },
-              { name: 'specificLocation', type: 'string' },
-            ],
-          },
-          { name: 'selectedPayeeIndex', type: 'uint8' },
-          { name: 'selectedYogaIndex', type: 'uint8' },
+          { name: 'location', type: 'string' },
+          { name: 'studentEmail', type: 'string' },
+          { name: 'teacherHandles', type: 'string[]' },
+          { name: 'timeSlots', type: 'uint64[3]' },
           { name: 'selectedTimeIndex', type: 'uint8' },
-          { name: 'selectedLocationIndex', type: 'uint8' },
           { name: 'selectedHandle', type: 'string' },
         ],
       },
     ],
+  },
+  {
+    type: 'function',
+    name: 'canTeacherRelease',
+    stateMutability: 'view',
+    inputs: [{ name: 'escrowId', type: 'uint256' }],
+    outputs: [{ name: '', type: 'bool' }],
   },
 ] as const
 
@@ -65,11 +53,16 @@ export function useEscrowHistory(studentAddress?: Address) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [items, setItems] = useState<ReturnType<typeof adaptEscrow>[]>([])
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
 
   const client = useMemo(() => createPublicClient({
     chain: NETWORK === 'base' ? base : baseSepolia,
     transport: http(),
   }), [])
+
+  const refreshData = () => {
+    setRefreshTrigger(prev => prev + 1)
+  }
 
   useEffect(() => {
     if (!studentAddress) return
@@ -79,11 +72,11 @@ export function useEscrowHistory(studentAddress?: Address) {
         setLoading(true); setError(null)
         const nowSec = Math.floor(Date.now() / 1000)
 
-        // Get all escrow IDs for this payer using the new efficient function
+        // Get all escrow IDs for this student using the new efficient function
         const escrowIds = await client.readContract({
           address: YOGA_ESCROW_CONTRACT_ADDRESS,
           abi: ABI,
-          functionName: 'getEscrowsByPayer',
+          functionName: 'getEscrowsByStudent',
           args: [studentAddress],
         }) as bigint[]
 
@@ -101,9 +94,11 @@ export function useEscrowHistory(studentAddress?: Address) {
         }) as any[]
 
         // Adapt the escrow data to our format
-        const results = escrowsData.map((raw, index) => 
-          adaptEscrow(raw, escrowIds[index], nowSec)
-        )
+        const results = escrowsData.map((raw, index) => {
+          const adapted = adaptEscrow(raw, escrowIds[index], nowSec)
+          console.log('Escrow data:', { id: adapted.id, status: adapted.status, raw: raw.status })
+          return adapted
+        })
 
         if (mounted) setItems(results.sort((a,b) => b.createdAt - a.createdAt))
       } catch (e: any) {
@@ -113,7 +108,7 @@ export function useEscrowHistory(studentAddress?: Address) {
       }
     })()
     return () => { mounted = false }
-  }, [client, studentAddress])
+  }, [client, studentAddress, refreshTrigger])
 
-  return { items, loading, error }
+  return { items, loading, error, refreshData }
 }

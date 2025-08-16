@@ -5,6 +5,7 @@ import { UpcomingClassCard } from './UpcomingClassCard'
 
 export type TeacherFilter = 'all' | 'high-value' | 'group-classes'
 export type TeacherSortOption = 'newest' | 'amount' | 'earliest-class'
+export type TeacherTab = 'upcoming' | 'opportunities' | 'history'
 
 export interface TeacherClassesListProps {
   opportunities: GroupedOpportunity[]
@@ -22,6 +23,7 @@ export interface TeacherClassesListProps {
   className?: string
   initialFilter?: TeacherFilter
   initialSort?: TeacherSortOption
+  initialTab?: TeacherTab
 }
 
 function formatTimeFromTimestamp(timestamp: number): string {
@@ -50,10 +52,12 @@ export const TeacherClassesList: React.FC<TeacherClassesListProps> = ({
   formatFiat,
   className,
   initialFilter = 'all',
-  initialSort = 'newest'
+  initialSort = 'newest',
+  initialTab = 'upcoming'
 }) => {
   const [filter, setFilter] = useState<TeacherFilter>(initialFilter)
   const [sort, setSort] = useState<TeacherSortOption>(initialSort)
+  const [activeTab, setActiveTab] = useState<TeacherTab>(initialTab)
   const [selectedOpportunity, setSelectedOpportunity] = useState<GroupedOpportunity | null>(null)
   const [isDetailsOpen, setIsDetailsOpen] = useState(false)
 
@@ -118,6 +122,24 @@ export const TeacherClassesList: React.FC<TeacherClassesListProps> = ({
 
   const classes = ['teacher-classes-list', className].filter(Boolean).join(' ')
 
+  const tabs: Array<{ key: TeacherTab; label: string; count?: number }> = [
+    { 
+      key: 'upcoming', 
+      label: 'Upcoming Classes', 
+      count: sortedUpcomingClasses.length 
+    },
+    { 
+      key: 'opportunities', 
+      label: 'New Opportunities', 
+      count: filteredAndSorted.length 
+    },
+    { 
+      key: 'history', 
+      label: 'Class History', 
+      count: classHistory.length 
+    }
+  ]
+
   const filters: Array<{ key: TeacherFilter; label: string; count: number }> = [
     { key: 'all', label: 'All Opportunities', count: counts.all },
     { key: 'high-value', label: 'High Value (≥0.005 ETH)', count: counts['high-value'] },
@@ -143,152 +165,171 @@ export const TeacherClassesList: React.FC<TeacherClassesListProps> = ({
       <div className="teacher-classes-list__header">
         <div className="teacher-classes-list__title-section">
           <h1 className="teacher-classes-list__title">Teacher Dashboard - {teacherHandle}</h1>
-          <div className="teacher-classes-list__summary">
-            <span className="teacher-classes-list__count">
-              {filteredAndSorted.length} opportunit{filteredAndSorted.length !== 1 ? 'ies' : 'y'}
-            </span>
-            {filteredAndSorted.length > 0 && (
-              <span className="teacher-classes-list__total">
-                Total Potential: {totalPayout} ETH
-                {ethToFiatRate && (
-                  <span className="teacher-classes-list__total-fiat">
-                    ({formatFiatAmount(parseFloat(totalPayout))})
-                  </span>
-                )}
-              </span>
-            )}
-          </div>
-        </div>
-        
-        <div className="teacher-classes-list__controls">
-          <div className="teacher-classes-list__sort">
-            <label htmlFor="teacher-sort-select" className="teacher-classes-list__sort-label">Sort:</label>
-            <select
-              id="teacher-sort-select"
-              value={sort}
-              onChange={(e) => setSort(e.target.value as TeacherSortOption)}
-              className="teacher-classes-list__sort-select"
-            >
-              {sortOptions.map(option => (
-                <option key={option.key} value={option.key}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
         </div>
       </div>
 
-      <div className="teacher-classes-list__filters">
-        {filters.map(filterOption => (
+      {/* Tab Navigation */}
+      <div className="teacher-classes-list__tabs">
+        {tabs.map(tab => (
           <button
-            key={filterOption.key}
-            className={`teacher-classes-list__filter ${filter === filterOption.key ? 'teacher-classes-list__filter--active' : ''}`}
-            onClick={() => setFilter(filterOption.key)}
+            key={tab.key}
+            className={`teacher-classes-list__tab ${activeTab === tab.key ? 'teacher-classes-list__tab--active' : ''}`}
+            onClick={() => setActiveTab(tab.key)}
           >
-            {filterOption.label} ({filterOption.count})
+            {tab.label}
+            {typeof tab.count === 'number' && (
+              <span className="teacher-classes-list__tab-count">({tab.count})</span>
+            )}
           </button>
         ))}
       </div>
 
-      {/* Upcoming Classes Section */}
-      {sortedUpcomingClasses.length > 0 && (
-        <div className="teacher-classes-list__upcoming-section">
-          <h2 className="teacher-classes-list__section-title">
-            Upcoming Classes ({sortedUpcomingClasses.length})
-          </h2>
-          <div className="teacher-classes-list__upcoming-grid">
-            {sortedUpcomingClasses.map(acceptedClass => (
-              <UpcomingClassCard
-                key={acceptedClass.escrowId}
-                acceptedClass={acceptedClass}
-                onViewDetails={onViewClassDetails}
-                onCancel={onCancelClass}
-                fiatCurrency={fiatCurrency}
-                ethToFiatRate={ethToFiatRate}
-                formatFiat={formatFiat}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Class History Section */}
-      {classHistory.length > 0 && (
-        <div className="teacher-classes-list__history-section">
-          <h2 className="teacher-classes-list__section-title">
-            Class History ({classHistory.length})
-          </h2>
-          <div className="teacher-classes-list__history-grid">
-            {classHistory
-              .sort((a, b) => b.classTime - a.classTime) // Most recent first
-              .map(historyClass => (
-                <div key={historyClass.escrowId} className="teacher-history-card">
-                  <div className="teacher-history-card__header">
-                    <div className={`teacher-history-card__status teacher-history-card__status--${historyClass.status}`}>
-                      {historyClass.status === 'completed' ? 'Completed' : 'Cancelled'}
-                    </div>
-                    <div className="teacher-history-card__date">
-                      {formatTimeFromTimestamp(historyClass.classTime)}
-                    </div>
-                  </div>
-                  
-                  <div className="teacher-history-card__details">
-                    <div className="teacher-history-card__location">
-                      {historyClass.location}
-                    </div>
-                    <div className="teacher-history-card__description">
-                      {historyClass.description}
-                    </div>
-                    <div className="teacher-history-card__payout">
-                      {historyClass.payout} ETH
-                      {formatFiatAmount(parseFloat(historyClass.payout)) && (
-                        <span className="teacher-history-card__fiat"> ({formatFiatAmount(parseFloat(historyClass.payout))})</span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="teacher-history-card__actions">
-                    <button 
-                      className="teacher-history-card__action"
-                      onClick={() => onViewClassDetails?.(historyClass.escrowId)}
-                    >
-                      View Details
-                    </button>
-                  </div>
+      {/* Tab Content */}
+      <div className="teacher-classes-list__tab-content">
+        
+        {/* Upcoming Classes Tab */}
+        {activeTab === 'upcoming' && (
+          <div className="teacher-classes-list__upcoming-content">
+            {sortedUpcomingClasses.length === 0 ? (
+              <div className="teacher-classes-list__empty">
+                <div className="teacher-classes-list__empty-state">
+                  <h3 className="teacher-classes-list__empty-title">No upcoming classes</h3>
+                  <p className="teacher-classes-list__empty-text">
+                    When you accept class opportunities, they'll appear here.
+                  </p>
                 </div>
-              ))}
-          </div>
-        </div>
-      )}
-
-      <div className="teacher-classes-list__opportunities-section">
-        <h2 className="teacher-classes-list__section-title">
-          New Opportunities ({filteredAndSorted.length})
-        </h2>
-        <div className="teacher-classes-list__content">
-          {filteredAndSorted.length === 0 ? (
-          <div className="teacher-classes-list__empty">
-            {opportunities.length === 0 ? (
-              <div className="teacher-classes-list__empty-state">
-                <h3 className="teacher-classes-list__empty-title">No class opportunities yet</h3>
-                <p className="teacher-classes-list__empty-text">
-                  When students create escrows with your handle <strong>{teacherHandle}</strong>, opportunities will appear here.
-                </p>
               </div>
             ) : (
-              <div className="teacher-classes-list__no-results">
-                <h3 className="teacher-classes-list__no-results-title">No opportunities match your filters</h3>
-                <p className="teacher-classes-list__no-results-text">
-                  Try adjusting your filter settings.
-                </p>
+              <div className="teacher-classes-list__upcoming-grid">
+                {sortedUpcomingClasses.map(acceptedClass => (
+                  <UpcomingClassCard
+                    key={acceptedClass.escrowId}
+                    acceptedClass={acceptedClass}
+                    onViewDetails={onViewClassDetails}
+                    onCancel={onCancelClass}
+                    fiatCurrency={fiatCurrency}
+                    ethToFiatRate={ethToFiatRate}
+                    formatFiat={formatFiat}
+                  />
+                ))}
               </div>
             )}
           </div>
-        ) : (
-          <div className="teacher-classes-list__grid">
-            {filteredAndSorted.map(opportunity => (
-              <div key={opportunity.groupKey} className="teacher-opportunity-card">
+        )}
+
+        {/* Class History Tab */}
+        {activeTab === 'history' && (
+          <div className="teacher-classes-list__history-content">
+            {classHistory.length === 0 ? (
+              <div className="teacher-classes-list__empty">
+                <div className="teacher-classes-list__empty-state">
+                  <h3 className="teacher-classes-list__empty-title">No class history</h3>
+                  <p className="teacher-classes-list__empty-text">
+                    Completed and cancelled classes will appear here.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="teacher-classes-list__history-grid">
+                {classHistory
+                  .sort((a, b) => b.classTime - a.classTime) // Most recent first
+                  .map(historyClass => (
+                    <div key={historyClass.escrowId} className="teacher-history-card">
+                      <div className="teacher-history-card__header">
+                        <div className={`teacher-history-card__status teacher-history-card__status--${historyClass.status}`}>
+                          {historyClass.status === 'completed' ? 'Completed' : 'Cancelled'}
+                        </div>
+                        <div className="teacher-history-card__date">
+                          {formatTimeFromTimestamp(historyClass.classTime)}
+                        </div>
+                      </div>
+                      
+                      <div className="teacher-history-card__details">
+                        <div className="teacher-history-card__location">
+                          {historyClass.location}
+                        </div>
+                        <div className="teacher-history-card__description">
+                          {historyClass.description}
+                        </div>
+                        <div className="teacher-history-card__payout">
+                          {historyClass.payout} ETH
+                          {formatFiatAmount(parseFloat(historyClass.payout)) && (
+                            <span className="teacher-history-card__fiat"> ({formatFiatAmount(parseFloat(historyClass.payout))})</span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="teacher-history-card__actions">
+                        <button 
+                          className="teacher-history-card__action"
+                          onClick={() => onViewClassDetails?.(historyClass.escrowId)}
+                        >
+                          View Details
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Opportunities Tab */}
+        {activeTab === 'opportunities' && (
+          <div className="teacher-classes-list__opportunities-content">
+            {/* Filters and Sort for Opportunities Tab */}
+            <div className="teacher-classes-list__opportunity-controls">
+              <div className="teacher-classes-list__filters">
+                {filters.map(filterOption => (
+                  <button
+                    key={filterOption.key}
+                    className={`teacher-classes-list__filter ${filter === filterOption.key ? 'teacher-classes-list__filter--active' : ''}`}
+                    onClick={() => setFilter(filterOption.key)}
+                  >
+                    {filterOption.label} ({filterOption.count})
+                  </button>
+                ))}
+              </div>
+              
+              <div className="teacher-classes-list__sort">
+                <label htmlFor="teacher-sort-select" className="teacher-classes-list__sort-label">Sort:</label>
+                <select
+                  id="teacher-sort-select"
+                  value={sort}
+                  onChange={(e) => setSort(e.target.value as TeacherSortOption)}
+                  className="teacher-classes-list__sort-select"
+                >
+                  {sortOptions.map(option => (
+                    <option key={option.key} value={option.key}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {filteredAndSorted.length === 0 ? (
+              <div className="teacher-classes-list__empty">
+                {opportunities.length === 0 ? (
+                  <div className="teacher-classes-list__empty-state">
+                    <h3 className="teacher-classes-list__empty-title">No class opportunities yet</h3>
+                    <p className="teacher-classes-list__empty-text">
+                      When students create escrows with your handle <strong>{teacherHandle}</strong>, opportunities will appear here.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="teacher-classes-list__no-results">
+                    <h3 className="teacher-classes-list__no-results-title">No opportunities match your filters</h3>
+                    <p className="teacher-classes-list__no-results-text">
+                      Try adjusting your filter settings.
+                    </p>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="teacher-classes-list__grid">
+                {filteredAndSorted.map(opportunity => (
+                  <div key={opportunity.groupKey} className="teacher-opportunity-card">
                 <div className="teacher-opportunity-card__header">
                   {opportunity.isGroup && (
                     <div className="teacher-opportunity-card__group-badge">
@@ -349,9 +390,11 @@ export const TeacherClassesList: React.FC<TeacherClassesListProps> = ({
                 </div>
               </div>
             ))}
+              </div>
+            )}
           </div>
         )}
-        </div>
+        
       </div>
 
       <OpportunityDetailsModal

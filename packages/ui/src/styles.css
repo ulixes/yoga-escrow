@@ -2621,10 +2621,84 @@
   color: #fff;
 }
 
+/* Teacher Dashboard Tabs */
+.teacher-classes-list__tabs {
+  display: flex;
+  border-bottom: 2px solid #000;
+  margin-bottom: 24px;
+}
+
+.teacher-classes-list__tab {
+  padding: 12px 24px;
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s ease;
+  color: #666;
+}
+
+.teacher-classes-list__tab:hover {
+  color: #000;
+  background: #f9f9f9;
+}
+
+.teacher-classes-list__tab--active {
+  color: #000;
+  border-bottom-color: #000;
+  background: #fff;
+  font-weight: 600;
+}
+
+.teacher-classes-list__tab-count {
+  margin-left: 8px;
+  font-weight: 400;
+  color: #666;
+}
+
+.teacher-classes-list__tab--active .teacher-classes-list__tab-count {
+  color: #000;
+}
+
+/* Tab Content */
+.teacher-classes-list__tab-content {
+  min-height: 400px;
+}
+
+.teacher-classes-list__opportunity-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  gap: 16px;
+}
+
+.teacher-classes-list__opportunity-controls .teacher-classes-list__filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.teacher-classes-list__opportunity-controls .teacher-classes-list__sort {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
 /* Teacher Dashboard Sections */
 .teacher-classes-list__upcoming-section,
-.teacher-classes-list__opportunities-section {
+.teacher-classes-list__opportunities-section,
+.teacher-classes-list__history-section {
   margin-bottom: 32px;
+}
+
+.teacher-classes-list__history-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 20px;
 }
 
 .teacher-classes-list__section-title {
@@ -2799,6 +2873,101 @@
 
 .upcoming-class-card__action--cancel:hover {
   background: #d32f2f;
+  color: #fff;
+}
+
+/* Teacher History Cards */
+.teacher-history-card {
+  border: 2px solid #000;
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.teacher-history-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.teacher-history-card__status {
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.teacher-history-card__status--completed {
+  background: #007c33;
+  color: #fff;
+}
+
+.teacher-history-card__status--cancelled {
+  background: #d32f2f;
+  color: #fff;
+}
+
+.teacher-history-card__date {
+  font-size: 14px;
+  color: #555;
+  font-weight: 500;
+}
+
+.teacher-history-card__details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.teacher-history-card__location {
+  font-size: 16px;
+  font-weight: 600;
+  color: #000;
+}
+
+.teacher-history-card__description {
+  font-size: 14px;
+  color: #555;
+}
+
+.teacher-history-card__payout {
+  font-size: 16px;
+  font-weight: 600;
+  color: #000;
+}
+
+.teacher-history-card__fiat {
+  opacity: 0.7;
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+.teacher-history-card__actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.teacher-history-card__action {
+  padding: 10px 16px;
+  border: 2px solid #000;
+  background: transparent;
+  color: #000;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex: 1;
+}
+
+.teacher-history-card__action:hover {
+  background: #000;
   color: #fff;
 }
 

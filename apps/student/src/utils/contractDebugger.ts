@@ -1,34 +1,17 @@
 import { createPublicClient, http, encodeFunctionData, type Address } from 'viem'
 import { baseSepolia } from 'viem/chains'
-import { YOGA_ESCROW_CONTRACT_ADDRESS } from '../config/constants'
+import { YOGA_ESCROW_CONTRACT_ADDRESS } from '../config'
 import type { ContractBookingPayload } from '../hooks/useYogaEscrow'
 
 const ESCROW_ABI = [
   {
     "inputs": [
-      {"internalType": "string[3]", "name": "teacherHandles", "type": "string[3]"},
-      {"internalType": "enum YogaClassEscrow.YogaType[3]", "name": "yogaTypes", "type": "uint8[3]"},
-      {
-        "components": [
-          {"internalType": "uint64", "name": "startTime", "type": "uint64"},
-          {"internalType": "uint32", "name": "durationMinutes", "type": "uint32"},
-          {"internalType": "int16", "name": "timezoneOffset", "type": "int16"}
-        ],
-        "internalType": "struct YogaClassEscrow.TimeSlot[3]",
-        "name": "timeSlots",
-        "type": "tuple[3]"
-      },
-      {
-        "components": [
-          {"internalType": "string", "name": "country", "type": "string"},
-          {"internalType": "string", "name": "city", "type": "string"},
-          {"internalType": "string", "name": "specificLocation", "type": "string"}
-        ],
-        "internalType": "struct YogaClassEscrow.Location[3]",
-        "name": "locations",
-        "type": "tuple[3]"
-      },
-      {"internalType": "string", "name": "description", "type": "string"}
+      {"internalType": "string[]", "name": "teacherHandles", "type": "string[]"},
+      {"internalType": "uint64[3]", "name": "timeSlots", "type": "uint64[3]"},
+      {"internalType": "string", "name": "location", "type": "string"},
+      {"internalType": "string", "name": "description", "type": "string"},
+      {"internalType": "string", "name": "studentEmail", "type": "string"},
+      {"internalType": "address", "name": "studentWallet", "type": "address"}
     ],
     "name": "createEscrow",
     "outputs": [{"internalType": "uint256", "name": "escrowId", "type": "uint256"}],
@@ -48,8 +31,8 @@ export function validateContractPayload(payload: ContractBookingPayload): Valida
   const warnings: string[] = []
 
   // Validate teacher handles
-  if (!payload.teacherHandles || payload.teacherHandles.length !== 3) {
-    errors.push('teacherHandles must be an array of exactly 3 strings')
+  if (!payload.teacherHandles || payload.teacherHandles.length < 1 || payload.teacherHandles.length > 3) {
+    errors.push('teacherHandles must be an array of 1-3 strings')
   } else {
     // Check for empty handles
     payload.teacherHandles.forEach((handle, index) => {
@@ -60,65 +43,43 @@ export function validateContractPayload(payload: ContractBookingPayload): Valida
 
     // Check for duplicates
     const uniqueHandles = new Set(payload.teacherHandles)
-    if (uniqueHandles.size !== 3) {
+    if (uniqueHandles.size !== payload.teacherHandles.length) {
       errors.push('teacherHandles must be unique')
     }
   }
 
-  // Validate yoga types
-  if (!payload.yogaTypes || payload.yogaTypes.length !== 3) {
-    errors.push('yogaTypes must be an array of exactly 3 numbers')
-  } else {
-    payload.yogaTypes.forEach((type, index) => {
-      const numType = Number(type)
-      if (isNaN(numType) || numType < 0 || numType > 7) {
-        errors.push(`yogaTypes[${index}] must be a number between 0-7, got: ${type}`)
-      }
-    })
-  }
+  // Yoga types validation removed - no longer used
 
-  // Validate time slots
+  // Validate time slots (now just timestamps)
   if (!payload.timeSlots || payload.timeSlots.length !== 3) {
-    errors.push('timeSlots must be an array of exactly 3 time slot objects')
+    errors.push('timeSlots must be an array of exactly 3 timestamps')
   } else {
-    payload.timeSlots.forEach((slot, index) => {
-      if (!slot.startTime) {
-        errors.push(`timeSlots[${index}].startTime is required`)
-      } else {
-        const startTime = Number(slot.startTime)
-        if (isNaN(startTime) || startTime <= 0) {
-          errors.push(`timeSlots[${index}].startTime must be a valid timestamp, got: ${slot.startTime}`)
-        }
-        if (startTime < Date.now() / 1000) {
-          warnings.push(`timeSlots[${index}].startTime is in the past`)
-        }
+    payload.timeSlots.forEach((timestamp, index) => {
+      const time = Number(timestamp)
+      if (isNaN(time) || time <= 0) {
+        errors.push(`timeSlots[${index}] must be a valid timestamp, got: ${timestamp}`)
       }
-
-      if (!slot.durationMinutes || Number(slot.durationMinutes) <= 0) {
-        errors.push(`timeSlots[${index}].durationMinutes must be a positive number`)
-      }
-
-      if (slot.timezoneOffset === undefined || slot.timezoneOffset === null) {
-        warnings.push(`timeSlots[${index}].timezoneOffset not set, using 0`)
+      if (time < Date.now() / 1000) {
+        warnings.push(`timeSlots[${index}] is in the past`)
       }
     })
   }
 
-  // Validate locations
-  if (!payload.locations || payload.locations.length !== 3) {
-    errors.push('locations must be an array of exactly 3 location objects')
+  // Validate location (now single string)
+  if (!payload.location || payload.location.trim().length === 0) {
+    errors.push('location string is required')
+  }
+
+  // Validate student data
+  if (!payload.student) {
+    errors.push('student data is required')
   } else {
-    payload.locations.forEach((location, index) => {
-      if (!location.country || location.country.trim().length === 0) {
-        errors.push(`locations[${index}].country is empty`)
-      }
-      if (!location.city || location.city.trim().length === 0) {
-        errors.push(`locations[${index}].city is empty`)
-      }
-      if (!location.specificLocation || location.specificLocation.trim().length === 0) {
-        errors.push(`locations[${index}].specificLocation is empty`)
-      }
-    })
+    if (!payload.student.email || payload.student.email.trim().length === 0) {
+      errors.push('student email is required')
+    }
+    if (!payload.student.wallet || payload.student.wallet.trim().length === 0) {
+      errors.push('student wallet address is required')
+    }
   }
 
   // Validate description
@@ -154,10 +115,11 @@ export async function simulateContractCall(
       functionName: 'createEscrow',
       args: [
         payload.teacherHandles,
-        payload.yogaTypes,
         payload.timeSlots,
-        payload.locations,
-        payload.description
+        payload.location,
+        payload.description,
+        payload.student.email,
+        payload.student.wallet as Address
       ]
     })
 
@@ -215,42 +177,17 @@ export function createMinimalValidPayload(): ContractBookingPayload {
 
   return {
     teacherHandles: ['@teacher1', '@teacher2', '@teacher3'],
-    yogaTypes: [0, 1, 2], // Vinyasa, Yin, Hatha
     timeSlots: [
-      {
-        startTime: BigInt(futureTime),
-        durationMinutes: 60,
-        timezoneOffset: 0
-      },
-      {
-        startTime: BigInt(futureTime + 3600),
-        durationMinutes: 90, 
-        timezoneOffset: 0
-      },
-      {
-        startTime: BigInt(futureTime + 7200),
-        durationMinutes: 75,
-        timezoneOffset: 0
-      }
+      BigInt(futureTime),
+      BigInt(futureTime + 3600),
+      BigInt(futureTime + 7200)
     ],
-    locations: [
-      {
-        country: 'USA',
-        city: 'New York',
-        specificLocation: 'Central Park'
-      },
-      {
-        country: 'USA', 
-        city: 'New York',
-        specificLocation: 'Brooklyn Bridge'
-      },
-      {
-        country: 'USA',
-        city: 'New York', 
-        specificLocation: 'Times Square'
-      }
-    ],
+    location: 'Central Park, New York',
     description: 'Test yoga class booking',
-    amount: '0.002'
+    amount: '0.002',
+    student: {
+      email: 'test@example.com',
+      wallet: '0x0000000000000000000000000000000000000001'
+    }
   }
 }

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { usePrivy, useWallets } from '@privy-io/react-auth'
 import { createPublicClient, http, formatEther } from 'viem'
 import { base, baseSepolia } from 'viem/chains'
-import { NETWORK } from '../config/constants'
+import { NETWORK } from '../config'
 
 export interface ETHBalance {
   ethBalance: string // Raw balance in wei

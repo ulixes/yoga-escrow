@@ -2,35 +2,18 @@ import { useState, useCallback } from 'react'
 import { useSendTransaction } from '@privy-io/react-auth'
 import { encodeFunctionData, parseEther, createPublicClient, http, formatEther } from 'viem'
 import { base, baseSepolia } from 'viem/chains'
-import { YOGA_ESCROW_CONTRACT_ADDRESS, CHAIN_ID, NETWORK } from '../config/constants'
+import { YOGA_ESCROW_CONTRACT_ADDRESS, CHAIN_ID, NETWORK } from '../config'
 
-// Contract ABI for createEscrow function
+// Contract ABI for createEscrow function - clean version
 const ESCROW_ABI = [
   {
     "inputs": [
-      {"internalType": "string[3]", "name": "teacherHandles", "type": "string[3]"},
-      {"internalType": "enum YogaClassEscrow.YogaType[3]", "name": "yogaTypes", "type": "uint8[3]"},
-      {
-        "components": [
-          {"internalType": "uint64", "name": "startTime", "type": "uint64"},
-          {"internalType": "uint32", "name": "durationMinutes", "type": "uint32"},
-          {"internalType": "int16", "name": "timezoneOffset", "type": "int16"}
-        ],
-        "internalType": "struct YogaClassEscrow.TimeSlot[3]",
-        "name": "timeSlots",
-        "type": "tuple[3]"
-      },
-      {
-        "components": [
-          {"internalType": "string", "name": "country", "type": "string"},
-          {"internalType": "string", "name": "city", "type": "string"},
-          {"internalType": "string", "name": "specificLocation", "type": "string"}
-        ],
-        "internalType": "struct YogaClassEscrow.Location[3]",
-        "name": "locations",
-        "type": "tuple[3]"
-      },
-      {"internalType": "string", "name": "description", "type": "string"}
+      {"internalType": "string[]", "name": "teacherHandles", "type": "string[]"},
+      {"internalType": "uint64[3]", "name": "timeSlots", "type": "uint64[3]"},
+      {"internalType": "string", "name": "location", "type": "string"},
+      {"internalType": "string", "name": "description", "type": "string"},
+      {"internalType": "string", "name": "studentEmail", "type": "string"},
+      {"internalType": "address", "name": "studentWallet", "type": "address"}
     ],
     "name": "createEscrow",
     "outputs": [{"internalType": "uint256", "name": "escrowId", "type": "uint256"}],
@@ -52,44 +35,15 @@ export const YogaTypeEnum = {
 } as const
 
 export interface ContractBookingPayload {
-  teacherHandles: [string, string, string]
-  yogaTypes: [number, number, number]
-  timeSlots: [
-    {
-      startTime: bigint
-      durationMinutes: number
-      timezoneOffset: number
-    },
-    {
-      startTime: bigint
-      durationMinutes: number
-      timezoneOffset: number
-    },
-    {
-      startTime: bigint
-      durationMinutes: number
-      timezoneOffset: number
-    }
-  ]
-  locations: [
-    {
-      country: string
-      city: string
-      specificLocation: string
-    },
-    {
-      country: string
-      city: string
-      specificLocation: string
-    },
-    {
-      country: string
-      city: string
-      specificLocation: string
-    }
-  ]
+  teacherHandles: string[] // 1-3 teacher handles
+  timeSlots: [bigint, bigint, bigint] // Unix timestamps
+  location: string // Single location string
   description: string
   amount: string // ETH amount as string like "0.01"
+  student: {
+    email: string
+    wallet: string
+  }
 }
 
 export interface ContractState {
@@ -131,10 +85,11 @@ export function useYogaEscrow(ethUsdPrice: number = 3000) {
         functionName: 'createEscrow',
         args: [
           payload.teacherHandles,
-          payload.yogaTypes,
           payload.timeSlots,
-          payload.locations,
-          payload.description
+          payload.location,
+          payload.description,
+          payload.student.email,
+          payload.student.wallet as `0x${string}`
         ]
       })
 
@@ -199,10 +154,11 @@ export function useYogaEscrow(ethUsdPrice: number = 3000) {
         functionName: 'createEscrow',
         args: [
           payload.teacherHandles,
-          payload.yogaTypes,
           payload.timeSlots,
-          payload.locations,
-          payload.description
+          payload.location,
+          payload.description,
+          payload.student.email,
+          payload.student.wallet as `0x${string}`
         ]
       })
 

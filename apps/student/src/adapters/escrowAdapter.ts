@@ -1,51 +1,36 @@
 import { formatEther } from 'viem'
-import type { StudentEscrow } from '@yoga/ui'
+import type { Escrow, ClassStatus } from '@yoga/ui'
 
 const NOT_SELECTED = 255
-const statusMap = ['Created', 'Assigned', 'Completed', 'Cancelled', 'Disputed'] as const
+const statusMap: ClassStatus[] = [0, 1, 2, 3] // Pending, Accepted, Delivered, Cancelled
 
-export function adaptEscrow(raw: any, id: bigint, nowSec: number): StudentEscrow {
+export function adaptEscrow(raw: any, id: bigint, nowSec: number): Escrow {
   const status = statusMap[Number(raw.status)]
-  const selected = {
-    payeeIndex: raw.selectedPayeeIndex !== NOT_SELECTED ? (raw.selectedPayeeIndex as 0 | 1 | 2) : undefined,
-    yogaIndex: raw.selectedYogaIndex !== NOT_SELECTED ? (raw.selectedYogaIndex as 0 | 1 | 2) : undefined,
-    timeIndex: raw.selectedTimeIndex !== NOT_SELECTED ? (raw.selectedTimeIndex as 0 | 1 | 2) : undefined,
-    locationIndex: raw.selectedLocationIndex !== NOT_SELECTED ? (raw.selectedLocationIndex as 0 | 1 | 2) : undefined,
-    handle: raw.selectedHandle?.length ? raw.selectedHandle : undefined,
-  }
-
-  const expiresAt = Number(raw.expiresAt)
-  const isExpired = expiresAt <= nowSec
   const amountWei = BigInt(raw.amount)
-
-  // Map yoga type enum indices to names if names not returned
-  let yogaTypes = (raw as any).yogaTypesNames
-  if (!yogaTypes || yogaTypes.length !== 3) {
-    const yogaNames = ['Vinyasa', 'Yin', 'Hatha', 'Ashtanga', 'Restorative', 'Iyengar', 'Kundalini', 'Power'] as const
-    yogaTypes = ((raw.yogaTypes as number[]) || []).map((i) => yogaNames[i]) as any
-  }
+  const amount = formatEther(amountWei)
+  
+  // Convert time slots from bigint to number (Unix timestamps)
+  const timeSlots = raw.timeSlots ? raw.timeSlots.map((slot: bigint) => Number(slot)) : []
+  
+  // Get selected options (only available when status is Accepted/Delivered)
+  const selectedTimeIndex = raw.selectedTimeIndex !== NOT_SELECTED ? raw.selectedTimeIndex : undefined
+  const selectedHandle = raw.selectedHandle?.length ? raw.selectedHandle : undefined
+  const teacher = raw.teacher !== '0x0000000000000000000000000000000000000000' ? raw.teacher : undefined
 
   return {
-    id,
-    payer: raw.payer,
-    payee: raw.payee !== '0x0000000000000000000000000000000000000000' ? raw.payee : undefined,
-    amountWei,
-    amountEth: formatEther(amountWei),
+    id: Number(id),
+    student: raw.student,
+    teacher,
+    amount,
     status,
     createdAt: Number(raw.createdAt),
-    expiresAt,
+    classTime: raw.classTime > 0 ? Number(raw.classTime) : undefined,
     description: raw.description,
-    teacherHandles: raw.teacherHandles as [string, string, string],
-    yogaTypes: yogaTypes as any,
-    timeSlots: raw.timeSlots,
-    locations: raw.locations,
-    selected,
-    isExpired,
-    timeToExpireMs: Math.max(0, (expiresAt - nowSec) * 1000),
-    canAssign: status === 'Created',
-    canCancel: status === 'Created',
-    canRelease: status === 'Assigned',
-    canDispute: status === 'Assigned',
-    canTriggerAutoRelease: status === 'Assigned' && isExpired,
+    location: raw.location,
+    studentEmail: raw.studentEmail,
+    teacherHandles: raw.teacherHandles || [],
+    timeSlots,
+    selectedTimeIndex,
+    selectedHandle
   }
 }

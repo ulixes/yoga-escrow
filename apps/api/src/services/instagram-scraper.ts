@@ -96,7 +96,7 @@ export class InstagramScraper {
 
   private transformToHotTeacherProfile(
     profile: InstagramProfile,
-    index: number
+    _index: number
   ): HotTeacherProfile {
     const gridImages = profile.latestPosts
       ?.slice(0, 3)

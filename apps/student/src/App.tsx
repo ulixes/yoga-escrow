@@ -11,18 +11,19 @@ import {
   TransactionError,
   NavBar
 } from '@yoga/ui'
-import type { FullJourneyResult, YogaTypeItem, YogaDay, PaymentSummary } from '@yoga/ui'
+import type { FullJourneyResult, YogaTypeItem, YogaDay, PaymentSummary, HotTeacherProfile } from '@yoga/ui'
 import '@yoga/ui/styles.css'
 import { useHeadlessEmailAuth } from './auth'
 import { useBookingFlow } from './hooks/useBookingFlow'
 import { useETHBalance } from './hooks/useETHBalance'
 import { useFundWallet } from './hooks/useFundWallet'
 import { useETHPrice } from './hooks/useETHPrice'
-import { CLASS_PRICE_USD } from './config/constants'
+// CLASS_PRICE_USD removed - now dynamic pricing
 import { History } from './components/History'
 import { ContractDebugger } from './components/ContractDebugger'
 
 export default function App() {
+  // ALL HOOKS MUST BE CALLED BEFORE ANY EARLY RETURNS
   const { ready, authenticated, user, requestCode, confirmCode, logout } = useHeadlessEmailAuth()
   const [showHistory, setShowHistory] = React.useState(false)
   
@@ -49,33 +50,26 @@ export default function App() {
     ethToUSD
   } = useETHPrice()
   
-  // Resilient email extraction for prefill (covers older sessions)
+  // Resilient email extraction for prefill
   const studentEmail = React.useMemo(() => {
     const u: any = user
     console.log('[EMAIL DEBUG] Full user object:', JSON.stringify(u, null, 2))
-    console.log('[EMAIL DEBUG] user.email:', u?.email)
-    console.log('[EMAIL DEBUG] user.emails:', u?.emails)
-    console.log('[EMAIL DEBUG] user.linkedAccounts:', u?.linkedAccounts)
     
     const emailFromAddress = u?.email?.address
-    const emailFromEmails = u?.emails?.[0]?.address
-    const emailFromLinkedAccounts = (u?.linkedAccounts || []).find((a: any) => a?.email)?.email
+    const emailFromString = typeof u?.email === 'string' ? u.email : null
+    const emailFromLinked = u?.linkedAccounts?.find((acc: any) => acc.type === 'email')?.address
     
-    console.log('[EMAIL DEBUG] emailFromAddress:', emailFromAddress)
-    console.log('[EMAIL DEBUG] emailFromEmails:', emailFromEmails)
-    console.log('[EMAIL DEBUG] emailFromLinkedAccounts:', emailFromLinkedAccounts)
-    
-    const finalEmail = emailFromAddress || emailFromEmails || emailFromLinkedAccounts || ''
-    console.log('[EMAIL DEBUG] Final extracted email:', finalEmail)
-    
-    return finalEmail
+    return emailFromAddress || emailFromString || emailFromLinked || ''
   }, [user])
 
+  // Teachers will be fetched from API
+  const [teachers, setTeachers] = React.useState<HotTeacherProfile[]>([])
+  const [teachersLoading, setTeachersLoading] = React.useState(true)
 
-  const { 
+  const {
     step,
-    journeyResult,
     bookingPayload,
+    journeyResult,
     paymentState,
     loading,
     error,
@@ -88,17 +82,84 @@ export default function App() {
     transactionHash,
     escrowId,
     goToStep
-  } = useBookingFlow(studentEmail, walletAddress, ethPrice)
+  } = useBookingFlow(studentEmail, walletAddress, ethPrice, teachers)
+
+  // Fetch teachers from API on mount
+  React.useEffect(() => {
+    const fetchTeachers = async () => {
+      try {
+        setTeachersLoading(true)
+        const response = await fetch('http://localhost:3001/api/teachers/instagram')
+        const result = await response.json()
+        
+        if (result.success && result.data) {
+          setTeachers(result.data)
+        } else {
+          console.error('Failed to fetch teachers:', result.error)
+        }
+      } catch (error) {
+        console.error('Error fetching teachers:', error)
+      } finally {
+        setTeachersLoading(false)
+      }
+    }
+    
+    fetchTeachers()
+  }, [])
+
+  // Calculate days with 24-hour skip logic - MUST be at top to avoid hooks order issues
+  const days: YogaDay[] = React.useMemo(() => {
+    const generateDays = () => {
+      const dayMap: Record<string, number> = {
+        'tue': 2, 'thu': 4, 'sat': 6
+      }
+      const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+      
+      const now = new Date()
+      const tomorrow = new Date(now)
+      tomorrow.setDate(now.getDate() + 1)
+      
+      return ['tue', 'thu', 'sat'].map(dayId => {
+        const targetDay = dayMap[dayId]
+        const currentDay = tomorrow.getDay()
+        
+        // Calculate days until target from tomorrow
+        let daysUntil = targetDay - currentDay
+        if (daysUntil <= 0) {
+          daysUntil += 7 // Next week
+        }
+        
+        const targetDate = new Date(tomorrow)
+        targetDate.setDate(tomorrow.getDate() + daysUntil)
+        
+        const month = monthNames[targetDate.getMonth()]
+        const day = targetDate.getDate()
+        const dayName = dayNames[targetDate.getDay()]
+        
+        return {
+          id: dayId,
+          label: `${month} ${day} - ${dayName}`,
+          times: [
+            { id: '09:00', label: '9:00 AM' },
+            { id: '11:00', label: '11:00 AM' },
+            { id: '18:00', label: '6:00 PM' }
+          ]
+        }
+      })
+    }
+    
+    return generateDays()
+  }, []) // Empty dependency array so it calculates once on mount
 
   // Update payment state when balance changes
   React.useEffect(() => {
     if (step === 'payment' && paymentState && paymentState.isCheckingBalance) {
       console.log('Debug - Triggering payment state update with ETH balance:', ethBalanceFormatted)
-      // Use actual ETH balance from wallet hook
       if (balanceError) {
         updatePaymentState('0', balanceError)
       } else {
-        updatePaymentState(ethBalanceFormatted, undefined, paymentState.gasEstimate) // Use real ETH balance
+        updatePaymentState(ethBalanceFormatted, undefined, paymentState.gasEstimate)
       }
     }
   }, [step, paymentState?.isCheckingBalance, ethBalanceFormatted, balanceError])
@@ -111,6 +172,7 @@ export default function App() {
     }
   }, [step, bookingPayload, walletAddress, paymentState?.gasEstimate, ethBalanceFormatted, estimateGasForBooking])
 
+  // NOW ALL HOOKS ARE DONE - WE CAN DO EARLY RETURNS
   if (!ready) {
     return (
       <div style={{ 
@@ -125,43 +187,24 @@ export default function App() {
     )
   }
 
+  // Simple login gate - if not authenticated, show login
   if (!authenticated) {
     return (
       <div style={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'center', 
-        justifyContent: 'center',
+        fontFamily: 'sans-serif',
         minHeight: '100vh',
-        padding: 24,
-        fontFamily: 'sans-serif'
+        background: '#fafafa',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
       }}>
-        <div style={{ 
-          display: 'grid', 
-          gap: 24, 
-          maxWidth: 440, 
-          width: '100%' 
-        }}>
-          <Brand
-            title="Ulyxes"
-            slogan="Yoga everywhere.. anytime.."
-            subtitle="Move with breath. Find your space."
-            orientation="vertical"
-            size="lg"
-            logoVariant="wave"
-            skin="ulyxes"
-          />
-          <PasswordlessSignup
-            onRequestCode={requestCode}
-            onVerifyCode={confirmCode}
-            onSuccess={() => {}}
-            skin="ulyxes"
-            translations={{
-              enterEmailTitle: 'Sign up or log in',
-              enterEmailDescription: 'Enter your email to get started with Yoga Escrow'
-            }}
-          />
-        </div>
+        <PasswordlessSignup
+          onRequestCode={requestCode}
+          onVerifyCode={confirmCode}
+          skin="ulyxes"
+          title="Sign up or log in"
+          description="Enter your email to get started with Yoga Escrow"
+        />
       </div>
     )
   }
@@ -203,58 +246,26 @@ export default function App() {
     }
   ]
 
-  const days: YogaDay[] = [
-    { id: 'mon', label: 'Monday', times: [
-      { id: '06:00', label: '6:00 AM' },
-      { id: '09:00', label: '9:00 AM' },
-      { id: '11:00', label: '11:00 AM' },
-      { id: '18:00', label: '6:00 PM', sublabel: 'Peak' }
-    ]},
-    { id: 'tue', label: 'Tuesday', times: [
-      { id: '06:00', label: '6:00 AM' },
-      { id: '09:00', label: '9:00 AM' },
-      { id: '11:00', label: '11:00 AM' },
-      { id: '18:00', label: '6:00 PM', sublabel: 'Peak' }
-    ]},
-    { id: 'wed', label: 'Wednesday', times: [
-      { id: '06:00', label: '6:00 AM' },
-      { id: '09:00', label: '9:00 AM' },
-      { id: '11:00', label: '11:00 AM' },
-      { id: '18:00', label: '6:00 PM', sublabel: 'Peak' }
-    ]},
-    { id: 'thu', label: 'Thursday', times: [
-      { id: '06:00', label: '6:00 AM' },
-      { id: '09:00', label: '9:00 AM' },
-      { id: '11:00', label: '11:00 AM' },
-      { id: '18:00', label: '6:00 PM', sublabel: 'Peak' }
-    ]},
-    { id: 'fri', label: 'Friday', times: [
-      { id: '06:00', label: '6:00 AM' },
-      { id: '09:00', label: '9:00 AM' },
-      { id: '17:30', label: '5:30 PM', sublabel: 'Peak' }
-    ]},
-    { id: 'sat', label: 'Saturday', times: [
-      { id: '09:00', label: '9:00 AM' },
-      { id: '10:00', label: '10:00 AM' }
-    ]},
-    { id: 'sun', label: 'Sunday', times: [
-      { id: '09:30', label: '9:30 AM' },
-      { id: '14:00', label: '2:00 PM' }
-    ]}
-  ]
-
   const handleSubmit = (result: FullJourneyResult) => {
-    handleJourneyComplete(result)
+    // handleJourneyComplete(result)
+  }
+
+  const handlePayment = async (result: FullJourneyResult) => {
+    // Complete Payment button clicked - process journey and trigger payment
+    const payload = handleJourneyComplete(result)
+    
+    // Use the returned payload to call confirmPayment immediately
+    if (payload) {
+      await confirmPayment(payload)
+    }
   }
 
   const handlePaymentProceed = async () => {
     if (bookingPayload) {
       try {
         await validatePaymentAndProceed(bookingPayload)
-        // Success state will be handled by the booking flow hook
       } catch (error) {
         console.error('Payment confirmation failed:', error)
-        // Error state will be handled by the booking flow hook
       }
     }
   }
@@ -267,7 +278,10 @@ export default function App() {
     }}>
       <NavBar
         skin="ulyxes"
-        onOpenBookings={() => setShowHistory(!showHistory)}
+        onOpenBookings={() => {
+          console.log('NavBar onOpenBookings clicked, current showHistory:', showHistory)
+          setShowHistory(!showHistory)
+        }}
         onLogout={logout}
         bookingsLabel={showHistory ? "Back to Booking" : "My bookings"}
         logoutLabel="Log out"
@@ -276,12 +290,8 @@ export default function App() {
       {/* History View */}
       {showHistory && (
         <div style={{ maxWidth: 800, margin: '24px auto', padding: '0 24px' }}>
+          <h2>My Bookings</h2>
           <History studentAddress={walletAddress as `0x${string}` | undefined} />
-          
-          {/* Debug panel - only show in development */}
-          {import.meta.env?.MODE === 'development' && (
-            <ContractDebugger />
-          )}
         </div>
       )}
 
@@ -292,6 +302,7 @@ export default function App() {
             yogaTypes={yogaTypes}
             yogaTypePersonas={['runner', 'traveler', 'dancer']}
             days={days}
+            teachers={teachers}
             defaultPersona="Traveler"
             defaultStudentEmail={studentEmail}
             locationProps={{
@@ -300,47 +311,16 @@ export default function App() {
               options: ['Vake Park', 'Lisi Lake', 'Turtle Lake']
             }}
             onSubmit={handleSubmit}
+            onPayment={handlePayment}
             skin="ulyxes"
+            // Authentication already done before journey starts
+            isAuthenticated={true}
+            userEmail={studentEmail}
+            userWallet={walletAddress}
           />
         </div>
       )}
 
-      {/* Payment Step */}
-      {step === 'payment' && !showHistory && journeyResult && bookingPayload && paymentState && (
-        <div style={{ maxWidth: 600, margin: '0 auto', padding: 24 }}>
-          <h2 style={{ marginBottom: 24 }}>Payment</h2>
-          
-          <BalanceDisplay 
-            balanceUSDC={ethToUSD(ethBalanceFormatted)}
-            minimumUSDC={paymentState.totalCostUSD || CLASS_PRICE_USD}
-            skin="ulyxes"
-          />
-          
-          {!paymentState.hasSufficientBalance && (
-            <InsufficientFunds
-              neededUSDC={ethToUSD(paymentState.shortfallAmount)}
-              onAddFunds={fundWallet}
-              onCancel={() => goToStep('journey')}
-              skin="ulyxes"
-            />
-          )}
-          
-          {paymentState.hasSufficientBalance && (
-            <PaymentConfirmation
-              summary={{
-                costUSDC: CLASS_PRICE_USD,
-                currentBalanceUSDC: ethToUSD(ethBalanceFormatted),
-                estimatedGasFeeETH: paymentState.gasEstimate ? parseFloat(paymentState.gasEstimate.gasFeeETH) : undefined,
-                estimatedGasFeeUSD: paymentState.gasEstimate?.gasFeeUSD,
-                totalCostWithGas: paymentState.totalCostUSD
-              }}
-              onConfirm={handlePaymentProceed}
-              onCancel={() => goToStep('journey')}
-              skin="ulyxes"
-            />
-          )}
-        </div>
-      )}
 
       {/* Confirmation Step */}
       {step === 'confirmation' && !showHistory && transactionHash && (
