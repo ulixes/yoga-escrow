@@ -34,6 +34,14 @@ export interface GroupedOpportunity {
   isGroup: boolean // true if more than one student
 }
 
+// Individual student in a class
+export interface ClassStudent {
+  escrowId: number
+  studentAddress: string
+  payout: string // ETH amount
+  status: 'accepted' | 'completed' | 'cancelled' | 'awaiting_release'
+}
+
 // Accepted/confirmed class for teacher's schedule
 export interface AcceptedClass {
   escrowId: number
@@ -44,6 +52,11 @@ export interface AcceptedClass {
   payout: string // ETH amount
   acceptedAt: number // When teacher accepted
   status: 'accepted' | 'completed' | 'cancelled'
+  // Group class properties (optional)
+  isGroup?: boolean
+  students?: ClassStudent[] // Individual students in group
+  totalStudents?: number
+  totalPayout?: string
 }
 
 // UI display models

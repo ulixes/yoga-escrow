@@ -22,26 +22,27 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
  */
 contract YogaClassEscrow is ReentrancyGuard {
     enum ClassStatus {
-        Pending,   // Created, waiting for teacher
-        Accepted,  // Teacher accepted the class
+        Pending, // Created, waiting for teacher
+        Accepted, // Teacher accepted the class
         Delivered, // Class completed, payment released
-        Cancelled  // Student cancelled, refunded
+        Cancelled // Student cancelled, refunded
+
     }
 
     struct Escrow {
-        address student;           // Student who created the escrow
-        address teacher;           // Teacher (set when accepted)
-        uint256 amount;            // Amount in escrow (wei)
-        ClassStatus status;        // Current status
-        uint64 createdAt;          // Creation timestamp
-        uint64 classTime;          // When class happens (from selected slot)
-        string description;        // Class description
-        string location;           // Class location
-        string studentEmail;       // Student contact
-        string[] teacherHandles;   // 1-3 teacher options
-        uint64[3] timeSlots;       // 3 time options (unix timestamps)
-        uint8 selectedTimeIndex;   // Which time was selected (when accepted)
-        string selectedHandle;     // Which teacher was selected
+        address student; // Student who created the escrow
+        address teacher; // Teacher (set when accepted)
+        uint256 amount; // Amount in escrow (wei)
+        ClassStatus status; // Current status
+        uint64 createdAt; // Creation timestamp
+        uint64 classTime; // When class happens (from selected slot)
+        string description; // Class description
+        string location; // Class location
+        string studentEmail; // Student contact
+        string[] teacherHandles; // 1-3 teacher options
+        uint64[3] timeSlots; // 3 time options (unix timestamps)
+        uint8 selectedTimeIndex; // Which time was selected (when accepted)
+        string selectedHandle; // Which teacher was selected
     }
 
     uint8 private constant NOT_SELECTED = 255;
@@ -109,7 +110,7 @@ contract YogaClassEscrow is ReentrancyGuard {
 
         // Validate teacher handles - must have 1-3, no empty strings, no duplicates
         require(teacherHandles.length >= 1 && teacherHandles.length <= 3, "Must have 1-3 teachers");
-        
+
         for (uint8 i = 0; i < teacherHandles.length; i++) {
             if (bytes(teacherHandles[i]).length == 0) revert EmptyHandle();
 
@@ -141,7 +142,7 @@ contract YogaClassEscrow is ReentrancyGuard {
         for (uint8 i = 0; i < teacherHandles.length; i++) {
             escrow.teacherHandles.push(teacherHandles[i]);
         }
-        
+
         // Store time options
         for (uint8 i = 0; i < 3; i++) {
             escrow.timeSlots[i] = timeSlots[i];
@@ -157,15 +158,46 @@ contract YogaClassEscrow is ReentrancyGuard {
      * @param teacherHandle The handle that matches one of the 3 preset handles
      * @param timeIndex Index (0-2) of which time slot to select
      */
-    function acceptClass(
-        uint256 escrowId,
-        string calldata teacherHandle,
-        uint8 timeIndex
-    ) external nonReentrant onlyStatus(escrowId, ClassStatus.Pending) {
+    function acceptClass(uint256 escrowId, string calldata teacherHandle, uint8 timeIndex)
+        external
+        nonReentrant
+        onlyStatus(escrowId, ClassStatus.Pending)
+    {
+        _acceptSingleClass(escrowId, teacherHandle, timeIndex);
+    }
+
+    /**
+     * @notice Teacher accepts multiple classes at once (for group classes)
+     * @dev Batch accept multiple escrows with same handle and time index
+     * @param escrowIds Array of escrow IDs to accept
+     * @param teacherHandle The handle that matches one of the preset handles
+     * @param timeIndex Index (0-2) of which time slot to select for all
+     */
+    function batchAcceptClass(uint256[] calldata escrowIds, string calldata teacherHandle, uint8 timeIndex)
+        external
+        nonReentrant
+    {
+        require(escrowIds.length > 0, "Empty escrow list");
+        require(escrowIds.length <= 20, "Too many escrows"); // Gas limit protection
+
+        for (uint256 i = 0; i < escrowIds.length; i++) {
+            // Check status before accepting
+            if (escrows[escrowIds[i]].status == ClassStatus.Pending) {
+                _acceptSingleClass(escrowIds[i], teacherHandle, timeIndex);
+            }
+        }
+    }
+
+    /**
+     * @notice Internal function to accept a single class
+     * @dev Shared logic for single and batch accept
+     */
+    function _acceptSingleClass(uint256 escrowId, string calldata teacherHandle, uint8 timeIndex) internal {
         require(msg.sender != address(0), "Invalid teacher address");
         if (timeIndex >= 3) revert InvalidTimeIndex();
 
         Escrow storage escrow = escrows[escrowId];
+        require(escrow.status == ClassStatus.Pending, "Not pending");
         require(msg.sender != escrow.student, "Student cannot be teacher");
 
         // Find matching handle
@@ -217,20 +249,15 @@ contract YogaClassEscrow is ReentrancyGuard {
      * @dev Student protection - can cancel anytime unless already delivered/cancelled
      * @param escrowId The ID of the escrow to cancel
      */
-    function cancelClass(uint256 escrowId)
-        external
-        nonReentrant
-        onlyStudent(escrowId)
-    {
+    function cancelClass(uint256 escrowId) external nonReentrant onlyStudent(escrowId) {
         Escrow storage escrow = escrows[escrowId];
-        
+
         // Can only cancel if not already delivered or cancelled
         require(
-            escrow.status != ClassStatus.Delivered && 
-            escrow.status != ClassStatus.Cancelled,
+            escrow.status != ClassStatus.Delivered && escrow.status != ClassStatus.Cancelled,
             "Cannot cancel delivered/cancelled class"
         );
-        
+
         uint256 refundAmount = escrow.amount;
         require(refundAmount > 0, "No funds to refund");
 
@@ -248,11 +275,11 @@ contract YogaClassEscrow is ReentrancyGuard {
      * @dev Only callable by assigned teacher after 24hr grace period
      * @param escrowId The ID of the escrow to auto-release
      */
-    function teacherRelease(uint256 escrowId) 
-        external 
-        nonReentrant 
-        onlyTeacher(escrowId) 
-        onlyStatus(escrowId, ClassStatus.Accepted) 
+    function teacherRelease(uint256 escrowId)
+        external
+        nonReentrant
+        onlyTeacher(escrowId)
+        onlyStatus(escrowId, ClassStatus.Accepted)
     {
         Escrow storage escrow = escrows[escrowId];
 
@@ -274,7 +301,6 @@ contract YogaClassEscrow is ReentrancyGuard {
         emit TeacherAutoRelease(escrowId, teacherAddress, amount);
     }
 
-
     /**
      * @notice Get escrow details
      * @param escrowId The ID of the escrow to query
@@ -292,7 +318,7 @@ contract YogaClassEscrow is ReentrancyGuard {
     function canTeacherRelease(uint256 escrowId) external view returns (bool) {
         Escrow memory escrow = escrows[escrowId];
         if (escrow.status != ClassStatus.Accepted) return false;
-        
+
         uint64 releaseTime = escrow.classTime + (AUTO_RELEASE_HOURS * 3600);
         return block.timestamp >= releaseTime;
     }

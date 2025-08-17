@@ -1,1 +1,1 @@
-{"root":["./src/App.tsx","./src/auth.ts","./src/config.ts","./src/main.tsx","./src/polyfills.ts","./src/privy.tsx","./src/hooks/useETHPrice.ts","./src/hooks/useFundWallet.ts","./src/hooks/useTeacherActions.ts","./src/hooks/useTeacherClassRequests.ts"],"version":"5.9.2"}
+{"root":["./src/App.tsx","./src/auth.ts","./src/config.ts","./src/main.tsx","./src/polyfills.ts","./src/privy.tsx","./src/hooks/useETHPrice.ts","./src/hooks/useFundWallet.ts","./src/hooks/useTeacherActions.ts","./src/hooks/useTeacherClassRequests.ts","./src/hooks/useWalletInfo.ts"],"version":"5.9.2"}

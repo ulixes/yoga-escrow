@@ -1,5 +1,6 @@
 import { formatEther } from 'viem'
-import type { Escrow, ClassStatus } from '@yoga/ui'
+import { ClassStatus } from '@yoga/ui'
+import type { Escrow } from '../types'
 
 const NOT_SELECTED = 255
 const statusMap: ClassStatus[] = [0, 1, 2, 3] // Pending, Accepted, Delivered, Cancelled

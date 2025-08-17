@@ -2876,6 +2876,415 @@
   color: #fff;
 }
 
+/* Group class roster toggle */
+.upcoming-class-card__roster-toggle {
+  background: transparent;
+  border: none;
+  color: #007c33;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 4px 0;
+  text-decoration: underline;
+  transition: opacity 0.2s ease;
+}
+.upcoming-class-card__roster-toggle:hover {
+  opacity: 0.7;
+}
+
+/* Expandable roster section */
+.upcoming-class-card__roster {
+  border-top: 1px solid #e0e0e0;
+  margin-top: 8px;
+  padding-top: 16px;
+}
+.upcoming-class-card__roster-header h4 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #000;
+}
+.upcoming-class-card__roster-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.upcoming-class-card__student-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: #f8f8f8;
+  border-radius: 4px;
+  font-size: 14px;
+}
+.upcoming-class-card__student-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+.upcoming-class-card__student-label {
+  font-weight: 500;
+  color: #000;
+}
+.upcoming-class-card__student-payout {
+  font-size: 12px;
+  color: #555;
+  font-weight: 600;
+}
+.upcoming-class-card__student-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.upcoming-class-card__student-status {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.upcoming-class-card__student-status--accepted {
+  background: #000;
+  color: #fff;
+}
+.upcoming-class-card__student-status--completed {
+  background: #007c33;
+  color: #fff;
+}
+.upcoming-class-card__student-status--cancelled {
+  background: #d32f2f;
+  color: #fff;
+}
+.upcoming-class-card__student-status--awaiting {
+  background: #f59e0b;
+  color: #fff;
+}
+.upcoming-class-card__student-details {
+  background: transparent;
+  border: 1px solid #666;
+  color: #666;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-family: monospace;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.upcoming-class-card__student-details:hover {
+  background: #666;
+  color: #fff;
+}
+
+/* Teacher Wallet Component */
+.teacher-wallet {
+  border: 2px solid #000;
+  background: #fff;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-family: inherit;
+}
+
+.teacher-wallet__header {
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 8px;
+}
+
+.teacher-wallet__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #000;
+}
+
+.teacher-wallet__disconnected {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 0;
+}
+
+.teacher-wallet__status {
+  color: #666;
+  font-size: 14px;
+  font-style: italic;
+}
+
+.teacher-wallet__balance-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.teacher-wallet__balance-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.teacher-wallet__balance-label {
+  color: #555;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.teacher-wallet__balance-value {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.teacher-wallet__eth-amount {
+  color: #000;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.teacher-wallet__fiat-amount {
+  color: #666;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.teacher-wallet__address-section {
+  border-top: 1px solid #f0f0f0;
+  padding-top: 8px;
+}
+
+.teacher-wallet__address-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.teacher-wallet__address-label {
+  color: #555;
+  font-size: 14px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.teacher-wallet__address-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.teacher-wallet__address-short {
+  color: #000;
+  font-size: 13px;
+  font-family: monospace;
+  font-weight: 500;
+}
+
+.teacher-wallet__copy-btn {
+  background: transparent;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 4px;
+  cursor: pointer;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  min-width: 24px;
+  height: 24px;
+}
+
+.teacher-wallet__copy-btn:hover:not(:disabled) {
+  background: #f0f0f0;
+  border-color: #999;
+  color: #000;
+}
+
+.teacher-wallet__copy-btn:disabled {
+  color: #007c33;
+  border-color: #007c33;
+  cursor: default;
+}
+
+.teacher-wallet__actions {
+  border-top: 1px solid #f0f0f0;
+  padding-top: 12px;
+  display: flex;
+  gap: 8px;
+}
+
+.teacher-wallet__action {
+  padding: 8px 12px;
+  border: 2px solid #000;
+  background: transparent;
+  color: #000;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex: 1;
+  text-align: center;
+}
+
+.teacher-wallet__action:hover {
+  background: #000;
+  color: #fff;
+}
+
+.teacher-wallet__action--primary {
+  background: #000;
+  color: #fff;
+}
+
+.teacher-wallet__action--primary:hover {
+  background: #333;
+}
+
+/* Nav menu integration styles */
+.nav-menu-wallet.teacher-wallet {
+  border: none;
+  border-radius: 0;
+  padding: 12px 0;
+  margin: 0 0 8px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.nav-menu-wallet .teacher-wallet__header {
+  border-bottom: none;
+  padding-bottom: 4px;
+}
+
+.nav-menu-wallet .teacher-wallet__title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.nav-menu-wallet .teacher-wallet__actions {
+  border-top: none;
+  padding-top: 8px;
+}
+
+.nav-menu-wallet .teacher-wallet__action {
+  font-size: 12px;
+  padding: 6px 10px;
+}
+
+/* Teacher Wallet Compact (for nav menu) */
+.teacher-wallet-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  padding: 8px 0;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 8px;
+}
+
+.teacher-wallet-compact__disconnected {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 0;
+}
+
+.teacher-wallet-compact__status {
+  color: #666;
+  font-style: italic;
+  font-size: 12px;
+}
+
+.teacher-wallet-compact__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.teacher-wallet-compact__label {
+  color: #555;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.teacher-wallet-compact__balance {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+}
+
+.teacher-wallet-compact__eth {
+  color: #000;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.teacher-wallet-compact__fiat {
+  color: #666;
+  font-size: 11px;
+}
+
+.teacher-wallet-compact__address {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.teacher-wallet-compact__address-text {
+  color: #000;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.teacher-wallet-compact__copy {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  font-size: 11px;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.teacher-wallet-compact__copy:hover:not(:disabled) {
+  opacity: 1;
+}
+
+.teacher-wallet-compact__copy:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
+.teacher-wallet-compact__actions {
+  margin-top: 4px;
+  padding-top: 6px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.teacher-wallet-compact__action {
+  background: transparent;
+  border: 1px solid #666;
+  color: #666;
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.teacher-wallet-compact__action:hover {
+  background: #666;
+  color: #fff;
+}
+
 /* Teacher History Cards */
 .teacher-history-card {
   border: 2px solid #000;

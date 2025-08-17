@@ -1,0 +1,1 @@
+import{j as e}from"./jsx-runtime-CDt2p4po.js";import"./index-GiUgBvb1.js";const s={controls:{expanded:!0},backgrounds:{default:"white",values:[{name:"white",value:"#ffffff"},{name:"dark",value:"#0b1220"}]}},d=[t=>e.jsx("div",{style:{padding:24,display:"grid",placeItems:"start",minHeight:"100vh"},children:e.jsx(t,{})})];export{d as decorators,s as parameters};

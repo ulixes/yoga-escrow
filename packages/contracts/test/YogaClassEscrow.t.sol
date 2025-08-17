@@ -18,7 +18,7 @@ contract YogaClassEscrowTest is Test {
     string constant HANDLE_1 = "@yogamaster";
     string constant HANDLE_2 = "@zenteacher";
     string constant HANDLE_3 = "@vinyasapro";
-    
+
     string constant STUDENT_EMAIL = "student@example.com";
     string constant LOCATION = "Vake Park, Tbilisi";
     string constant DESCRIPTION = "Private yoga class booking";
@@ -37,21 +37,13 @@ contract YogaClassEscrowTest is Test {
         teacherHandles[0] = HANDLE_1;
         teacherHandles[1] = HANDLE_2;
         teacherHandles[2] = HANDLE_3;
-        
-        uint64[3] memory timeSlots = [
-            uint64(block.timestamp + 2 days),
-            uint64(block.timestamp + 3 days), 
-            uint64(block.timestamp + 4 days)
-        ];
+
+        uint64[3] memory timeSlots =
+            [uint64(block.timestamp + 2 days), uint64(block.timestamp + 3 days), uint64(block.timestamp + 4 days)];
 
         vm.prank(student);
         return escrow.createEscrow{value: ESCROW_AMOUNT}(
-            teacherHandles,
-            timeSlots,
-            LOCATION,
-            DESCRIPTION,
-            STUDENT_EMAIL,
-            student
+            teacherHandles, timeSlots, LOCATION, DESCRIPTION, STUDENT_EMAIL, student
         );
     }
 
@@ -112,7 +104,7 @@ contract YogaClassEscrowTest is Test {
 
         YogaClassEscrow.Escrow memory escrowData = escrow.getEscrow(escrowId);
         assertEq(uint8(escrowData.status), uint8(YogaClassEscrow.ClassStatus.Delivered));
-        assertEq(escrowData.amount, 0);
+        assertEq(escrowData.amount, ESCROW_AMOUNT); // Amount kept for history
     }
 
     function test_CancelClass() public {
@@ -127,7 +119,7 @@ contract YogaClassEscrowTest is Test {
 
         YogaClassEscrow.Escrow memory escrowData = escrow.getEscrow(escrowId);
         assertEq(uint8(escrowData.status), uint8(YogaClassEscrow.ClassStatus.Cancelled));
-        assertEq(escrowData.amount, 0);
+        assertEq(escrowData.amount, ESCROW_AMOUNT); // Amount kept for history
     }
 
     function test_TeacherRelease() public {
@@ -179,11 +171,8 @@ contract YogaClassEscrowTest is Test {
         teacherHandles[0] = HANDLE_1;
         teacherHandles[1] = HANDLE_2;
         teacherHandles[2] = HANDLE_3;
-        uint64[3] memory timeSlots = [
-            uint64(block.timestamp + 2 days),
-            uint64(block.timestamp + 3 days),
-            uint64(block.timestamp + 4 days)
-        ];
+        uint64[3] memory timeSlots =
+            [uint64(block.timestamp + 2 days), uint64(block.timestamp + 3 days), uint64(block.timestamp + 4 days)];
 
         vm.prank(student);
         vm.expectRevert(YogaClassEscrow.ZeroAmount.selector);
@@ -195,15 +184,14 @@ contract YogaClassEscrowTest is Test {
         teacherHandles[0] = HANDLE_1;
         teacherHandles[1] = HANDLE_1; // Duplicate HANDLE_1
         teacherHandles[2] = HANDLE_3;
-        uint64[3] memory timeSlots = [
-            uint64(block.timestamp + 2 days),
-            uint64(block.timestamp + 3 days),
-            uint64(block.timestamp + 4 days)
-        ];
+        uint64[3] memory timeSlots =
+            [uint64(block.timestamp + 2 days), uint64(block.timestamp + 3 days), uint64(block.timestamp + 4 days)];
 
         vm.prank(student);
         vm.expectRevert(YogaClassEscrow.DuplicateHandle.selector);
-        escrow.createEscrow{value: ESCROW_AMOUNT}(teacherHandles, timeSlots, LOCATION, DESCRIPTION, STUDENT_EMAIL, student);
+        escrow.createEscrow{value: ESCROW_AMOUNT}(
+            teacherHandles, timeSlots, LOCATION, DESCRIPTION, STUDENT_EMAIL, student
+        );
     }
 
     function test_RevertCreateEscrowWithEmptyHandle() public {
@@ -211,15 +199,14 @@ contract YogaClassEscrowTest is Test {
         teacherHandles[0] = HANDLE_1;
         teacherHandles[1] = ""; // Empty string
         teacherHandles[2] = HANDLE_3;
-        uint64[3] memory timeSlots = [
-            uint64(block.timestamp + 2 days),
-            uint64(block.timestamp + 3 days),
-            uint64(block.timestamp + 4 days)
-        ];
+        uint64[3] memory timeSlots =
+            [uint64(block.timestamp + 2 days), uint64(block.timestamp + 3 days), uint64(block.timestamp + 4 days)];
 
         vm.prank(student);
         vm.expectRevert(YogaClassEscrow.EmptyHandle.selector);
-        escrow.createEscrow{value: ESCROW_AMOUNT}(teacherHandles, timeSlots, LOCATION, DESCRIPTION, STUDENT_EMAIL, student);
+        escrow.createEscrow{value: ESCROW_AMOUNT}(
+            teacherHandles, timeSlots, LOCATION, DESCRIPTION, STUDENT_EMAIL, student
+        );
     }
 
     function test_RevertAcceptClassHandleMismatch() public {
@@ -265,25 +252,25 @@ contract YogaClassEscrowTest is Test {
 
         // Student should be able to cancel even after acceptance (full protection)
         uint256 studentBalanceBefore = student.balance;
-        
+
         vm.prank(student);
         escrow.cancelClass(escrowId);
-        
+
         // Verify refund
         assertEq(student.balance, studentBalanceBefore + ESCROW_AMOUNT);
-        
+
         // Verify escrow status
         YogaClassEscrow.Escrow memory escrowData = escrow.getEscrow(escrowId);
         assertEq(uint8(escrowData.status), uint8(YogaClassEscrow.ClassStatus.Cancelled));
-        assertEq(escrowData.amount, 0);
+        assertEq(escrowData.amount, ESCROW_AMOUNT); // Amount kept for history
     }
-    
+
     function test_RevertCancelClassAfterDelivered() public {
         uint256 escrowId = createSampleEscrow();
 
         vm.prank(teacher1);
         escrow.acceptClass(escrowId, HANDLE_1, 0);
-        
+
         vm.prank(student);
         escrow.releasePayment(escrowId);
 
@@ -324,11 +311,8 @@ contract YogaClassEscrowTest is Test {
         teacherHandles[0] = HANDLE_1;
         teacherHandles[1] = HANDLE_2;
         teacherHandles[2] = HANDLE_3;
-        uint64[3] memory timeSlots = [
-            uint64(block.timestamp + 2 days),
-            uint64(block.timestamp + 3 days),
-            uint64(block.timestamp + 4 days)
-        ];
+        uint64[3] memory timeSlots =
+            [uint64(block.timestamp + 2 days), uint64(block.timestamp + 3 days), uint64(block.timestamp + 4 days)];
 
         vm.prank(student);
         vm.expectRevert(YogaClassEscrow.EmptyLocation.selector);
@@ -340,11 +324,8 @@ contract YogaClassEscrowTest is Test {
         teacherHandles[0] = HANDLE_1;
         teacherHandles[1] = HANDLE_2;
         teacherHandles[2] = HANDLE_3;
-        uint64[3] memory timeSlots = [
-            uint64(block.timestamp + 2 days),
-            uint64(block.timestamp + 3 days),
-            uint64(block.timestamp + 4 days)
-        ];
+        uint64[3] memory timeSlots =
+            [uint64(block.timestamp + 2 days), uint64(block.timestamp + 3 days), uint64(block.timestamp + 4 days)];
 
         vm.prank(student);
         vm.expectRevert(YogaClassEscrow.EmptyEmail.selector);
@@ -438,4 +419,86 @@ contract YogaClassEscrowTest is Test {
         assertEq(escrows[1].amount, ESCROW_AMOUNT);
     }
 
+    function test_BatchAcceptClass() public {
+        // Create 3 escrows for a group class
+        uint256 escrow1 = createSampleEscrow();
+        uint256 escrow2 = createSampleEscrow();
+        uint256 escrow3 = createSampleEscrow();
+
+        // Prepare array of escrow IDs
+        uint256[] memory escrowIds = new uint256[](3);
+        escrowIds[0] = escrow1;
+        escrowIds[1] = escrow2;
+        escrowIds[2] = escrow3;
+
+        // Teacher accepts all 3 at once
+        vm.prank(teacher1);
+        escrow.batchAcceptClass(escrowIds, HANDLE_1, 0);
+
+        // Verify all escrows are accepted
+        YogaClassEscrow.Escrow memory escrowData1 = escrow.getEscrow(escrow1);
+        YogaClassEscrow.Escrow memory escrowData2 = escrow.getEscrow(escrow2);
+        YogaClassEscrow.Escrow memory escrowData3 = escrow.getEscrow(escrow3);
+
+        assertEq(escrowData1.teacher, teacher1);
+        assertEq(escrowData2.teacher, teacher1);
+        assertEq(escrowData3.teacher, teacher1);
+        assertEq(uint8(escrowData1.status), uint8(YogaClassEscrow.ClassStatus.Accepted));
+        assertEq(uint8(escrowData2.status), uint8(YogaClassEscrow.ClassStatus.Accepted));
+        assertEq(uint8(escrowData3.status), uint8(YogaClassEscrow.ClassStatus.Accepted));
+    }
+
+    function test_BatchAcceptClassSkipsNonPending() public {
+        // Create 3 escrows
+        uint256 escrow1 = createSampleEscrow();
+        uint256 escrow2 = createSampleEscrow();
+        uint256 escrow3 = createSampleEscrow();
+
+        // Accept escrow2 individually first
+        vm.prank(teacher1);
+        escrow.acceptClass(escrow2, HANDLE_1, 0);
+
+        // Prepare array with all 3 escrows
+        uint256[] memory escrowIds = new uint256[](3);
+        escrowIds[0] = escrow1;
+        escrowIds[1] = escrow2; // Already accepted
+        escrowIds[2] = escrow3;
+
+        // Batch accept should skip the already accepted one
+        vm.prank(teacher2);
+        escrow.batchAcceptClass(escrowIds, HANDLE_2, 1);
+
+        // Verify escrow1 and escrow3 accepted by teacher2, escrow2 still by teacher1
+        YogaClassEscrow.Escrow memory escrowData1 = escrow.getEscrow(escrow1);
+        YogaClassEscrow.Escrow memory escrowData2 = escrow.getEscrow(escrow2);
+        YogaClassEscrow.Escrow memory escrowData3 = escrow.getEscrow(escrow3);
+
+        assertEq(escrowData1.teacher, teacher2);
+        assertEq(escrowData2.teacher, teacher1); // Still teacher1
+        assertEq(escrowData3.teacher, teacher2);
+        assertEq(uint8(escrowData1.status), uint8(YogaClassEscrow.ClassStatus.Accepted));
+        assertEq(uint8(escrowData2.status), uint8(YogaClassEscrow.ClassStatus.Accepted));
+        assertEq(uint8(escrowData3.status), uint8(YogaClassEscrow.ClassStatus.Accepted));
+    }
+
+    function test_RevertBatchAcceptEmptyArray() public {
+        uint256[] memory emptyArray = new uint256[](0);
+
+        vm.prank(teacher1);
+        vm.expectRevert("Empty escrow list");
+        escrow.batchAcceptClass(emptyArray, HANDLE_1, 0);
+    }
+
+    function test_RevertBatchAcceptTooManyEscrows() public {
+        uint256[] memory tooManyEscrows = new uint256[](21);
+
+        // Just fill with dummy IDs
+        for (uint256 i = 0; i < 21; i++) {
+            tooManyEscrows[i] = i;
+        }
+
+        vm.prank(teacher1);
+        vm.expectRevert("Too many escrows");
+        escrow.batchAcceptClass(tooManyEscrows, HANDLE_1, 0);
+    }
 }

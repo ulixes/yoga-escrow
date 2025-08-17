@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { BookingsList, BookingDetailView } from '@yoga/ui'
+import React from 'react'
+import { BookingsList } from '@yoga/ui'
 import { useEscrowHistory } from '../hooks/useEscrowHistory'
 import { useETHPrice } from '../hooks/useETHPrice'
 import { useSendTransaction } from '@privy-io/react-auth'
@@ -28,7 +28,6 @@ export function History({ studentAddress }: { studentAddress?: `0x${string}` }) 
   const { items, loading, error, refreshData } = useEscrowHistory(studentAddress)
   const { usdPrice: ethPrice } = useETHPrice()
   const { sendTransaction } = useSendTransaction()
-  const [selectedBooking, setSelectedBooking] = useState<number | null>(null)
 
   const handleCancel = async (escrowId: number) => {
     try {
@@ -84,27 +83,6 @@ export function History({ studentAddress }: { studentAddress?: `0x${string}` }) 
     }
   }
 
-  if (selectedBooking !== null) {
-    const booking = items.find(item => item.id === selectedBooking)
-    if (booking) {
-      return (
-        <div style={{ maxWidth: 800, margin: '0 auto', padding: 16 }}>
-          <BookingDetailView
-            booking={booking}
-            ethToUsdRate={ethPrice}
-            onBack={() => setSelectedBooking(null)}
-            onCancel={() => handleCancel(booking.id)}
-            onReleasePayment={() => handleReleasePayment(booking.id)}
-            onViewTransaction={(txHash) => {
-              window.open(`https://sepolia.basescan.org/tx/${txHash}`, '_blank')
-            }}
-            skin="ulyxes"
-          />
-        </div>
-      )
-    }
-  }
-
   return (
     <div style={{ maxWidth: 800, margin: '0 auto', padding: 16 }}>
       <h2>My Bookings</h2>
@@ -113,11 +91,9 @@ export function History({ studentAddress }: { studentAddress?: `0x${string}` }) 
       {!loading && !error && (
         <BookingsList
           bookings={items}
-          ethToUsdRate={ethPrice}
-          onViewDetails={(escrowId) => setSelectedBooking(escrowId)}
+          ethToFiatRate={ethPrice}
           onCancel={handleCancel}
           onReleasePayment={handleReleasePayment}
-          skin="ulyxes"
         />
       )}
     </div>

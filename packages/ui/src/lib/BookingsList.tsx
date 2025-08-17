@@ -8,7 +8,6 @@ export interface BookingsListProps {
   bookings: Escrow[]
   onCancel?: (escrowId: number) => void
   onReleasePayment?: (escrowId: number) => void
-  onViewDetails?: (escrowId: number) => void
   onCreateBooking?: () => void
   fiatCurrency?: string
   ethToFiatRate?: number
@@ -21,14 +20,24 @@ export interface BookingsListProps {
 function applyFilter(bookings: Escrow[], filter: BookingFilter): Escrow[] {
   if (filter === 'all') return bookings
   
-  const statusMap: Record<Exclude<BookingFilter, 'all'>, ClassStatus> = {
-    pending: ClassStatus.Pending,
-    confirmed: ClassStatus.Accepted,
-    completed: ClassStatus.Delivered,
-    cancelled: ClassStatus.Cancelled
-  }
+  const now = Math.floor(Date.now() / 1000)
   
-  return bookings.filter(booking => booking.status === statusMap[filter])
+  return bookings.filter(booking => {
+    switch (filter) {
+      case 'pending':
+        return booking.status === ClassStatus.Pending
+      case 'confirmed':
+        return booking.status === ClassStatus.Accepted || 
+               (booking.status === ClassStatus.Delivered && booking.classTime && booking.classTime > now)
+      case 'completed':
+        return booking.status === ClassStatus.Delivered && 
+               (!booking.classTime || booking.classTime <= now)
+      case 'cancelled':
+        return booking.status === ClassStatus.Cancelled
+      default:
+        return true
+    }
+  })
 }
 
 function applySorting(bookings: Escrow[], sort: BookingSortOption): Escrow[] {
@@ -61,6 +70,8 @@ function getFilterCounts(bookings: Escrow[]) {
     cancelled: 0
   }
   
+  const now = Math.floor(Date.now() / 1000)
+  
   bookings.forEach(booking => {
     switch (booking.status) {
       case ClassStatus.Pending:
@@ -70,7 +81,13 @@ function getFilterCounts(bookings: Escrow[]) {
         counts.confirmed++
         break
       case ClassStatus.Delivered:
-        counts.completed++
+        // Only count as completed if class time has passed
+        if (booking.classTime && booking.classTime <= now) {
+          counts.completed++
+        } else {
+          // Future class with early payment - count as confirmed
+          counts.confirmed++
+        }
         break
       case ClassStatus.Cancelled:
         counts.cancelled++
@@ -85,7 +102,6 @@ export const BookingsList: React.FC<BookingsListProps> = ({
   bookings,
   onCancel,
   onReleasePayment,
-  onViewDetails,
   onCreateBooking,
   fiatCurrency = 'USD',
   ethToFiatRate,
@@ -214,7 +230,6 @@ export const BookingsList: React.FC<BookingsListProps> = ({
                 escrow={booking}
                 onCancel={onCancel}
                 onReleasePayment={onReleasePayment}
-                onViewDetails={onViewDetails}
                 fiatCurrency={fiatCurrency}
                 ethToFiatRate={ethToFiatRate}
                 formatFiat={formatFiat}

@@ -82,7 +82,8 @@ export type { TeacherDiscoveryProps } from './lib/TeacherDiscovery'
 
 // Student Booking Tracking Components
 export { BookingRequestCard } from './lib/BookingRequestCard'
-export type { BookingRequestCardProps, Escrow, ClassStatus } from './lib/BookingRequestCard'
+export type { BookingRequestCardProps } from './lib/BookingRequestCard'
+export { ClassStatus } from './lib/BookingRequestCard'
 export { BookingsList } from './lib/BookingsList'
 export type { BookingsListProps, BookingFilter, BookingSortOption } from './lib/BookingsList'
 export { BookingDetailView } from './lib/BookingDetailView'
@@ -100,5 +101,11 @@ export type { UpcomingClassCardProps } from './lib/UpcomingClassCard'
 export { TeacherOnboarding } from './lib/TeacherOnboarding'
 export type { TeacherOnboardingProps } from './lib/TeacherOnboarding'
 
+// Teacher Wallet Components
+export { TeacherWallet } from './lib/TeacherWallet'
+export type { TeacherWalletProps, WalletInfo } from './lib/TeacherWallet'
+export { TeacherWalletCompact } from './lib/TeacherWalletCompact'
+export type { TeacherWalletCompactProps } from './lib/TeacherWalletCompact'
+
 // Core Types
-export type { Escrow, ClassOpportunity, GroupedOpportunity, AcceptedClass, TeacherDashboardData } from './lib/types'
+export type { Escrow, ClassOpportunity, GroupedOpportunity, AcceptedClass, TeacherDashboardData, ClassStudent } from './lib/types'

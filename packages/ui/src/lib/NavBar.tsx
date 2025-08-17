@@ -10,6 +10,7 @@ export type NavBarProps = {
   showBrand?: boolean
   logo?: React.ReactNode
   logoVariant?: 'none' | 'openCircle' | 'lotus' | 'wave'
+  customMenuContent?: React.ReactNode
   onOpenBookings?: () => void
   onLogout?: () => void
 }
@@ -24,6 +25,7 @@ export const NavBar: React.FC<NavBarProps> = ({
   showBrand = true,
   logo,
   logoVariant = 'wave',
+  customMenuContent,
   onOpenBookings,
   onLogout,
 }) => {
@@ -116,28 +118,32 @@ export const NavBar: React.FC<NavBarProps> = ({
 
           {isOpen ? (
             <div className="yui-nav__menu" role="menu" ref={menuRef}>
-              <button
-                type="button"
-                role="menuitem"
-                className="yui-nav__menu-item"
-                onClick={() => {
-                  setIsOpen(false)
-                  onOpenBookings?.()
-                }}
-              >
-                {bookingsLabel}
-              </button>
-              <button
-                type="button"
-                role="menuitem"
-                className="yui-nav__menu-item yui-nav__menu-item--danger"
-                onClick={() => {
-                  setIsOpen(false)
-                  onLogout?.()
-                }}
-              >
-                {logoutLabel}
-              </button>
+              {customMenuContent || (
+                <>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className="yui-nav__menu-item"
+                    onClick={() => {
+                      setIsOpen(false)
+                      onOpenBookings?.()
+                    }}
+                  >
+                    {bookingsLabel}
+                  </button>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className="yui-nav__menu-item yui-nav__menu-item--danger"
+                    onClick={() => {
+                      setIsOpen(false)
+                      onLogout?.()
+                    }}
+                  >
+                    {logoutLabel}
+                  </button>
+                </>
+              )}
             </div>
           ) : null}
         </div>

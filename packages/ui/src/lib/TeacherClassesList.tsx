@@ -15,7 +15,7 @@ export interface TeacherClassesListProps {
   onAcceptOpportunity?: (opportunityId: string, escrowId: number, timeIndex: number) => void
   onAcceptGroup?: (groupKey: string) => void
   onViewDetails?: (opportunity: GroupedOpportunity) => void
-  onViewClassDetails?: (escrowId: number) => void
+  onViewStudentDetails?: (escrowId: number) => void
   onCancelClass?: (escrowId: number) => void
   fiatCurrency?: string
   ethToFiatRate?: number
@@ -45,7 +45,7 @@ export const TeacherClassesList: React.FC<TeacherClassesListProps> = ({
   onAcceptOpportunity,
   onAcceptGroup,
   onViewDetails,
-  onViewClassDetails,
+  onViewStudentDetails,
   onCancelClass,
   fiatCurrency = 'USD',
   ethToFiatRate,
@@ -116,7 +116,7 @@ export const TeacherClassesList: React.FC<TeacherClassesListProps> = ({
   const sortedUpcomingClasses = useMemo(() => {
     const safeUpcomingClasses = Array.isArray(upcomingClasses) ? upcomingClasses : []
     return safeUpcomingClasses
-      .filter(cls => cls.status === 'accepted') // Only show accepted classes
+      .filter(cls => cls.status === 'accepted' || cls.status === 'completed') // Show accepted and completed (paid early) classes
       .sort((a, b) => a.classTime - b.classTime) // Sort by classTime ascending
   }, [upcomingClasses])
 
@@ -205,7 +205,7 @@ export const TeacherClassesList: React.FC<TeacherClassesListProps> = ({
                   <UpcomingClassCard
                     key={acceptedClass.escrowId}
                     acceptedClass={acceptedClass}
-                    onViewDetails={onViewClassDetails}
+                    onViewStudentDetails={onViewStudentDetails}
                     onCancel={onCancelClass}
                     fiatCurrency={fiatCurrency}
                     ethToFiatRate={ethToFiatRate}
@@ -259,14 +259,6 @@ export const TeacherClassesList: React.FC<TeacherClassesListProps> = ({
                         </div>
                       </div>
 
-                      <div className="teacher-history-card__actions">
-                        <button 
-                          className="teacher-history-card__action"
-                          onClick={() => onViewClassDetails?.(historyClass.escrowId)}
-                        >
-                          View Details
-                        </button>
-                      </div>
                     </div>
                   ))}
               </div>

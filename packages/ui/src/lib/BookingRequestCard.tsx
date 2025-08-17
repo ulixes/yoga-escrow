@@ -28,7 +28,6 @@ export interface BookingRequestCardProps {
   escrow: Escrow
   onCancel?: (escrowId: number) => void
   onReleasePayment?: (escrowId: number) => void
-  onViewDetails?: (escrowId: number) => void
   fiatCurrency?: string
   ethToFiatRate?: number
   formatFiat?: (fiatAmount: number, currency: string) => string
@@ -78,11 +77,17 @@ function formatCountdownToClass(classTime: number): string {
   return 'Class starting soon'
 }
 
-function StatusBadge({ status }: { status: ClassStatus }) {
+function StatusBadge({ status, classTime }: { status: ClassStatus; classTime?: number }) {
+  const now = Math.floor(Date.now() / 1000)
+  const isClassInFuture = classTime && classTime > now
+  
   const statusMap = {
     [ClassStatus.Pending]: { label: 'Waiting for Teacher', color: 'orange' },
     [ClassStatus.Accepted]: { label: 'Class Confirmed', color: 'green' },
-    [ClassStatus.Delivered]: { label: 'Completed', color: 'blue' },
+    [ClassStatus.Delivered]: { 
+      label: isClassInFuture ? 'Payment Sent' : 'Completed', 
+      color: isClassInFuture ? 'green' : 'blue' 
+    },
     [ClassStatus.Cancelled]: { label: 'Cancelled', color: 'gray' }
   }
   
@@ -99,7 +104,6 @@ export const BookingRequestCard: React.FC<BookingRequestCardProps> = ({
   escrow,
   onCancel,
   onReleasePayment,
-  onViewDetails,
   fiatCurrency = 'USD',
   ethToFiatRate,
   formatFiat,
@@ -117,7 +121,7 @@ export const BookingRequestCard: React.FC<BookingRequestCardProps> = ({
   return (
     <div className={classes}>
       <div className="booking-request-card__header">
-        <StatusBadge status={escrow.status} />
+        <StatusBadge status={escrow.status} classTime={escrow.classTime} />
         <div className="booking-request-card__amount">
           {escrow.amount} ETH
           {formattedFiat && <span className="booking-request-card__fiat">({formattedFiat})</span>}
@@ -182,7 +186,10 @@ export const BookingRequestCard: React.FC<BookingRequestCardProps> = ({
               Payment released to {escrow.selectedHandle}
             </div>
             <div className="booking-request-card__completed-info">
-              Class completed on {escrow.classTime && formatTimeFromTimestamp(escrow.classTime)}
+              {escrow.classTime && escrow.classTime > Math.floor(Date.now() / 1000) 
+                ? `Class scheduled for ${formatTimeFromTimestamp(escrow.classTime)}`
+                : `Class completed on ${escrow.classTime && formatTimeFromTimestamp(escrow.classTime)}`
+              }
             </div>
           </div>
         )}
@@ -222,14 +229,6 @@ export const BookingRequestCard: React.FC<BookingRequestCardProps> = ({
             </button>
           </>
         )}
-
-
-        <button 
-          className="booking-request-card__action booking-request-card__action--details"
-          onClick={() => onViewDetails?.(escrow.id)}
-        >
-          View Details
-        </button>
       </div>
     </div>
   )

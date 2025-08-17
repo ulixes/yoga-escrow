@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useRef } from 'react'
 import { createPublicClient, http } from 'viem'
 import { base, baseSepolia } from 'viem/chains'
 import { YOGA_ESCROW_CONTRACT_ADDRESS, NETWORK } from '../config'
-import type { GroupedOpportunity, ClassOpportunity, AcceptedClass } from '@yoga/ui'
+import type { GroupedOpportunity, ClassOpportunity, AcceptedClass, ClassStudent } from '@yoga/ui'
 
 // Contract ABI for reading escrows
 const ESCROW_READ_ABI = [
@@ -157,6 +157,83 @@ function groupOpportunities(opportunities: ClassOpportunity[]): GroupedOpportuni
   return groupedOpportunities
 }
 
+// Transform grouped classes into AcceptedClass objects with group structure
+function createVirtualAcceptedClasses(acceptedClasses: AcceptedClass[]): AcceptedClass[] {
+  const groups = new Map<string, AcceptedClass[]>()
+  
+  console.log('=== GROUPING DEBUG ===')
+  console.log('Input accepted classes:', acceptedClasses.map(cls => ({
+    escrowId: cls.escrowId,
+    location: cls.location,
+    classTime: cls.classTime,
+    payout: cls.payout,
+    description: cls.description
+  })))
+
+  // Group by location-classTime
+  acceptedClasses.forEach(cls => {
+    const groupKey = `${cls.location}-${cls.classTime}`
+    if (!groups.has(groupKey)) {
+      groups.set(groupKey, [])
+    }
+    groups.get(groupKey)!.push(cls)
+  })
+  
+  console.log('Groups after processing:', Array.from(groups.entries()).map(([key, classes]) => ({ 
+    groupKey: key, 
+    count: classes.length, 
+    escrowIds: classes.map(c => c.escrowId),
+    totalPayout: classes.reduce((sum, c) => sum + parseFloat(c.payout), 0)
+  })))
+  
+  // Convert groups to AcceptedClass objects with group properties
+  const virtualClasses: AcceptedClass[] = []
+  
+  groups.forEach((classes) => {
+    if (classes.length === 1) {
+      // Single class - use as-is but ensure it's not marked as group
+      const singleClass = { 
+        ...classes[0],
+        isGroup: false
+      }
+      virtualClasses.push(singleClass)
+    } else {
+      // Group class - create class with students array
+      const totalPayout = classes.reduce((sum, cls) => sum + parseFloat(cls.payout), 0).toFixed(6)
+      
+      // Create ClassStudent objects for each student
+      const students: ClassStudent[] = classes.map(cls => ({
+        escrowId: cls.escrowId,
+        studentAddress: cls.studentAddress,
+        payout: cls.payout,
+        status: cls.status as 'accepted' | 'completed' | 'cancelled' | 'awaiting_release'
+      }))
+      
+      const groupClass: AcceptedClass = {
+        escrowId: classes[0].escrowId, // Primary escrow ID for main callbacks
+        studentAddress: classes[0].studentAddress, // Keep original for compatibility
+        classTime: classes[0].classTime,
+        location: classes[0].location,
+        description: `Group yoga class booking (${classes.length} students)`,
+        payout: totalPayout, // Use total payout for compatibility and display
+        acceptedAt: classes[0].acceptedAt,
+        status: classes[0].status,
+        // Group-specific properties - CRITICAL for UI
+        isGroup: true,
+        students: students,
+        totalStudents: classes.length,
+        totalPayout: totalPayout
+      }
+      
+      console.log('Created group class:', groupClass)
+      virtualClasses.push(groupClass)
+    }
+  })
+  
+  console.log('Final virtual classes:', virtualClasses)
+  return virtualClasses
+}
+
 // Step 4: Extract all classes (accepted, completed, cancelled) for teacher dashboard
 function extractAcceptedClasses(escrows: RawEscrow[], teacherHandle: string): AcceptedClass[] {
   const acceptedClasses: AcceptedClass[] = []
@@ -174,7 +251,7 @@ function extractAcceptedClasses(escrows: RawEscrow[], teacherHandle: string): Ac
     if (!isRelevant) return
     
     // Map status to AcceptedClass status
-    const statusMap = {
+    const statusMap: Record<number, 'accepted' | 'completed' | 'cancelled'> = {
       [ClassStatus.Accepted]: 'accepted' as const,
       [ClassStatus.Delivered]: 'completed' as const,
       [ClassStatus.Cancelled]: 'cancelled' as const
@@ -202,7 +279,7 @@ function extractAcceptedClasses(escrows: RawEscrow[], teacherHandle: string): Ac
 
 export interface TeacherRequestsState {
   opportunities: GroupedOpportunity[]
-  upcomingClasses: AcceptedClass[] // Only accepted classes (future)
+  upcomingClasses: AcceptedClass[] // Only accepted classes (future), transformed for groups
   classHistory: AcceptedClass[] // Completed and cancelled classes (past)
   isLoading: boolean
   error: string | null
@@ -285,16 +362,20 @@ export function useTeacherClassRequests(teacherHandle: string) {
       const allClasses = extractAcceptedClasses(escrows, teacherHandle)
       console.log('Extracted all classes:', allClasses)
       
-      // Separate upcoming (accepted only) from history (completed/cancelled)
+      // Separate upcoming (future classes regardless of payment) from history (past classes)
       const now = Math.floor(Date.now() / 1000)
-      const upcomingClasses = allClasses.filter(cls => 
-        cls.status === 'accepted' && cls.classTime > now
+      const upcomingClassesList = allClasses.filter(cls => 
+        cls.classTime > now && (cls.status === 'accepted' || cls.status === 'completed')
       )
       const classHistory = allClasses.filter(cls => 
-        cls.status === 'completed' || cls.status === 'cancelled'
+        cls.classTime <= now || cls.status === 'cancelled'
       )
       
-      console.log('Upcoming classes:', upcomingClasses)
+      // Transform upcoming classes into virtual classes for UI compatibility
+      const upcomingClasses = createVirtualAcceptedClasses(upcomingClassesList)
+      
+      console.log('Upcoming classes (individual):', upcomingClassesList)
+      console.log('Upcoming classes (virtual/grouped):', upcomingClasses)
       console.log('Class history:', classHistory)
 
       const timestamp = Date.now()

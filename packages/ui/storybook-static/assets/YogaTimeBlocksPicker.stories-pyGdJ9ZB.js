@@ -1,0 +1,10 @@
+import{j as S}from"./jsx-runtime-CDt2p4po.js";import{r as E}from"./index-GiUgBvb1.js";import{Y as f}from"./YogaTimeBlocksPicker-Dp0HS9iO.js";const v={title:"Ulyx/YogaTimeBlocksPicker",component:f};function T(n){const[o,s]=n.split(":").map(c=>parseInt(c,10)),i=new Date;return i.setHours(o,s,0,0),i.toLocaleTimeString(void 0,{hour:"numeric",minute:"2-digit"})}function a(n,o,s=30){const i=t=>{const[u,p]=t.split(":").map(I=>parseInt(I,10));return u*60+p},c=t=>t<10?`0${t}`:String(t),h=[];for(let t=i(n);t<=i(o);t+=s){const u=Math.floor(t/60),p=t%60;h.push(`${c(u)}:${c(p)}`)}return h}function e(n,o){return n.map(s=>({id:s,label:T(s),sublabel:o===s?"Peak":void 0}))}const d=a("05:30","07:00"),r=a("09:00","11:00"),l=a("12:00","13:00"),y=a("17:00","20:00"),k=a("17:00","18:00"),N=[{id:"mon",label:"Monday",times:[...e(d),...e(r),...e(l),...e(y,"18:00")]},{id:"tue",label:"Tuesday",times:[...e(d),...e(r),...e(l),...e(y,"18:00")]},{id:"wed",label:"Wednesday",times:[...e(d),...e(r),...e(l),...e(y,"18:00")]},{id:"thu",label:"Thursday",times:[...e(d),...e(r),...e(l),...e(k,"18:00")]},{id:"fri",label:"Friday",times:[...e(d),...e(r),...e(l),...e(k,"17:30")]},{id:"sat",label:"Saturday",times:e(r)},{id:"sun",label:"Sunday",times:[...e(a("09:30","11:00")),...e(["13:00","14:00","15:00"])]}],m={render:()=>{const[n,o]=E.useState([]);return S.jsx("div",{"data-skin":"ulyxes",style:{maxWidth:560},children:S.jsx(f,{days:N,selectedIds:n,onChange:o,minSelections:3,onDone:s=>alert(`Selected: ${s.join(", ")}`),persona:"runner"})})}};var x,b,g;m.parameters={...m.parameters,docs:{...(x=m.parameters)==null?void 0:x.docs,source:{originalSource:`{
+  render: () => {
+    const [selected, setSelected] = useState<string[]>([]);
+    return <div data-skin="ulyxes" style={{
+      maxWidth: 560
+    }}>
+        <YogaTimeBlocksPicker days={sampleDays} selectedIds={selected} onChange={setSelected} minSelections={3} onDone={ids => alert(\`Selected: \${ids.join(', ')}\`)} persona="runner" />
+      </div>;
+  }
+}`,...(g=(b=m.parameters)==null?void 0:b.docs)==null?void 0:g.source}}};const B=["GroupedBlocks"];export{m as GroupedBlocks,B as __namedExportsOrder,v as default};

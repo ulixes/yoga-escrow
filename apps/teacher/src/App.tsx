@@ -4,13 +4,15 @@ import {
   TeacherOnboarding,
   NavBar,
   TeacherClassesList,
-  PasswordlessSignup
+  PasswordlessSignup,
+  TeacherWalletCompact
 } from '@yoga/ui'
 import '@yoga/ui/styles.css'
 import { useHeadlessEmailAuth } from './auth'
 import { useTeacherClassRequests } from './hooks/useTeacherClassRequests'
 import { useTeacherActions } from './hooks/useTeacherActions'
 import { useETHPrice } from './hooks/useETHPrice'
+import { useWalletInfo } from './hooks/useWalletInfo'
 
 type AppStep = 'onboarding' | 'dashboard'
 
@@ -33,8 +35,14 @@ export default function App() {
   console.log('App - opportunities:', opportunities, 'type:', typeof opportunities)
   console.log('App - upcomingClasses:', upcomingClasses, 'type:', typeof upcomingClasses)
   console.log('App - classHistory:', classHistory, 'type:', typeof classHistory)
-  const { acceptClass, actionState, resetActionState } = useTeacherActions()
+  const { acceptClass, batchAcceptClass, actionState, resetActionState } = useTeacherActions()
   const { ethPrice } = useETHPrice()
+  
+  // Wallet info hook
+  const { walletInfo, ethToFiatRate, isLoading: walletLoading, handleCopyAddress, handleViewFullWallet } = useWalletInfo({
+    walletAddress,
+    ethPrice: ethPrice || undefined
+  })
 
   // Check if teacher has already set their handle and is authenticated
   React.useEffect(() => {
@@ -76,18 +84,21 @@ export default function App() {
 
   const handleAcceptGroup = async (groupKey: string) => {
     try {
-      // Find the group and accept the first opportunity
+      // Find the group and collect all escrow IDs
       const group = opportunities.find(opp => opp.groupKey === groupKey)
       if (!group || group.opportunities.length === 0) {
         throw new Error('Group not found')
       }
       
-      // Accept the first opportunity in the group
-      const firstOpp = group.opportunities[0]
-      await acceptClass({
-        escrowId: firstOpp.escrowId,
+      // Collect all escrow IDs from the group
+      const escrowIds = group.opportunities.map(opp => opp.escrowId)
+      const timeIndex = group.opportunities[0].timeIndex // They should all have the same time
+      
+      // Batch accept all opportunities in the group
+      await batchAcceptClass({
+        escrowIds,
         teacherHandle,
-        timeIndex: firstOpp.timeIndex
+        timeIndex
       })
       
       // Refresh the opportunities list after successful acceptance
@@ -102,15 +113,17 @@ export default function App() {
     // TODO: Implement details modal/view
   }
 
-  const handleViewClassDetails = (escrowId: number) => {
-    console.log('Viewing class details for escrow:', escrowId)
-    // TODO: Implement class details modal/view
+
+  const handleViewStudentDetails = (escrowId: number) => {
+    console.log('Viewing student details for escrow:', escrowId)
+    // TODO: Implement student-specific details modal/view
   }
 
   const handleCancelClass = async (escrowId: number) => {
     console.log('Cancelling class for escrow:', escrowId)
     // TODO: Implement cancel class functionality
-    // This would call a cancelClass function from contract
+    // For group classes, this would cancel the entire group
+    // Individual student cancellations would be handled via handleViewStudentDetails
   }
 
   const handleLogout = () => {
@@ -187,9 +200,33 @@ export default function App() {
       <NavBar
         skin="ulyxes"
         title="Teacher Dashboard"
-        slogan={`Welcome, ${teacherHandle} • ${walletAddress ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}` : 'No wallet'}`}
-        onLogout={handleLogout}
-        logoutLabel="Log out"
+        slogan={`Welcome, ${teacherHandle}`}
+        customMenuContent={
+          <>
+            <TeacherWalletCompact
+              wallet={walletInfo}
+              ethToFiatRate={ethToFiatRate}
+              fiatCurrency="USD"
+              onCopyAddress={handleCopyAddress}
+              onViewFullWallet={handleViewFullWallet}
+            />
+            <button
+              type="button"
+              role="menuitem"
+              className="yui-nav__menu-item"
+            >
+              My Bookings
+            </button>
+            <button
+              type="button"
+              role="menuitem"
+              className="yui-nav__menu-item yui-nav__menu-item--danger"
+              onClick={handleLogout}
+            >
+              Log out
+            </button>
+          </>
+        }
       />
 
       <TeacherClassesList
@@ -200,7 +237,7 @@ export default function App() {
         onAcceptOpportunity={handleAcceptOpportunity}
         onAcceptGroup={handleAcceptGroup}
         onViewDetails={handleViewDetails}
-        onViewClassDetails={handleViewClassDetails}
+        onViewStudentDetails={handleViewStudentDetails}
         onCancelClass={handleCancelClass}
         ethToFiatRate={ethPrice || undefined}
         fiatCurrency="USD"
