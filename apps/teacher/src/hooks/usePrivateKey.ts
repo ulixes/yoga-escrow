@@ -7,8 +7,18 @@ export function usePrivateKey() {
   const [isExporting, setIsExporting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Find Privy embedded wallet
-  const privyWallet = wallets.find(wallet => wallet.walletClientType === 'privy')
+  // Find Privy embedded wallet - check multiple possible types
+  const privyWallet = wallets.find(wallet => 
+    wallet.walletClientType === 'privy' || 
+    (wallet as any).connectorType === 'embedded' ||
+    (wallet as any).type === 'privy'
+  )
+
+  // Debug logging
+  if (process.env.NODE_ENV === 'development') {
+    console.log('usePrivateKey - wallets:', wallets)
+    console.log('usePrivateKey - privyWallet:', privyWallet)
+  }
 
   const exportPrivateKey = useCallback(async () => {
     if (!privyWallet) {

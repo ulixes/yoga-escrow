@@ -22,6 +22,8 @@ export function WithPrivyProvider({ children }: { children: React.ReactNode }) {
         },
         defaultChain: NETWORK === 'base' ? base : baseSepolia,
         supportedChains: NETWORK === 'base' ? [base] : [baseSepolia],
+        // Ensure proper wallet initialization
+        walletConnectCloudProjectId: undefined,
         // We won't render their modal; we'll trigger flows and show our own UI.
       }}
     >
