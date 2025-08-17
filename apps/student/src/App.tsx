@@ -22,6 +22,7 @@ import { useETHPrice } from './hooks/useETHPrice'
 import { History } from './components/History'
 import { ContractDebugger } from './components/ContractDebugger'
 import { WalletSettings } from './components/WalletSettings'
+import { AutoWalletCreator } from './components/AutoWalletCreator'
 import { API_BASE_URL } from './config'
 
 export default function App() {
@@ -286,6 +287,9 @@ export default function App() {
       minHeight: '100vh',
       background: '#fafafa'
     }}>
+      {/* Auto-create wallet when user is authenticated */}
+      <AutoWalletCreator />
+      
       <NavBar
         skin="ulyxes"
         customMenuContent={

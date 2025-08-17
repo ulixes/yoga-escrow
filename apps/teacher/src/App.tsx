@@ -14,6 +14,7 @@ import { useTeacherActions } from './hooks/useTeacherActions'
 import { useETHPrice } from './hooks/useETHPrice'
 import { useWalletInfo } from './hooks/useWalletInfo'
 import { WalletSettings } from './components/WalletSettings'
+import { AutoWalletCreator } from './components/AutoWalletCreator'
 
 type AppStep = 'onboarding' | 'dashboard'
 
@@ -184,6 +185,9 @@ export default function App() {
         alignItems: 'center',
         justifyContent: 'center'
       }}>
+        {/* Auto-create wallet when user is authenticated */}
+        <AutoWalletCreator />
+        
         <TeacherOnboarding
           onComplete={handleOnboardingComplete}
           onSkip={() => handleOnboardingComplete('@teacher')} // fallback
@@ -199,6 +203,9 @@ export default function App() {
       minHeight: '100vh',
       background: '#fafafa'
     }}>
+      {/* Auto-create wallet when user is authenticated */}
+      <AutoWalletCreator />
+      
       <NavBar
         skin="ulyxes"
         title="Teacher Dashboard"

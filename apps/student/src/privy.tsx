@@ -19,6 +19,10 @@ export function WithPrivyProvider({ children }: { children: React.ReactNode }) {
         embeddedWallets: {
           createOnLogin: 'all-users',
           requireUserPasswordOnCreate: false,
+          priceDisplay: {
+            primary: 'fiat-currency',
+            secondary: 'native-token',
+          },
         },
         defaultChain: NETWORK === 'base' ? base : baseSepolia,
         supportedChains: NETWORK === 'base' ? [base] : [baseSepolia],

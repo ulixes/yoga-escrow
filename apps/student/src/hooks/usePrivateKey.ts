@@ -2,9 +2,10 @@ import { useState, useCallback } from 'react'
 import { usePrivy, useWallets } from '@privy-io/react-auth'
 
 export function usePrivateKey() {
-  const { exportWallet } = usePrivy()
+  const { exportWallet, createWallet } = usePrivy()
   const { wallets } = useWallets()
   const [isExporting, setIsExporting] = useState(false)
+  const [isCreating, setIsCreating] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   // Find Privy embedded wallet - check multiple possible types
@@ -19,6 +20,21 @@ export function usePrivateKey() {
     console.log('usePrivateKey - wallets:', wallets)
     console.log('usePrivateKey - privyWallet:', privyWallet)
   }
+
+  const createPrivyWallet = useCallback(async () => {
+    setIsCreating(true)
+    setError(null)
+
+    try {
+      // Use Privy's createWallet method to explicitly create an embedded wallet
+      await createWallet()
+    } catch (err) {
+      console.error('Error creating wallet:', err)
+      setError(err instanceof Error ? err.message : 'Failed to create wallet')
+    } finally {
+      setIsCreating(false)
+    }
+  }, [createWallet])
 
   const exportPrivateKey = useCallback(async () => {
     if (!privyWallet) {
@@ -42,9 +58,11 @@ export function usePrivateKey() {
 
   return {
     isExporting,
+    isCreating,
     error,
     walletAddress: privyWallet?.address,
     exportPrivateKey,
+    createPrivyWallet,
     hasPrivyWallet: !!privyWallet
   }
 }
