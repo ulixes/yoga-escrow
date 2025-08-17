@@ -17,7 +17,8 @@ export function WithPrivyProvider({ children }: { children: React.ReactNode }) {
         },
         loginMethods: ['email'],
         embeddedWallets: {
-          createOnLogin: 'users-without-wallets',
+          createOnLogin: 'all-users',
+          requireUserPasswordOnCreate: false,
         },
         defaultChain: NETWORK === 'base' ? base : baseSepolia,
         supportedChains: NETWORK === 'base' ? [base] : [baseSepolia],
