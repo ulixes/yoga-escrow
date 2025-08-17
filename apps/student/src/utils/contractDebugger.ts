@@ -104,22 +104,10 @@ export async function simulateContractCall(
   fromAddress: Address
 ): Promise<{ success: boolean; error?: string; gasEstimate?: bigint }> {
   try {
-    // HARDCODE Base mainnet for production - same fix as useYogaEscrow
+    // Use environment-based chain configuration
     const publicClient = createPublicClient({
-      chain: {
-        id: 8453,
-        name: 'Base',
-        network: 'base',
-        nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
-        rpcUrls: {
-          default: { http: ['https://mainnet.base.org'] },
-          public: { http: ['https://mainnet.base.org'] }
-        },
-        blockExplorers: {
-          default: { name: 'BaseScan', url: 'https://basescan.org' }
-        }
-      },
-      transport: http('https://mainnet.base.org')
+      chain: NETWORK === 'base' ? base : baseSepolia,
+      transport: http()
     })
 
     // Encode the function call

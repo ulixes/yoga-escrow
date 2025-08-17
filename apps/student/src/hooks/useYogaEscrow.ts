@@ -70,22 +70,10 @@ export function useYogaEscrow(ethUsdPrice: number = 3000) {
     escrowId: null
   })
 
-  // HARDCODE production RPC URL - force Base mainnet for production
+  // Use environment-based chain configuration
   const publicClient = createPublicClient({
-    chain: {
-      id: 8453,
-      name: 'Base',
-      network: 'base',
-      nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
-      rpcUrls: {
-        default: { http: ['https://mainnet.base.org'] },
-        public: { http: ['https://mainnet.base.org'] }
-      },
-      blockExplorers: {
-        default: { name: 'BaseScan', url: 'https://basescan.org' }
-      }
-    },
-    transport: http('https://mainnet.base.org'),
+    chain: NETWORK === 'base' ? base : baseSepolia,
+    transport: http(),
     batch: { multicall: false }
   })
 
