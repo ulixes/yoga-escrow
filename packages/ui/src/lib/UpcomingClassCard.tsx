@@ -203,16 +203,7 @@ export const UpcomingClassCard: React.FC<UpcomingClassCardProps> = ({
         </div>
       )}
 
-      {acceptedClass.status === 'accepted' && !isPastDue && (
-        <div className="upcoming-class-card__actions">
-          <button 
-            className="upcoming-class-card__action upcoming-class-card__action--cancel"
-            onClick={() => onCancel?.(acceptedClass.escrowId)}
-          >
-            Cancel Class
-          </button>
-        </div>
-      )}
+      {/* Cancel functionality temporarily removed */}
     </div>
   )
 }

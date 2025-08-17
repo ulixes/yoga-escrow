@@ -130,9 +130,17 @@ export function useBookingFlow(userEmail?: string, userWalletAddress?: string, e
     const selectedTeachers = teachers.filter(t => result.selectedTeacherIds.includes(t.id))
     console.log('DEBUG - Found selected teachers:', selectedTeachers.map(t => ({ id: t.id, handle: t.handle })))
     
-    const teacherHandles = selectedTeachers.map(t => `@${t.handle}`)
+    const teacherHandles = selectedTeachers.map(t => {
+      // Ensure handle always starts with @
+      const handle = t.handle.startsWith('@') ? t.handle : `@${t.handle}`
+      console.log('DEBUG - Processing teacher handle:', { originalHandle: t.handle, finalHandle: handle })
+      return handle
+    })
+    
+    console.log('DEBUG - Final teacher handles array:', teacherHandles)
 
     // Parse time selections to Unix timestamps
+    console.log('DEBUG - Converting timeIds to timestamps:', result.timeIds)
     const timeSlots = result.timeIds.slice(0, 3).map(timeId => {
       const parts = timeId.split(':')
       if (parts.length !== 3) {
@@ -143,6 +151,8 @@ export function useBookingFlow(userEmail?: string, userWalletAddress?: string, e
       const dayId = parts[0]
       const hours = Number(parts[1])
       const minutes = Number(parts[2])
+      
+      console.log('DEBUG - Parsing timeId:', { timeId, dayId, hours, minutes })
       
       if (isNaN(hours) || isNaN(minutes)) {
         console.error('Invalid time values:', { hours, minutes, timeId })
@@ -156,12 +166,20 @@ export function useBookingFlow(userEmail?: string, userWalletAddress?: string, e
       }
       
       const targetDay = dayMap[dayId]
+      if (targetDay === undefined) {
+        console.error('Unknown dayId:', dayId, 'Available:', Object.keys(dayMap))
+        return Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60)
+      }
+      
       const daysUntilTarget = (targetDay - now.getDay() + 7) % 7 || 7
       const targetDate = new Date(now)
       targetDate.setDate(now.getDate() + daysUntilTarget)
       targetDate.setHours(hours, minutes, 0, 0)
       
-      return Math.floor(targetDate.getTime() / 1000)
+      const timestamp = Math.floor(targetDate.getTime() / 1000)
+      console.log('DEBUG - Calculated timestamp:', { dayId, targetDay, targetDate: targetDate.toISOString(), timestamp })
+      
+      return timestamp
     })
 
     // Ensure we have exactly 3 timestamps

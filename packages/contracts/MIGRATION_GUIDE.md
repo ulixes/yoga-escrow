@@ -1,9 +1,77 @@
-# Migration Guide: EscrowOfferETH → YogaClassEscrow
+# Migration Guide: YogaClassEscrow Security Update
+
+## Critical Security Update - TeacherRegistry Integration
+
+**⚠️ URGENT**: The original YogaClassEscrow contract has a critical vulnerability where any address can impersonate a teacher by providing the correct handle string. This guide covers migrating to the secured version with TeacherRegistry.
 
 ## Overview
-This guide helps developers understand the changes made during the contract refactoring from `EscrowOfferETH.sol` to `YogaClassEscrow.sol`. The refactoring focused on improving code clarity, adding yoga-specific features, and enforcing stricter validation rules.
+This guide covers two migrations:
+1. **CRITICAL**: Security update with TeacherRegistry integration
+2. Historical refactoring from `EscrowOfferETH.sol` to `YogaClassEscrow.sol`
 
-## Major Changes
+## Part 1: Security Migration (CRITICAL)
+
+### The Vulnerability
+In the original implementation, the `acceptClass` function only checks if the provided handle matches one in the escrow:
+```solidity
+// VULNERABLE CODE - DO NOT USE
+if (keccak256(bytes(escrow.teacherHandles[i])) == keccak256(bytes(teacherHandle))) {
+    escrow.teacher = msg.sender; // ANY address can become the teacher!
+}
+```
+
+### The Solution: TeacherRegistry
+The new system requires teachers to be registered in a separate TeacherRegistry contract:
+```solidity
+// SECURE CODE
+address registeredTeacher = teacherRegistry.getTeacherAddress(teacherHandle);
+require(msg.sender == registeredTeacher, "UnauthorizedTeacher");
+```
+
+### Migration Steps
+
+#### Step 1: Deploy New Contracts
+```bash
+cd packages/contracts
+source .env
+./Deploy.sh
+```
+This deploys:
+1. TeacherRegistry (deployed first)
+2. YogaClassEscrow (with registry address)
+
+#### Step 2: Register All Teachers
+```solidity
+// Script to register existing teachers
+registry.registerTeacher("@yogamaster", 0x123...);
+registry.registerTeacher("@zenflow", 0x456...);
+// Register all active teachers
+```
+
+#### Step 3: Update Frontend
+```javascript
+// Update contract addresses
+const REGISTRY_ADDRESS = "0x...new registry...";
+const ESCROW_ADDRESS = "0x...new escrow...";
+
+// No API changes needed - same functions work
+```
+
+#### Step 4: Handle Existing Escrows
+For escrows on the old contract:
+1. **Pending Escrows**: Create new ones on secured contract
+2. **Accepted Escrows**: Let them complete on old contract
+3. **Set Sunset Date**: Stop accepting new escrows on old contract
+
+### Verification Checklist
+- [ ] TeacherRegistry deployed and owner set
+- [ ] All teachers registered with correct addresses
+- [ ] New YogaClassEscrow deployed with registry address
+- [ ] Frontend updated with new addresses
+- [ ] Old contract disabled for new escrows
+- [ ] Users notified of migration
+
+## Part 2: Historical Refactoring Changes
 
 ### 1. Contract Name and Purpose
 - **Old**: `EscrowOfferETH` - Generic escrow contract

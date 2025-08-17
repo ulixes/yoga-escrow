@@ -492,33 +492,36 @@ export function FullJourney(props: FullJourneyProps) {
         )}
           </main>
 
-          <footer className="yui-journey__footer">
-            <button type="button" className="yui-btn yui-journey__back" onClick={handleBack} disabled={step === 1}>Back</button>
-            <button type="button" className="yui-btn yui-journey__next" onClick={() => {
-              if (step === 6) {
-                // Complete Payment clicked - trigger payment flow
-                const result = {
-                  selectedTeacherIds,
-                  persona,
-                  goal,
-                  yogaTypeId: selectedYogaTypeId,
-                  location: location!,
-                  timeIds: selectedTimes,
-                  student: { email: studentEmail.trim(), wallet },
-                  pricing: {
-                    sessionType,
-                    customAmount
+          {/* Hide footer on step 1 - teacher selection handles its own flow */}
+          {step !== (1 as Step) && (
+            <footer className="yui-journey__footer">
+              <button type="button" className="yui-btn yui-journey__back" onClick={handleBack} disabled={step === (1 as Step)}>Back</button>
+              <button type="button" className="yui-btn yui-journey__next" onClick={() => {
+                if (step === 6) {
+                  // Complete Payment clicked - trigger payment flow
+                  const result = {
+                    selectedTeacherIds,
+                    persona,
+                    goal,
+                    yogaTypeId: selectedYogaTypeId,
+                    location: location!,
+                    timeIds: selectedTimes,
+                    student: { email: studentEmail.trim(), wallet },
+                    pricing: {
+                      sessionType,
+                      customAmount
+                    }
                   }
+                  onPayment?.(result)
+                  onSubmit?.(result)
+                } else {
+                  handleNext()
                 }
-                onPayment?.(result)
-                onSubmit?.(result)
-              } else {
-                handleNext()
-              }
-            }} disabled={!canNext}>
-              {step === 5 ? 'Review Payment' : step === 6 ? 'Complete Payment' : 'Next'}
-            </button>
-          </footer>
+              }} disabled={!canNext}>
+                {step === 5 ? 'Review Payment' : step === 6 ? 'Complete Payment' : 'Next'}
+              </button>
+            </footer>
+          )}
         </>
       )}
     </div>

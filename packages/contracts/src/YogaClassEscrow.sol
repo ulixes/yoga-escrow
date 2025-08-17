@@ -3,6 +3,11 @@ pragma solidity ^0.8.26;
 
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
+interface ITeacherRegistry {
+    function getTeacherAddress(string calldata handle) external view returns (address);
+    function isHandleRegistered(string calldata handle) external view returns (bool);
+}
+
 /**
  * @title YogaClassEscrow
  * @author Yoga Escrow Development Team
@@ -47,15 +52,20 @@ contract YogaClassEscrow is ReentrancyGuard {
 
     uint8 private constant NOT_SELECTED = 255;
     uint32 private constant AUTO_RELEASE_HOURS = 24; // Hours after class time teacher can release
+    uint256 private constant PLATFORM_FEE_PERCENT = 10; // 10% platform fee
 
     mapping(uint256 => Escrow) public escrows;
     uint256 public nextEscrowId;
+    
+    ITeacherRegistry public teacherRegistry;
+    address public owner; // Platform owner for fees
 
     event EscrowCreated(uint256 indexed escrowId, address indexed student, uint256 amount);
     event ClassAccepted(uint256 indexed escrowId, address indexed teacher, string teacherHandle, uint8 timeIndex);
     event ClassDelivered(uint256 indexed escrowId, address indexed teacher, uint256 amount);
     event ClassCancelled(uint256 indexed escrowId, address indexed student, uint256 refund);
     event TeacherAutoRelease(uint256 indexed escrowId, address indexed teacher, uint256 amount);
+    event PlatformFeeCollected(uint256 indexed escrowId, address indexed owner, uint256 feeAmount);
 
     error NotStudent();
     error NotTeacher();
@@ -68,6 +78,8 @@ contract YogaClassEscrow is ReentrancyGuard {
     error HandleMismatch();
     error EmptyLocation();
     error EmptyEmail();
+    error UnauthorizedTeacher();
+    error HandleNotRegistered();
 
     modifier onlyStudent(uint256 escrowId) {
         if (msg.sender != escrows[escrowId].student) revert NotStudent();
@@ -82,6 +94,11 @@ contract YogaClassEscrow is ReentrancyGuard {
     modifier onlyStatus(uint256 escrowId, ClassStatus requiredStatus) {
         if (escrows[escrowId].status != requiredStatus) revert InvalidStatus();
         _;
+    }
+
+    constructor(address _registryAddress) {
+        teacherRegistry = ITeacherRegistry(_registryAddress);
+        owner = msg.sender;
     }
 
     /**
@@ -190,7 +207,7 @@ contract YogaClassEscrow is ReentrancyGuard {
 
     /**
      * @notice Internal function to accept a single class
-     * @dev Shared logic for single and batch accept
+     * @dev Shared logic for single and batch accept. VERIFIES SENDER AGAINST REGISTRY.
      */
     function _acceptSingleClass(uint256 escrowId, string calldata teacherHandle, uint8 timeIndex) internal {
         require(msg.sender != address(0), "Invalid teacher address");
@@ -200,7 +217,7 @@ contract YogaClassEscrow is ReentrancyGuard {
         require(escrow.status == ClassStatus.Pending, "Not pending");
         require(msg.sender != escrow.student, "Student cannot be teacher");
 
-        // Find matching handle
+        // Verify the handle is in the escrow's teacher options
         bool handleFound = false;
         for (uint8 i = 0; i < escrow.teacherHandles.length; i++) {
             if (keccak256(bytes(escrow.teacherHandles[i])) == keccak256(bytes(teacherHandle))) {
@@ -209,6 +226,13 @@ contract YogaClassEscrow is ReentrancyGuard {
             }
         }
         if (!handleFound) revert HandleMismatch();
+
+        // Get the official address for the handle from the registry
+        address registeredTeacher = teacherRegistry.getTeacherAddress(teacherHandle);
+        
+        // Verify that the handle is registered and the caller is the registered teacher
+        if (registeredTeacher == address(0)) revert HandleNotRegistered();
+        if (msg.sender != registeredTeacher) revert UnauthorizedTeacher();
 
         // Accept the class
         escrow.teacher = msg.sender;
@@ -232,16 +256,26 @@ contract YogaClassEscrow is ReentrancyGuard {
         onlyStatus(escrowId, ClassStatus.Accepted)
     {
         Escrow storage escrow = escrows[escrowId];
-        uint256 amount = escrow.amount;
+        uint256 totalAmount = escrow.amount;
         address teacherAddress = escrow.teacher;
+
+        // Calculate platform fee (10%)
+        uint256 platformFee = (totalAmount * PLATFORM_FEE_PERCENT) / 100;
+        uint256 teacherAmount = totalAmount - platformFee;
 
         // Keep amount for UI display, just change status
         escrow.status = ClassStatus.Delivered;
 
-        (bool success,) = payable(teacherAddress).call{value: amount}("");
-        require(success, "Payment transfer failed");
+        // Send fee to platform owner
+        (bool feeSuccess,) = payable(owner).call{value: platformFee}("");
+        require(feeSuccess, "Platform fee transfer failed");
 
-        emit ClassDelivered(escrowId, teacherAddress, amount);
+        // Send remaining amount to teacher
+        (bool teacherSuccess,) = payable(teacherAddress).call{value: teacherAmount}("");
+        require(teacherSuccess, "Teacher payment transfer failed");
+
+        emit PlatformFeeCollected(escrowId, owner, platformFee);
+        emit ClassDelivered(escrowId, teacherAddress, teacherAmount);
     }
 
     /**
@@ -289,16 +323,26 @@ contract YogaClassEscrow is ReentrancyGuard {
             revert TooEarlyToRelease();
         }
 
-        uint256 amount = escrow.amount;
+        uint256 totalAmount = escrow.amount;
         address teacherAddress = escrow.teacher;
+
+        // Calculate platform fee (10%)
+        uint256 platformFee = (totalAmount * PLATFORM_FEE_PERCENT) / 100;
+        uint256 teacherAmount = totalAmount - platformFee;
 
         // Keep amount for UI display, just change status
         escrow.status = ClassStatus.Delivered;
 
-        (bool success,) = payable(teacherAddress).call{value: amount}("");
-        require(success, "Teacher release failed");
+        // Send fee to platform owner
+        (bool feeSuccess,) = payable(owner).call{value: platformFee}("");
+        require(feeSuccess, "Platform fee transfer failed");
 
-        emit TeacherAutoRelease(escrowId, teacherAddress, amount);
+        // Send remaining amount to teacher
+        (bool teacherSuccess,) = payable(teacherAddress).call{value: teacherAmount}("");
+        require(teacherSuccess, "Teacher release failed");
+
+        emit PlatformFeeCollected(escrowId, owner, platformFee);
+        emit TeacherAutoRelease(escrowId, teacherAddress, teacherAmount);
     }
 
     /**

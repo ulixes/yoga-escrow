@@ -3,15 +3,18 @@ pragma solidity ^0.8.26;
 
 import "forge-std/Test.sol";
 import "../src/YogaClassEscrow.sol";
+import "../src/TeacherRegistry.sol";
 
 contract YogaClassEscrowTest is Test {
     YogaClassEscrow public escrow;
+    TeacherRegistry public registry;
 
     address student = makeAddr("student");
     address teacher1 = makeAddr("teacher1");
     address teacher2 = makeAddr("teacher2");
     address teacher3 = makeAddr("teacher3");
     address other = makeAddr("other");
+    address registryOwner = makeAddr("registryOwner");
 
     uint256 constant ESCROW_AMOUNT = 0.1 ether;
 
@@ -24,7 +27,20 @@ contract YogaClassEscrowTest is Test {
     string constant DESCRIPTION = "Private yoga class booking";
 
     function setUp() public {
-        escrow = new YogaClassEscrow();
+        // Deploy registry with registryOwner as initial owner
+        vm.prank(registryOwner);
+        registry = new TeacherRegistry(registryOwner);
+        
+        // Deploy escrow with registry address
+        escrow = new YogaClassEscrow(address(registry));
+        
+        // Register teachers in the registry
+        vm.startPrank(registryOwner);
+        registry.registerTeacher(HANDLE_1, teacher1);
+        registry.registerTeacher(HANDLE_2, teacher2);
+        registry.registerTeacher(HANDLE_3, teacher3);
+        vm.stopPrank();
+        
         vm.deal(student, 10 ether);
         vm.deal(teacher1, 1 ether);
         vm.deal(teacher2, 1 ether);
@@ -215,6 +231,27 @@ contract YogaClassEscrowTest is Test {
         vm.prank(teacher1);
         vm.expectRevert(YogaClassEscrow.HandleMismatch.selector);
         escrow.acceptClass(escrowId, "@wronghandle", 0); // Wrong handle
+    }
+
+    function test_RevertAcceptClassHandleNotRegistered() public {
+        uint256 escrowId = createSampleEscrow();
+
+        // Register a new handle that's not in the registry
+        vm.prank(registryOwner);
+        registry.registerTeacher("@newteacher", other);
+
+        vm.prank(other);
+        vm.expectRevert(YogaClassEscrow.HandleMismatch.selector);
+        escrow.acceptClass(escrowId, "@newteacher", 0); // Handle not in escrow options
+    }
+
+    function test_RevertAcceptClassUnauthorizedTeacher() public {
+        uint256 escrowId = createSampleEscrow();
+
+        // Try to accept with correct handle but wrong address
+        vm.prank(other);
+        vm.expectRevert(YogaClassEscrow.UnauthorizedTeacher.selector);
+        escrow.acceptClass(escrowId, HANDLE_1, 0); // other is not registered for HANDLE_1
     }
 
     function test_RevertAcceptClassInvalidTimeIndex() public {

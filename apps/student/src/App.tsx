@@ -253,6 +253,13 @@ export default function App() {
 
   const handlePayment = async (result: FullJourneyResult) => {
     // Complete Payment button clicked - process journey and trigger payment
+    
+    // Ensure teachers data has loaded before proceeding
+    if (teachersLoading || teachers.length === 0) {
+      console.error('Teachers data not loaded yet, please wait...')
+      return
+    }
+    
     const payload = handleJourneyComplete(result)
     
     // Use the returned payload to call confirmPayment immediately
@@ -299,26 +306,38 @@ export default function App() {
       {/* Journey Step */}
       {step === 'journey' && !showHistory && (
         <div style={{ maxWidth: 800, margin: '0 auto' }}>
-          <FullJourney
-            yogaTypes={yogaTypes}
-            yogaTypePersonas={['runner', 'traveler', 'dancer']}
-            days={days}
-            teachers={teachers}
-            defaultPersona="Traveler"
-            defaultStudentEmail={studentEmail}
-            locationProps={{
-              country: 'Georgia',
-              city: 'Tbilisi',
-              options: ['Vake Park', 'Lisi Lake', 'Turtle Lake']
-            }}
-            onSubmit={handleSubmit}
-            onPayment={handlePayment}
-            skin="ulyxes"
-            // Authentication already done before journey starts
-            isAuthenticated={true}
-            userEmail={studentEmail}
-            userWallet={walletAddress}
-          />
+          {teachersLoading ? (
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              minHeight: '50vh',
+              fontFamily: 'sans-serif'
+            }}>
+              Loading teachers...
+            </div>
+          ) : (
+            <FullJourney
+              yogaTypes={yogaTypes}
+              yogaTypePersonas={['runner', 'traveler', 'dancer']}
+              days={days}
+              teachers={teachers}
+              defaultPersona="Traveler"
+              defaultStudentEmail={studentEmail}
+              locationProps={{
+                country: 'Georgia',
+                city: 'Tbilisi',
+                options: ['Vake Park', 'Lisi Lake', 'Turtle Lake']
+              }}
+              onSubmit={handleSubmit}
+              onPayment={handlePayment}
+              skin="ulyxes"
+              // Authentication already done before journey starts
+              isAuthenticated={true}
+              userEmail={studentEmail}
+              userWallet={walletAddress}
+            />
+          )}
         </div>
       )}
 

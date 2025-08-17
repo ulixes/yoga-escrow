@@ -177,8 +177,10 @@ export const createInstagramScraper = (token: string) => {
   return new InstagramScraper(token);
 };
 
+
 export const DEFAULT_YOGA_HANDLES = [
   'yoginastya',
   'vi_zahvatova', 
-  'mila.yoga.balance'
+  'mila.yoga.balance',
+  'ulyx.es'
 ];

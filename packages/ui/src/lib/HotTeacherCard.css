@@ -201,28 +201,53 @@
 .teacher-discovery {
   min-height: 100vh;
   background: #fafafa;
-  padding: 40px 20px;
+  padding: 20px 16px;
 }
 
 .teacher-discovery__header {
   max-width: 1200px;
-  margin: 0 auto 40px;
+  margin: 0 auto 24px;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 16px;
+  text-align: center;
 }
 
 .teacher-discovery__title-section h1 {
-  font-size: 48px;
+  font-size: 28px;
   font-weight: 800;
   margin: 0 0 8px 0;
   color: #111;
+  line-height: 1.2;
 }
 
 .teacher-discovery__title-section p {
-  font-size: 18px;
+  font-size: 16px;
   color: #666;
   margin: 0;
+  line-height: 1.4;
+}
+
+@media (min-width: 768px) {
+  .teacher-discovery {
+    padding: 40px 20px;
+  }
+  
+  .teacher-discovery__header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    text-align: left;
+    margin-bottom: 40px;
+  }
+  
+  .teacher-discovery__title-section h1 {
+    font-size: 48px;
+  }
+  
+  .teacher-discovery__title-section p {
+    font-size: 18px;
+  }
 }
 
 /* View Toggle */
@@ -255,16 +280,38 @@
   max-width: 1200px;
   margin: 0 auto;
   display: grid;
-  gap: 24px;
+  gap: 16px;
 }
 
 .teacher-discovery__content--stack {
-  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  grid-template-columns: 1fr;
 }
 
 .teacher-discovery__content--grid {
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: 1fr;
   gap: 16px;
+}
+
+@media (min-width: 640px) {
+  .teacher-discovery__content--stack {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+  }
+  
+  .teacher-discovery__content--grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .teacher-discovery__content {
+    gap: 24px;
+  }
+  
+  .teacher-discovery__content--stack {
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  }
 }
 
 /* Selection Bar */
@@ -275,29 +322,56 @@
   right: 0;
   background: #fff;
   border-top: 1px solid #e0e0e0;
-  padding: 20px;
+  padding: 16px;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 12px;
   box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
   z-index: 100;
 }
 
 .selection-info {
   display: flex;
-  align-items: center;
-  gap: 20px;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .selection-info .count {
   font-size: 14px;
   font-weight: 600;
   color: #666;
+  text-align: center;
 }
 
 .selected-handles {
   display: flex;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+
+@media (min-width: 640px) {
+  .teacher-discovery__selection-bar {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+  }
+  
+  .selection-info {
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  .selection-info .count {
+    text-align: left;
+  }
+  
+  .selected-handles {
+    justify-content: flex-start;
+    gap: 8px;
+  }
 }
 
 .handle-chip {
@@ -327,7 +401,7 @@
 }
 
 .submit-btn {
-  padding: 12px 32px;
+  padding: 14px 24px;
   background: #111;
   color: #fff;
   border: none;
@@ -336,6 +410,15 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+  width: 100%;
+  text-align: center;
+}
+
+@media (min-width: 640px) {
+  .submit-btn {
+    width: auto;
+    padding: 12px 32px;
+  }
 }
 
 .submit-btn:hover:not(:disabled) {

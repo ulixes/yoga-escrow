@@ -126,7 +126,6 @@ export async function simulateContractCall(
     console.log('Simulating contract call with data:', {
       to: YOGA_ESCROW_CONTRACT_ADDRESS,
       contractAddress: YOGA_ESCROW_CONTRACT_ADDRESS,
-      expectedAddress: '0xc7fefe90aa9f82536dbf6135db5e7280b898f5e6',
       data,
       value: payload.amount
     })
