@@ -11,7 +11,15 @@ const PORT = process.env.PORT || 3001;
 const cache = getCache();
 
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'],
+  origin: [
+    'http://localhost:5173', 
+    'http://localhost:5174', 
+    'http://localhost:5175',
+    'https://stage.ulyxes.xyz',
+    'https://stage.yogie.ulyxes.xyz',
+    'https://ulyxes.xyz',
+    'https://yogie.ulyxes.xyz'
+  ],
   credentials: true
 }));
 
@@ -191,7 +199,7 @@ app.delete('/api/cache/invalidate', (req, res) => {
   }
   
   cache.invalidate(handles);
-  res.json({
+  return res.json({
     success: true,
     message: `Cache invalidated for: ${handles.join(', ')}`,
     timestamp: new Date().toISOString()
