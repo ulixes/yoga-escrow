@@ -21,12 +21,14 @@ import { useETHPrice } from './hooks/useETHPrice'
 // CLASS_PRICE_USD removed - now dynamic pricing
 import { History } from './components/History'
 import { ContractDebugger } from './components/ContractDebugger'
+import { WalletSettings } from './components/WalletSettings'
 import { API_BASE_URL } from './config'
 
 export default function App() {
   // ALL HOOKS MUST BE CALLED BEFORE ANY EARLY RETURNS
   const { ready, authenticated, user, requestCode, confirmCode, logout } = useHeadlessEmailAuth()
   const [showHistory, setShowHistory] = React.useState(false)
+  const [showWalletSettings, setShowWalletSettings] = React.useState(false)
   
   const { 
     ethBalance,
@@ -289,14 +291,52 @@ export default function App() {
         onOpenBookings={() => {
           console.log('NavBar onOpenBookings clicked, current showHistory:', showHistory)
           setShowHistory(!showHistory)
+          setShowWalletSettings(false)
         }}
         onLogout={logout}
         bookingsLabel={showHistory ? "Back to Booking" : "My bookings"}
         logoutLabel="Log out"
       />
 
+      {/* Wallet Settings Button */}
+      <div style={{ 
+        position: 'fixed', 
+        bottom: 20, 
+        right: 20, 
+        zIndex: 100 
+      }}>
+        <button
+          onClick={() => {
+            setShowWalletSettings(!showWalletSettings)
+            setShowHistory(false)
+          }}
+          style={{
+            padding: '10px 16px',
+            backgroundColor: showWalletSettings ? '#6b7280' : '#3b82f6',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontSize: '14px',
+            fontWeight: '500',
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+            transition: 'background-color 0.2s'
+          }}
+        >
+          {showWalletSettings ? 'Close Settings' : '⚙️ Wallet Settings'}
+        </button>
+      </div>
+
+      {/* Wallet Settings View */}
+      {showWalletSettings && (
+        <div style={{ maxWidth: 600, margin: '24px auto', padding: '0 24px' }}>
+          <h2 style={{ marginBottom: '20px' }}>Wallet Settings</h2>
+          <WalletSettings />
+        </div>
+      )}
+
       {/* History View */}
-      {showHistory && (
+      {showHistory && !showWalletSettings && (
         <div style={{ maxWidth: 800, margin: '24px auto', padding: '0 24px' }}>
           <h2>My Bookings</h2>
           <History studentAddress={walletAddress as `0x${string}` | undefined} />
@@ -304,7 +344,7 @@ export default function App() {
       )}
 
       {/* Journey Step */}
-      {step === 'journey' && !showHistory && (
+      {step === 'journey' && !showHistory && !showWalletSettings && (
         <div style={{ maxWidth: 800, margin: '0 auto' }}>
           {teachersLoading ? (
             <div style={{ 
@@ -343,7 +383,7 @@ export default function App() {
 
 
       {/* Confirmation Step */}
-      {step === 'confirmation' && !showHistory && transactionHash && (
+      {step === 'confirmation' && !showHistory && !showWalletSettings && transactionHash && (
         <div style={{ maxWidth: 600, margin: '0 auto', padding: 24 }}>
           <TransactionConfirmation
             transactionHash={transactionHash}
@@ -358,7 +398,7 @@ export default function App() {
       )}
       
       {/* Error State */}
-      {error && step === 'payment' && !showHistory && (
+      {error && step === 'payment' && !showHistory && !showWalletSettings && (
         <div style={{ maxWidth: 600, margin: '0 auto', padding: 24 }}>
           <TransactionError
             error={error}
