@@ -1,0 +1,40 @@
+import { useState, useCallback } from 'react'
+import { usePrivy, useWallets } from '@privy-io/react-auth'
+
+export function usePrivateKey() {
+  const { exportWallet } = usePrivy()
+  const { wallets } = useWallets()
+  const [isExporting, setIsExporting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  // Find Privy embedded wallet
+  const privyWallet = wallets.find(wallet => wallet.walletClientType === 'privy')
+
+  const exportPrivateKey = useCallback(async () => {
+    if (!privyWallet) {
+      setError('No Privy wallet found')
+      return
+    }
+
+    setIsExporting(true)
+    setError(null)
+
+    try {
+      // Use Privy's built-in export modal - this will open a modal with the private key
+      await exportWallet({ address: privyWallet.address })
+    } catch (err) {
+      console.error('Error exporting private key:', err)
+      setError(err instanceof Error ? err.message : 'Failed to export private key')
+    } finally {
+      setIsExporting(false)
+    }
+  }, [privyWallet, exportWallet])
+
+  return {
+    isExporting,
+    error,
+    walletAddress: privyWallet?.address,
+    exportPrivateKey,
+    hasPrivyWallet: !!privyWallet
+  }
+}

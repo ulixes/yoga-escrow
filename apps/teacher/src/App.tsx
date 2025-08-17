@@ -13,12 +13,14 @@ import { useTeacherClassRequests } from './hooks/useTeacherClassRequests'
 import { useTeacherActions } from './hooks/useTeacherActions'
 import { useETHPrice } from './hooks/useETHPrice'
 import { useWalletInfo } from './hooks/useWalletInfo'
+import { WalletSettings } from './components/WalletSettings'
 
 type AppStep = 'onboarding' | 'dashboard'
 
 export default function App() {
   const [step, setStep] = React.useState<AppStep>('onboarding')
   const [teacherHandle, setTeacherHandle] = React.useState<string>('')
+  const [showWalletSettings, setShowWalletSettings] = React.useState(false)
 
   // Authentication hooks
   const { ready, authenticated, user, requestCode, confirmCode, logout } = useHeadlessEmailAuth()
@@ -220,6 +222,14 @@ export default function App() {
             <button
               type="button"
               role="menuitem"
+              className="yui-nav__menu-item"
+              onClick={() => setShowWalletSettings(!showWalletSettings)}
+            >
+              {showWalletSettings ? 'Hide Settings' : '⚙️ Wallet Settings'}
+            </button>
+            <button
+              type="button"
+              role="menuitem"
               className="yui-nav__menu-item yui-nav__menu-item--danger"
               onClick={handleLogout}
             >
@@ -229,19 +239,30 @@ export default function App() {
         }
       />
 
-      <TeacherClassesList
-        opportunities={opportunities}
-        upcomingClasses={upcomingClasses}
-        classHistory={classHistory}
-        teacherHandle={teacherHandle}
-        onAcceptOpportunity={handleAcceptOpportunity}
-        onAcceptGroup={handleAcceptGroup}
-        onViewDetails={handleViewDetails}
-        onViewStudentDetails={handleViewStudentDetails}
-        onCancelClass={handleCancelClass}
-        ethToFiatRate={ethPrice || undefined}
-        fiatCurrency="USD"
-      />
+      {/* Wallet Settings View */}
+      {showWalletSettings && (
+        <div style={{ maxWidth: 600, margin: '24px auto', padding: '0 24px' }}>
+          <h2 style={{ marginBottom: '20px' }}>Wallet Settings</h2>
+          <WalletSettings />
+        </div>
+      )}
+
+      {/* Teacher Classes List - hide when showing wallet settings */}
+      {!showWalletSettings && (
+        <TeacherClassesList
+          opportunities={opportunities}
+          upcomingClasses={upcomingClasses}
+          classHistory={classHistory}
+          teacherHandle={teacherHandle}
+          onAcceptOpportunity={handleAcceptOpportunity}
+          onAcceptGroup={handleAcceptGroup}
+          onViewDetails={handleViewDetails}
+          onViewStudentDetails={handleViewStudentDetails}
+          onCancelClass={handleCancelClass}
+          ethToFiatRate={ethPrice || undefined}
+          fiatCurrency="USD"
+        />
+      )}
     </div>
   )
 }

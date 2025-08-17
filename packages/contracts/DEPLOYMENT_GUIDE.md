@@ -44,6 +44,16 @@ forge script script/DeployRegistry.s.sol --rpc-url https://mainnet.base.org --br
 forge script script/DeployEscrow.s.sol --rpc-url https://mainnet.base.org --broadcast --verify
 ```
 
+```bash
+PRIVATE_KEY=0xYOUR_PRIVATE_KEY \
+ETHERSCAN_API_KEY=YOUR_ETHERSCAN_API_KEY \
+TEACHER_REGISTRY_ADDRESS=0xFC0daa9D632c705Fe4d8280E71B07FE498F909D5 \
+forge script script/DeployRegistry.s.sol \
+  --rpc-url https://mainnet.base.org \
+  --broadcast \
+  --verify
+```
+
 ## Teacher Management
 
 ### Register Teacher

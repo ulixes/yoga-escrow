@@ -11,7 +11,7 @@ fi
 
 HANDLE="$1"
 ADDRESS="$2"
-source .env.staging
+source .env.prod
 
 echo "Registering teacher: $HANDLE -> $ADDRESS"
 
