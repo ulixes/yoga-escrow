@@ -10,7 +10,7 @@ export default defineConfig({
     }
   },
   preview: {
-    allowedHosts: ['stage.ulyxes.xyz', 'localhost']
+    allowedHosts: ['stage.ulyxes.xyz', 'yoga.ulyxes.xyz', 'localhost']
   },
   optimizeDeps: {
     include: ['buffer']

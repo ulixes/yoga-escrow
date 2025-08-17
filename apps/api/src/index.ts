@@ -17,7 +17,7 @@ app.use(cors({
     'http://localhost:5175',
     'https://stage.ulyxes.xyz',
     'https://stage.yogie.ulyxes.xyz',
-    'https://ulyxes.xyz',
+    'https://yoga.ulyxes.xyz',
     'https://yogie.ulyxes.xyz'
   ],
   credentials: true

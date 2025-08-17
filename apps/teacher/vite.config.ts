@@ -5,7 +5,7 @@ export default defineConfig({
   plugins: [react()],
   server: { port: 5173 },
   preview: {
-    allowedHosts: ['stage.yogie.ulyxes.xyz', 'localhost']
+    allowedHosts: ['stage.yogie.ulyxes.xyz', 'yogie.ulyxes.xyz', 'localhost']
   },
 })
 

@@ -1,5 +1,7 @@
 import { PrivyProvider } from '@privy-io/react-auth'
 import React from 'react'
+import { base, baseSepolia } from 'viem/chains'
+import { NETWORK } from './config'
 
 const appId = (import.meta as any).env.VITE_PRIVY_APP_ID as string
 const clientId = (import.meta as any).env.VITE_PRIVY_CLIENT_ID as string
@@ -18,6 +20,8 @@ export const WithPrivyProvider = ({ children }: { children: React.ReactNode }) =
           createOnLogin: 'all-users',
           requireUserPasswordOnCreate: false,
         },
+        defaultChain: NETWORK === 'base' ? base : baseSepolia,
+        supportedChains: NETWORK === 'base' ? [base] : [baseSepolia],
       }}
     >
       {children}

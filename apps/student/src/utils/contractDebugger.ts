@@ -1,6 +1,6 @@
 import { createPublicClient, http, encodeFunctionData, type Address } from 'viem'
-import { baseSepolia } from 'viem/chains'
-import { YOGA_ESCROW_CONTRACT_ADDRESS } from '../config'
+import { base, baseSepolia } from 'viem/chains'
+import { YOGA_ESCROW_CONTRACT_ADDRESS, NETWORK } from '../config'
 import type { ContractBookingPayload } from '../hooks/useYogaEscrow'
 
 const ESCROW_ABI = [
@@ -104,9 +104,22 @@ export async function simulateContractCall(
   fromAddress: Address
 ): Promise<{ success: boolean; error?: string; gasEstimate?: bigint }> {
   try {
+    // HARDCODE Base mainnet for production - same fix as useYogaEscrow
     const publicClient = createPublicClient({
-      chain: baseSepolia,
-      transport: http()
+      chain: {
+        id: 8453,
+        name: 'Base',
+        network: 'base',
+        nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+        rpcUrls: {
+          default: { http: ['https://mainnet.base.org'] },
+          public: { http: ['https://mainnet.base.org'] }
+        },
+        blockExplorers: {
+          default: { name: 'BaseScan', url: 'https://basescan.org' }
+        }
+      },
+      transport: http('https://mainnet.base.org')
     })
 
     // Encode the function call

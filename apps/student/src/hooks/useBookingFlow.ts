@@ -3,7 +3,7 @@ import type { FullJourneyResult } from '@yoga/ui'
 import { hasSufficientBalance, calculateShortfall } from '../utils/walletUtils'
 import { useYogaEscrow, type ContractBookingPayload, type GasEstimate } from './useYogaEscrow'
 import { YOGA_ESCROW_CONTRACT_ADDRESS } from '../config'
-import { validateContractPayload, simulateContractCall } from '../utils/contractDebugger'
+import { validateContractPayload } from '../utils/contractDebugger'
 
 // Contract enums matching Solidity
 export enum YogaType {
@@ -406,17 +406,7 @@ export function useBookingFlow(userEmail?: string, userWalletAddress?: string, e
         console.warn('Payload validation warnings:', validation.warnings)
       }
 
-      // Simulate the contract call before sending real transaction
-      console.log('Simulating contract call with address:', YOGA_ESCROW_CONTRACT_ADDRESS)
-      const simulation = await simulateContractCall(contractPayload, userWalletAddress as `0x${string}`)
-      console.log('Contract simulation result:', simulation)
-
-      if (!simulation.success) {
-        const errorMessage = `Contract simulation failed: ${simulation.error}`
-        console.error(errorMessage)
-        setState(prev => ({ ...prev, loading: false, error: errorMessage }))
-        return
-      }
+      // Skip simulation - let Privy handle all transaction validation and funding
 
       console.log('Creating escrow with validated payload:', contractPayload)
 
