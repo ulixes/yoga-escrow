@@ -21,6 +21,7 @@ import { useETHPrice } from './hooks/useETHPrice'
 // CLASS_PRICE_USD removed - now dynamic pricing
 import { History } from './components/History'
 import { ContractDebugger } from './components/ContractDebugger'
+import { API_BASE_URL } from './config'
 
 export default function App() {
   // ALL HOOKS MUST BE CALLED BEFORE ANY EARLY RETURNS
@@ -89,7 +90,7 @@ export default function App() {
     const fetchTeachers = async () => {
       try {
         setTeachersLoading(true)
-        const response = await fetch('http://localhost:3001/api/teachers/instagram')
+        const response = await fetch(`${API_BASE_URL}/api/teachers/instagram`)
         const result = await response.json()
         
         if (result.success && result.data) {
